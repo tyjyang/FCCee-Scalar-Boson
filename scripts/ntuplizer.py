@@ -43,7 +43,7 @@ for entry in chain:
 		ntuple_muon.Fill(i, muon.PT, muon.Eta, muon.Phi)
 	i = i + 1
 
-output = ROOT.TFile('ntuple.root', 'recreate')
+output = ROOT.TFile('../ntuples/ntuple.root', 'recreate')
 ntuple_electron.Write()
 ntuple_muon.Write()
 output.Close()
