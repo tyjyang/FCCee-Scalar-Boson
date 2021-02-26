@@ -6,7 +6,7 @@ muon_mass = 0.10566
 COME = 91 # center of mass energy for e+e- collision
 E_res = 1 # energy resolution for histograms
 
-filename = "ntuple.root"
+filename = "../ntuples/ntuple.root"
 
 rootfile = ROOT.TFile.Open(filename)
 key1 = 'lepton_inv_m'
@@ -23,10 +23,12 @@ recoil_m = ROOT.TH1D(key2, key2, 20, 0, 10)
 
 iev_prev = 0
 num_of_electrons = 0
-electron_pt = []
+#electron_pt = getattr(rootfile, "electron")
+electron_pt = [getattr(entries, "electron_pt") for entries in getattr(rootfile, "electron")]
+print electron_pt
 electron_eta = []
 electron_phi = []
-
+'''
 for entries in rootfile.electron:
 	iev = entries.iev
 	# move to next particle within an event
@@ -105,3 +107,4 @@ inv_m.Draw()
 c.cd(2)
 recoil_m.Draw()
 c.SaveAs("../plots/canvas.pdf")
+'''
