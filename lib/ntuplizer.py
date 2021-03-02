@@ -5,17 +5,17 @@ import ROOT
 import numpy as np
 
 '''
---------------------
-Parameters
---------------------
+====================
+Parameters         
+====================
 NONE
---------------------
+====================
 Routine
---------------------
+====================
 # load the local delphes lobrary into ROOT
---------------------
+====================
 Output
---------------------
+====================
 NONE
 '''
 
@@ -25,20 +25,20 @@ def load_delphes():
 	
 
 '''
---------------------
+====================
 Parameters
---------------------
+====================
 * (str) or list(str) variables: the variables to be converted to the 
                                 delphes format, must be COMMA-SEPARATED
---------------------
+====================
 Routine
---------------------
+====================
 * make variables into a list of strings
 * capitalize every string
 * deal with special instances such as 'PT' instead of 'Pt' for delphes
---------------------
+====================
 Output
---------------------
+====================
 * [(str)] Variables: the delphes-formatted variables
 '''
 def variables_to_delphes_format(variables):
@@ -51,26 +51,124 @@ def variables_to_delphes_format(variables):
 	return Variables
 
 '''
---------------------
+====================
 Parameters
---------------------
+====================
 * (float) eta: the pseudorapidity
---------------------
+====================
 Routine
---------------------
+====================
 * calculate the forward angle theta 
---------------------
+====================
 Output
---------------------
+====================
 * (float) theta: the forward angle 
 '''
 def calculate_theta(eta):
 	return 2 * np.arctan(np.exp(-1 * eta))
 
 '''
---------------------
+====================
 Parameters
---------------------
+====================
+* (float) phi1: the azimuthal angle of the first particle
+* (float) phi2: the azimuthla angle of teh second particle
+====================
+Routine
+====================
+* calculate the acoplanarity angle betwen the 2 particles
+====================
+Output
+====================
+* (float) phi_a: the acoplanarity angle
+'''
+def calculate_acoplanarity(phi1, phi2):
+	return np.pi - np.absolute(phi1 - phi2)
+
+'''
+====================
+Parameters
+====================
+* (float) theta1: the forward angle of the first particle
+* (float) theta2: the forward angle of the second particle
+====================
+Routine
+====================
+* calculate the acolinearity angle betwen the 2 particles
+====================
+Output
+====================
+* (float) theta_a: the acolinearity angle
+'''
+def calculate_acolinearity(theta1, theta2):
+	return np.pi - np.absolute(theta1 - theta2)
+
+'''
+====================
+Parameters
+====================
+* (float) pt: the transverse momentum of the particle
+* (float) eta: the pseudorapidity of the particle
+* (float) phi: the azimuthal angle of the particle
+* (float) m: the mass of the particle
+====================
+Routine
+====================
+* store the 4-momentum of a particle into a ROOT.TLorentzVector object
+====================
+Output
+====================
+* (ROOT.TLorentzVector) p4: the 4-momentum in PtEtaPhiM
+'''
+
+def to_pt_eta_phi_m(pt, eta, phi, m):
+	p4 = ROOT.TLorentzVector(0,0,0,0)
+	p4.SetPtEtaPhiM(pt, eta, phi, m)
+	return p4
+
+'''
+====================
+Parameters
+====================
+* (ROOT.TLorentzVector) p4_1: the 4-momentum of the first particle in 
+                              (pt, eta, phi, m)
+* (ROOT.TLorentzVector) p4_2: the 4-momentum of the second particle in 
+                              (pt, eta, phi, m)
+====================
+Routine
+====================
+* add up the 2 4-momenta and get mass by .M() 
+====================
+Output
+====================
+* (float) inv_m: the invariant mass
+'''
+def calculate_inv_m(p4_1, p4_2):
+	return (p4_1 + p4_2).M()
+
+'''
+====================
+Parameters
+====================
+* (float) 
+* (float) theta1: the forward angle of the first particle
+* (float) theta2: the forward angle of the second particle
+====================
+Routine
+====================
+* calculate the acolinearity angle betwen the 2 particles
+====================
+Output
+====================
+* (float) theta_a: the acolinearity angle
+'''
+def calculate_recoil_m(s, p4_1, p4_2):
+	return np.pi - np.absolute(theta1 - theta2)
+
+'''
+====================
+Parameters
+====================
 * (TObject) event: the delphes event object to look at
 * (str) particle: the particle type to be selected in the final state
 * (str) or list(str) variables: the variable based on which one makes the 
@@ -79,15 +177,15 @@ Parameters
 * (str) or list(str) criteria: the criteria to select particles based on 
                                their variable
                                Must be COMMA-SEPARATED when passed as str
---------------------
+====================
 Routine
---------------------
+====================
 * within each event, look at the variables of a type of particles
 * according to the criteria on each varialbe, select the pair of 
   particle from that type
---------------------
+====================
 Output
---------------------
+====================
 * list(int) [i, j]: The indices of the selected pair of particles 
                     if all conditions are satisfied
 * int 0: if the number of candidates is less than two, or if no pair
@@ -159,24 +257,24 @@ def select_fs_particle_pair(event, particle, variables, criteria):
 
 
 '''
---------------------
+====================
 Parameters
---------------------
+====================
 * (str) delphes_path: the path to the delphes file to be ntuplized
 * (dict) particle_variable: the dictionary specifying which 
 		 variables are to be extracted from each particle.
 		 e.g. particle_variable = {"electron":["pt", "eta", "phi"]}
---------------------
+====================
 Routine
---------------------
+====================
 # checks if file with that informaiton already exists
 #- if yes, return message
 #- if no, produce the requested ntuple file
 	# put each particle into one root TNtuple object
 	# write the root file with TNtuple objects only 
---------------------
+====================
 Output
---------------------
+====================
 # message indicating file already exist
 OR
 # a TFile with only TNtuple objects
