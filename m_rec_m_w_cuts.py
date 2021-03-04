@@ -93,10 +93,12 @@ for file in [rootfile1, rootfile2, rootfile3]:
 				pair = lep1 + lep2
 				inv_m = pair.M()
 				pt = pair.Pt()
-				acpl = np.pi - (muon_phi[i_max] - muon_phi[i_second_max])
-				theta1 = np.cos( 2 * np.arctan(np.exp(-muon_eta[i_max])))
-				theta2 = np.cos( 2 * np.arctan(np.exp(-muon_eta[i_second_max])))
-				theta = calculate_theta(pair.Eta())
+				dphi = abs(muon_phi[i_max] - muon_phi[i_second_max])
+				while dphi > np.pi:
+					dphi = abs(dphi - 2.0 * np.pi)
+				acpl = np.pi - dphi
+				costheta1 = np.cos( 2 * np.arctan(np.exp(-muon_eta[i_max])))
+				costheta2 = np.cos( 2 * np.arctan(np.exp(-muon_eta[i_second_max])))
 				rec_m = COME ** 2 + pair.M() ** 2 - 2 * COME * pair.E()
 				if rec_m > 0:
 					recoil_m = (np.sqrt(abs(COME ** 2 + pair.M() ** 2 - 2 * COME * pair.E())))
@@ -105,7 +107,7 @@ for file in [rootfile1, rootfile2, rootfile3]:
 				abp1 = muon_pt[i_max] * np.cosh(muon_eta[i_max])
 				abp2 = muon_pt[i_second_max] * np.cosh(muon_eta[i_second_max])
 				if (inv_m > 30):
-					if (acpl > 0.15) and (theta1 < 0.90) and (theta2 < 0.95) and (abp1 > 27) and (abp2 > 25):
+					if (acpl > 0.15) and (costheta1 < 0.90) and (costheta2 < 0.95) and (abp1 > 27) and (abp2 > 25):
 						if file == rootfile1:
 							rec_m_s.Fill(recoil_m, (3.0 /10)*weight_factor(luminosity, xsec1, nevents_s))
 							sig_events += 1
@@ -134,21 +136,21 @@ for file in [rootfile1, rootfile2, rootfile3]:
 			muon_phi = [entries.muon_phi]
 
 #efficiency of cuts
-uncut_bkg = (float(uncut_bkg_2) * (3.0/10) * float(weight_factor(luminosity, xsec2, nevents_b))) + (float(uncut_bkg_4) * (3.0/10) * float(weight_factor(luminosity, xsec3, nevents_b)))
-total_bkg = (float(total_bkg_2) * (3.0/10) * float(weight_factor(luminosity, xsec2, nevents_b))) + (float(total_bkg_4) * (3.0/10) * float(weight_factor(luminosity, xsec3, nevents_b)))
-effs = float(sig_events) / float(total_signal)
-effb = uncut_bkg / total_bkg 
+#uncut_bkg = (float(uncut_bkg_2) * (3.0/10) * float(weight_factor(luminosity, xsec2, nevents_b))) + (float(uncut_bkg_4) * (3.0/10) * float(weight_factor(luminosity, xsec3, nevents_b)))
+#total_bkg = (float(total_bkg_2) * (3.0/10) * float(weight_factor(luminosity, xsec2, nevents_b))) + (float(total_bkg_4) * (3.0/10) * float(weight_factor(luminosity, xsec3, nevents_b)))
+#effs = float(sig_events) / float(total_signal)
+#effb = uncut_bkg / total_bkg 
 
 print len(rec_m_s)
 print len(rec_m_b_2)
 print len(rec_m_b_4)
 
-print sig_events
-print total_signal
-print uncut_bkg
-print total_bkg
-print effs
-print effb
+#print sig_events
+#print total_signal
+#print uncut_bkg
+#print total_bkg
+#print effs
+#print effb
 
 rec_m_s.SetLineColor(ROOT.kRed)
 rec_m_s.SetMinimum(0)
