@@ -44,8 +44,8 @@ OUTPUT ------------------------------------------------------------------------
 |* (float) phi_a: the acoplanarity angle
 +------------------------------------------------------------------------------
 '''
-def calculate_acoplanarity(phi1, phi2):
-	return np.pi - np.absolute(phi1 - phi2)
+def calculate_acoplanarity(phi_1, phi_2):
+	return np.pi - np.absolute(phi_1 - phi_2)
 
 ''' 
 INPUT -------------------------------------------------------------------------
@@ -59,8 +59,28 @@ OUTPUT ------------------------------------------------------------------------
 |* (float) theta_a: the acolinearity angle
 +------------------------------------------------------------------------------
 '''
-def calculate_acolinearity(theta1, theta2):
-	return np.pi - np.absolute(theta1 - theta2)
+def calculate_acolinearity(theta_1, theta_2):
+	return np.pi - np.absolute(theta_1 - theta_2)
+
+
+'''
+INPUT --------------------------------------------------------------------
+|* (float) theta_1: the forward angle of the first lepton
+|* (float) theta_2: the forward angle of the second lepton
+|* (float) phi_1: the azimuthal angle of the first lepton
+|* (float) phi_2: the azimuthal angle of the second lepton
+ROUTINE ------------------------------------------------------------------
+|* take the average of the sin of the 2 leptons
+|* call calculate_acoplanarity(), and weigh it by the average of the sins
+| 
+OUTPUT -------------------------------------------------------------------
+|* (float) the modified acoplanarity
++------------------------------------------------------------------------- 
+''' 
+def calculate_mod_acoplanarity(theta_1, theta_2, phi_1, phi_2):
+	w = 0.5 * (np.sin(theta_1) + np.sin(theta_2))
+	phi_a = calculate_acoplanarity(phi_1, phi_2)
+	return w * phi_a
 
 '''
 INPUT -------------------------------------------------------------------------
@@ -70,13 +90,14 @@ INPUT -------------------------------------------------------------------------
 |* (float) m: the mass of the particle
 |
 ROUTINE -----------------------------------------------------------------------
-|* store the 4-momentum of a particle into a ROOT.TLorentzVector object
+|* store the 4-momentum of a particle into a ROOT.TLorentzVector object 
+|  with format (pt, eta, phi, m)
 |
 OUTPUT ------------------------------------------------------------------------
 |* (ROOT.TLorentzVector) p4: the 4-momentum in PtEtaPhiM
 +------------------------------------------------------------------------------
 '''
-def to_pt_eta_phi_m(pt, eta, phi, m):
+def to_TLorentzVector(pt, eta, phi, m):
 	p4 = ROOT.TLorentzVector(0,0,0,0)
 	p4.SetPtEtaPhiM(pt, eta, phi, m)
 	return p4
@@ -100,19 +121,27 @@ def calculate_inv_m(p4_1, p4_2):
 
 '''
 INPUT -------------------------------------------------------------------------
-|* (float) 
-|* (float) theta1: the forward angle of the first particle
-|* (float) theta2: the forward angle of the second particle
+|* (float) s: the square of the COM energy
+|* (ROOT.TLorentzVector) p4_1: the 4-momentum of the first particle
+|* (ROOT.TLorentzVector) p4_2: the 4-momentum of the second particle
 |
 ROUTINE -----------------------------------------------------------------------
-|* calculate the acolinearity angle betwen the 2 particles
+|* add the two p4 up
+|* calculate the m_rec squared using s, and m and E of the di-particle system
+|* if m_rec >= 0, take sqrt 
+|* if m_rec < 0, take negative of sqrt(-m_rec^2)
 |
 OUTPUT ------------------------------------------------------------------------
-|* (float) theta_a: the acolinearity angle
+|* (float) the mass of the recoiling particle
 +------------------------------------------------------------------------------
 '''
 def calculate_recoil_m(s, p4_1, p4_2):
-	return np.pi - np.absolute(theta1 - theta2)
+	p4_sum = p4_1 + p4_2
+	E_ll = p4_sum.E()
+	m_ll = p4_sum.M()
+	m_rec_sq = s + m_ll ^ 2 - 2 * np.sqrt(s) * E_ll
+	if m_rec_sq < 0: return -np.sqrt(-m_rec_sq)
+	else: return np.sqrt(m_rec_sq)
 
 '''
 INPUT -------------------------------------------------------------------------

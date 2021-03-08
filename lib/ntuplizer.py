@@ -6,7 +6,8 @@ import numpy as np
 from helper import *
 
 '''
-INPUT -------------------------------------------------------------------------   |* (str) path_delphes_file: the path to the delphes file to be loaded
+INPUT -------------------------------------------------------------------------   
+|* (str) path_delphes_file: the path to the delphes file to be loaded
 |* list(str) particles: the list of particle trees to be loaded
 |
 ROUTINE -----------------------------------------------------------------------
