@@ -34,7 +34,7 @@ INPUT -------------------------------------------------------------------------
 |* (str) or list(str) variables: the variables to be converted to the 
 |                                delphes format, must be COMMA-SEPARATED
 |
-ROUTINE ------------------------------------------------------------------------
+ROUTINE -----------------------------------------------------------------------
 |* make variables into a list of strings
 |* capitalize every string
 |* deal with special instances such as 'PT' instead of 'Pt' for delphes

@@ -64,18 +64,18 @@ def calculate_acolinearity(theta_1, theta_2):
 
 
 '''
-INPUT --------------------------------------------------------------------
+INPUT -------------------------------------------------------------------------
 |* (float) theta_1: the forward angle of the first lepton
 |* (float) theta_2: the forward angle of the second lepton
 |* (float) phi_1: the azimuthal angle of the first lepton
 |* (float) phi_2: the azimuthal angle of the second lepton
-ROUTINE ------------------------------------------------------------------
+ROUTINE -----------------------------------------------------------------------
 |* take the average of the sin of the 2 leptons
 |* call calculate_acoplanarity(), and weigh it by the average of the sins
 | 
-OUTPUT -------------------------------------------------------------------
+OUTPUT ------------------------------------------------------------------------
 |* (float) the modified acoplanarity
-+------------------------------------------------------------------------- 
++------------------------------------------------------------------------------ 
 ''' 
 def calculate_mod_acoplanarity(theta_1, theta_2, phi_1, phi_2):
 	w = 0.5 * (np.sin(theta_1) + np.sin(theta_2))
