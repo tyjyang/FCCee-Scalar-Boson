@@ -1,0 +1,12 @@
+## particle variable names to be used in scripts
+- "pt"
+- "eta"
+- "phi"
+- "charge"
+- "energy"
+- "theta"
+- "phi_a"
+- "alpha"
+- "cos_theta"
+- "m_inv"
+- "m_rec"

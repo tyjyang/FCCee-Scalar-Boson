@@ -4,18 +4,105 @@ import numpy as np
 
 '''
 INPUT -------------------------------------------------------------------------
-|* NONE
+|* (str) string: the string to be converted to list
 |
 ROUTINE -----------------------------------------------------------------------
-|* load the local delphes lobrary into ROOT
+|* converts a string to a string element in a list
 |
 OUTPUT ------------------------------------------------------------------------
-|* NONE
+|* (float) string: the list-lized string
 +------------------------------------------------------------------------------
 '''
-def load_delphes_lib():
-	ROOT.gSystem.Load("libDelphes.so")
-	ROOT.gInterpreter.Declare('#include "classes/DelphesClasses.h"');
+def to_list_of_string(string):
+	if type(string) == str:
+		string = string.split(",") # separate by ",", not commonly found in str
+		return string
+	elif type(string) == list:
+		return string
+	else:
+		sys.exit(("to_list_of_string(string): cannot convert an inpit that is"
+                  "neither a single string or a list of strings"))  
+
+'''
+INPUT -------------------------------------------------------------------------
+|* (str) or list(str) variables: the list of variables of interest in lowercase
+|                                must be COMMA-SEPARATED when passed in as str
+|  
+ROUTINE -----------------------------------------------------------------------
+|* select out the variables that can be found in delphes, pu them into list(str)
+|* put the rest into another list(str)
+| 
+OUTPUT ------------------------------------------------------------------------
+|* list(str) delphes_variables: the list of variables already in delphes
+|* list(str) calc_variables: the list of variables need to be calculated
++------------------------------------------------------------------------------ 
+''' 
+def sep_var_into_delphes_calculated(variables):
+	variables = to_list_of_string(variables)
+	delphes_variable_list = ["pt", "eta", "phi", "charge", "energy"] 
+	delphes_variables = []
+	calc_variables = []
+	for variable in variables:
+		if (variable in delphes_variable_list):
+			delphes_variables.append(variable)
+		else:
+			calc_variables.append(variable)
+	return delphes_variables, calc_variables
+
+'''
+INPUT -------------------------------------------------------------------------
+|* (str) or list(str) variables: the lowercase variables to be converted to the 
+|                                delphes format, must be COMMA-SEPARATED
+|                                and contained in the delphes sample
+|
+ROUTINE -----------------------------------------------------------------------
+|* make variables into a list of strings
+|* capitalize every string
+|* deal with special instances such as 'PT' instead of 'Pt' for delphes
+|
+OUTPUT ------------------------------------------------------------------------
+|* list(str) Variables: the delphes-formatted variables
++------------------------------------------------------------------------------
+'''
+def variables_to_delphes_format(variables):
+	variables = to_list_of_string(variables)
+	Variables = [variable.capitalize() for variable in variables]
+	for i, Variable in enumerate(Variables):
+		if Variable == 'Pt' or Variable == u'Pt':
+			Variables[i] = 'PT'
+		if Variable == 'Energy':
+			Variables[i] = 'E'
+	return Variables
+
+'''
+INPUT -------------------------------------------------------------------------
+|* (str) delphes_file_path: the full absolute path to the delphes file
+|* (dict) particle_variable: particles are in the keys, with values of 
+|                            their corresponding variables in an array
+|                            of strings. e.g. {"electron":["pt", "eta", "phi"]}  
+ROUTINE -----------------------------------------------------------------------
+|* get rid of everything before the last "/" and the file suffix
+|* append the ntuple column content after the delphes file name 
+|* in format ":particle1_var1_var2-particle2_var1_var2"
+|* 
+OUTPUT ------------------------------------------------------------------------
+|* (str) the full filename of the ntuple file
++------------------------------------------------------------------------------ 
+''' 
+def get_ntuple_filename(delphes_file_path, particle_variable):
+	delphes_file = delphes_path.split("/")[-1] # get rid of path
+	delphes_file = delphes_file.split(".")[0]  # get rid of file suffix
+	ntuple_content = delphes_file + ':'
+	variable_separator = '_'
+	particles = particle_variable.keys()
+
+	for particle in sorted(particles):
+		variables = list(particle_variable[particle])
+		ntuple_content += particle + "_" + variable_separator.join(variables)
+		if particle != sorted(particles)[-1]: # use "-" btwn particles
+			ntuple_content += "-"
+
+	return ntuple_content + '.root'
 
 '''
 INPUT -------------------------------------------------------------------------
@@ -145,22 +232,12 @@ def calculate_recoil_m(s, p4_1, p4_2):
 
 '''
 INPUT -------------------------------------------------------------------------
-|* (str) string: the string to be converted to list
-|
+|* 
+|  
 ROUTINE -----------------------------------------------------------------------
-|* converts a string to a string element in a list
-|
+|* 
+| 
 OUTPUT ------------------------------------------------------------------------
-|* (float) string: the list-lized string
-+------------------------------------------------------------------------------
-'''
-
-def to_list_of_string(string):
-	if type(string) == str:
-		string = string.split(",") # separate by ",", not commonly found in str
-		return string
-	elif type(string) == list:
-		return string
-	else:
-		sys.exit(("to_list_of_string(string): cannot convert an inpit that is"
-                  "neither a single string or a list of strings"))  
+|* 
++------------------------------------------------------------------------------ 
+''' 
