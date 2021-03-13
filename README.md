@@ -1,4 +1,4 @@
-# Setuo
+# Setup
 To use this repo,
 ```bash
 git clone https://github.com/tyjyang/FCCee-Scalar-Boson
