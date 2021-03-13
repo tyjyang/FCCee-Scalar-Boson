@@ -36,18 +36,25 @@ single out one variable for selection.
 We use snake-case for all particle variables in our code. In order to access
 variable data in delphes, we have to convert variables in our case to the 
 delphes format. 
-## 
-- "pt"
-- "eta"
-- "phi"
-- "charge"
-- "energy"
-- "theta"
-- "phi_a"
-- "alpha"
-- "cos_theta"
-- "m_inv"
-- "m_rec"
+## variable calculation
+To calculate the variables on demand, we call the calculation functions in
+`lib/helper.py`. The functions are called by the dictionary `calc_var_func_call`
+where it links the variable name to its calculation function. Arguments of the
+functions are linked to the variable name in another dict `calc_var_func_args`.
+## Variable options
+- delphes
+    - "pt"
+    - "eta"
+    - "phi"
+    - "charge"
+    - "energy"
+- calculated
+    - "theta"
+    - "phi_a"
+    - "alpha"
+    - "cos_theta"
+    - "m_inv"
+    - "m_rec"
 
 # Selection
 ## Criteria
