@@ -35,7 +35,6 @@ OUTPUT ------------------------------------------------------------------------
 |                       for evt in chain: particle_tree = evt.Particle
 +------------------------------------------------------------------------------
 '''
-
 def load_delphes_file(delphes_file_path, particles):
 	chain = ROOT.TChain("Delphes")
 	chain.Add(delphes_file_path)
@@ -47,14 +46,82 @@ def load_delphes_file(delphes_file_path, particles):
 '''
 INPUT -------------------------------------------------------------------------
 |* (TObject) event: the delphes event object to look at
-|* (str) particle: the particle type to be selected in the final state
-|* (str) or list(str) variables: the variable based on which one makes the 
-|                                selection.
-|                                Must be COMMA-SEPARATED when passed as str
-|* (str) or list(str) criteria: 
+|* (str) particle: the particle to be used for the veto
+|* (str) var: the variable of that particle to be used for the veto
+|* (str) threshold: The condition, when satisfied, vetos the event
+|                   takes the form {quantifier inequaility critical_val uint}
+|                   e.g. threshold = "highest > 10 GeV"
+|* (np.array) *candidates: the array of particle indices from previous selection
+|             - if nothing passed, then loop over all the candidates in the evt
+|             - if there are preselcted candidates, look over those
+|                                                   candidates in the evt only
+|             - if 0, return 0
+|  
+ROUTINE -----------------------------------------------------------------------
+|* parse the threshold string into quantifier, inequality, critical_val
+|* fetch the particle value with event.particle[quantifier].Var
+|* check if the threshold condition is met
+|  - if yes, return 0 to signal veto of the event
+|  - if no, return 1 to signal passing 
+|
+OUTPUT ------------------------------------------------------------------------
+|* (int): 0 for vetoed event; 1 for passed event 
++------------------------------------------------------------------------------ 
+'''
+def particle_var_veto(event, particle, var, threshold, *candidates):
+	if len(threshold.split()) != 4:
+		sys.exit("invalid threshold format for event veto")
+	else:
+		quantifier, inequality, crit_val, unit = threshold.split()
+	
+	var = variables_to_delphes_format(var)
+	num_particle = 0
+	for candidate in getattr(event, particle.captialize()):
+		num_particle += 1
+	if num_particle == 0: return 1
+
+	if quantifier == "highest":
+		for i_cand, cand in enumerate(getattr(event, particle.captialize())):
+			if i_cand = 0:
+				particle_var_max = cand.var
+			else:
+				if cand.var > particle_var_max: particle_var_max = cand.var
+		if inequality == ">":
+			if particle_var_max > crit_val: return 0
+			else: return 1
+		elif inequality == "<":
+			if particle_var_max < crit_val: return 0
+			else: return 1
+		else: sys.exit("invalid inequality for event veto")
+	elif quantifier == "lowest":
+		for i_cand, cand in enumerate(getattr(event, particle.captialize())):
+			if i_cand = 0:
+				particle_var_min = cand.var
+			else:
+				if cand.var < particle_var_min: particle_var_min = cand.var
+		if inequality == ">":
+			if particle_var_min > crit_val: return 0
+			else: return 1
+		elif inequality == "<":
+			if particle_var_min < crit_val: return 0
+			else: return 1
+		else: sys.exit("invalid inequality for event veto")
+	else: sys.exit("invalid particle quantifier for event veto")
+
+def particle_var_opposite(event, particle, var, *candidates):
+
+def particle_var_highest(event, particle, var, *candidates):
+'''
+INPUT -------------------------------------------------------------------------
+|* (TObject) event: the delphes event object to look at
+|* (dict) particle_variable_criteria:
+|* (str) or list(str) particle: the particle type to be selected 
+|                               in the final state
+|                               must be COMMA-SEPARATED when passed in as str
+|* (dict) variable_criteria: the dictionary with variabels as keys and their
+|                            corresponding pre-selection criteria as values 
 |  - the criteria to select particles based on their variable
-|  - must be COMMA-SEPARATED when passed as str
-|  - can be one of the following:
+|  - criteria can be one of the following:
 |    - "opposite": require the values of the variable to have opposite signs
 |    - "highest": select the lepton pair with the highest possible sum in the 
 |                 value of the variable while satisfying other criteria
@@ -73,8 +140,7 @@ INPUT -------------------------------------------------------------------------
 |         from the candidate pool satisfy all the criteria
 +------------------------------------------------------------------------------
 '''
-
-def preselect_fs_lepton_pair(event, particle, variables, criteria):
+def preselect_fs_lepton_pair(event, particle_variable_criteria):
 	# loop over candidates to extract variable of interest
 	particles = to_list_of_string(particles)
 	variables = to_list_of_string(variables)
@@ -149,32 +215,6 @@ def preselect_fs_lepton_pair(event, particle, variables, criteria):
 
 '''
 INPUT -------------------------------------------------------------------------
-|* (TObject) event: the delphes event object to look at
-|* (float) threshold: the photon veto threshold energy
-|  
-ROUTINE -----------------------------------------------------------------------
-|* find the energy of the most energetic photon in an event
-|* discard the event if there are fs photons and 
-|  the most energetic one exceeds the threshold energy
-|* keep the event otherwise 
-|
-OUTPUT ------------------------------------------------------------------------
-|* (int): 0 for discarded event; 1 for passed event 
-+------------------------------------------------------------------------------ 
-''' 
-def photon_veto(event, threshold):
-	max_photon_energy = 0
-	num_of_photon = 0
-	for photon in event.Photon:
-		num_of_photon += 1
-		if photon.E > max_photon_energy: max_photon_energy = photon.E
-	if num_of_photon > 0 and max_photon_energy > threshold:
-		return 0
-	else:
-		return 1
-
-'''
-INPUT -------------------------------------------------------------------------
 |* (str) ntuple_path: the path to the folder containing all ntuple files
 |* (str) ntuple_filename: the name of the ntuple file
 |  
@@ -187,7 +227,7 @@ OUTPUT ------------------------------------------------------------------------
 |* sys.exit() msg
 |OR
 |* (ROOT.TFile) the created ntuple file 
-+------------------------------------------------------------------------------ 
++------------------------------------------------------------------------------
 ''' 
 def open_ntuple_file(ntuple_path, ntuple_filename):
 	if os.path.exists(ntuple_filename):
@@ -206,6 +246,8 @@ ROUTINE -----------------------------------------------------------------------
 |* create an enpty dict of TNtuple trees
 |* create a TNtuple tree for each particle with their corresponding variables
 |  to be written, put it into the dict with the particle name as key
+|* for each tree, the columns are ordered in sorted delphes var in lowercase +
+|  sorted calc var in lowercase
 | 
 OUTPUT ------------------------------------------------------------------------
 |* {(str) "particle":(TNtuple) ntuple_Tree} the dict containing all trees
@@ -219,8 +261,10 @@ def create_tntuple_trees(particle_variable):
 		# create a ROOT Ntuple tree to store all variables of desire for 
 		# each particle
 		variables = particle_variable[particle]
+		delphes, calc = sep_var_into_delphes_calculated(variables)
+		sorted_var = sort_delphes_and_calc_var(delphes, calc)
 		particle_variables = [particle + '_' + variable 
-		                      for variable in variables]
+		                      for variable in sorted_var]
 		column_separator = ":"
 		variables_combined = column_separator.join(particle_variables)
 		ntuple_tree[particle] = ROOT.TNtuple(particle, "Flat ntuple tree for " 
@@ -229,12 +273,31 @@ def create_tntuple_trees(particle_variable):
 
 '''
 INPUT -------------------------------------------------------------------------
+|* (str) or list(str) variables
+|  
+ROUTINE -----------------------------------------------------------------------
+|* split the variables into delphes and calc
+|* sort the two lists, and convert them to dict with ind as values
+OUTPUT ------------------------------------------------------------------------
+|* (dict) delphes_var_dict, calc_var_dict
++------------------------------------------------------------------------------ 
+''' 
+def get_var_ind_dicts(variables):
+	delphes_var, calc_var = sep_var_into_delphes_calculated(variables)
+	delphes_var_dict = {x: i for i, x in enumerate(sorted(delphes_var))}
+	calc_var_dict = {x: i for i, x in enumerate(sorted(calc_var))}
+	return delphes_var_dict, calc_var_dict
+
+'''
+INPUT -------------------------------------------------------------------------
 |* (TObject) event: the delphes event to look at
+|* list(int) pair_indices: the indices for the pair of leptons in the event
 |* (str) particle: the particle for the ntuple tree to be filled
-|* list(str) or (str) variables: the list of variables to be filled for 
-|                                that particle
-|                                must be COMMA-SEPARATED when passed in as (str) 
-|* list(int) pair_indices
+|* (dict) delphes_var_dict: the dict of delphes vars with var name as keys 
+|                           and indices as values
+|* (dict) calc)_var_dict: same as delphes_var_dict but with calc vars 
+|* (TNtuple) tree: the ntuple tree to be filled
+|
 ROUTINE -----------------------------------------------------------------------
 |* separate variables into those alredy in delphes and those need to be 
 |  calculated by calling sep_var_into_delphes_calculated()
@@ -245,17 +308,26 @@ OUTPUT ------------------------------------------------------------------------
 |* NONE
 +------------------------------------------------------------------------------
 '''
-
-def write_event_to_ntuple_tree(event, particle, variables, pair_indices):
-	variables = to_list_of_string(variables)
-	delphes, calculated = sep_var_into_delphes_calculated(variables)
-	delphes_variables = variables_to_delphes_format(delphes) 
-
-	# select the lepton pair and fill their data to the ntuple tree
-	for candidate, i_candidate in (
+def write_event_to_ntuple_tree(event, pair_indices, particle, 
+                               delphes_var_dict, calc_var_dict, tree):
+	delphes_var = delphes_var_dict.keys()
+	delphes_format_var = variables_to_delphes_format(delphes_var) 
+	calc_var = calc_var_dict.keys()
+	variables = delphes_var + calc_var
+	num_var = len(variables)
+	num_delphes_var = len(delphes_var)
+	var_data = np.empty([2,num_var])
+	
+	# select the lepton pair and fill their delphes data to the data array 
+	i = 0
+	for i_candidate, candidate in (
 	enumerate(getattr(event, particle.capitalize()))):
 		if i_candidate in pair_indices:
-			
-			ntuple_tree.Fill(*[getattr(candidate, variable) 
-			                   for variable in delphes_variables])
+			var_data[i][:num_delphes_var] = (
+			[getattr(candidate, variable) for variable in delphes_format_var])
+			i += 1
+	var_data = calculate_all_var(particle, delphes_var_dict, calc_var_dict, 
+                                 var_data[:,:num_delphes_var])
+	tree.Fill(*var_data[0,:])
+	tree.Fill(*var_data[1,:])
 

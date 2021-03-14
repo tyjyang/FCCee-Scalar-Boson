@@ -1,0 +1,35 @@
+export CMSSW_VER=CMSSW_10_6_12
+export DELPHES_FOLDER=Delphes-3.4.2
+
+# get the full directory of the setup script.
+export REPO_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+cd $REPO_DIR
+
+# setup CMSSW for accessing the software stack (e.g. git, python)
+source /cvmfs/cms.cern.ch/cmsset_default.sh
+if [-d $CMSSW_VER/src]; then
+	echo $CMSSW_VER already setup 
+else
+	echo Fetching $CMSSW_VER
+	cmsrel $CMSSW_VER
+fi
+cd $CMSSW_VER/src && cmsenv && cd -
+
+# install delphes
+if [ -d "$DELPHES_FOLDER" ]; then
+	echo Delphes already setup. 
+else
+	echo Delphes not found under current directory, installing new instance...
+	wget http://cp3.irmp.ucl.ac.be/downloads/Delphes-3.4.2.tar.gz
+	tar -zxf ($DELPHES_FOLDER).tar.gz
+	cd $DELPHES_FOLDER 
+	make -j 8
+	cd .. && rm ($DELPHES_FOLDER).tar.gz 
+
+# setup running environment for delphes
+source /cvmfs/sft.cern.ch/lcg/views/LCG_88/x86_64-slc6-gcc49-opt/setup.sh
+source /cvmfs/sft.cern.ch/lcg/app/releases/ROOT/6.06.00/x86_64-centos7-gcc49-opt/root/bin/thisroot.sh
+#source /cvmfs/sft.cern.ch/lcg/views/LCG_92/x86_64-slc6-gcc62-opt/setup.sh
+export DELPHES_PATH=$REPO_DIR/Delphes-3.4.2
+export LD_LIBRARY_PATH="$DELPHES_PATH:$LD_LIBRARY_PATH"
+export PYTHONPATH="$PYTHONPATH:$REPO_DIR/lib"
