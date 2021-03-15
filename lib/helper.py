@@ -9,12 +9,12 @@ calc_var_func_call = {"theta":calculate_theta,
                       "m_inv":calculate_inv_m,
                       "m_rec":calculate_recoil_m}
 
-calc_var_func_args = {"theta":"eta",
-                      "phi_a":"phi",
+calc_var_func_args = {"theta":"eta:1",
+                      "phi_a":"phi:1",
                       "alpha":"eta,phi:2",
-                      "cos_theta":calculate_cos_theta;
-                      "m_inv":calculate_inv_m,
-                      "m_rec":calculate_recoil_m}
+                      "cos_theta":"eta:1",
+                      "m_inv":"pt,eta,phi,m:2",
+                      "m_rec":"s:all-pt,eta,phi,m:2"}
 
 particle_mass = {"electron": 0.000511
                  "muon": 0.1057}
