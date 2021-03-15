@@ -1,9 +1,9 @@
 # Setup
 To use this repo,
 ```bash
-git clone https://github.com/tyjyang/FCCee-Scalar-Boson
+git clone https://github.com/tyjyang/FCCee-Scalar-Boson -b dev-justin
 cd FCCee-Scalar-Boson
-source scripts/setup.sh
+source setup.sh
 ```
 Add `from ntuplizer import *` to access functions under `lib`
 
