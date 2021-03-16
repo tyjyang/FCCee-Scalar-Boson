@@ -74,7 +74,7 @@ def particle_var_veto(event, particle, var, threshold, *candidates):
 	else:
 		quantifier, inequality, crit_val, unit = threshold.split()
 	
-	var = variables_to_delphes_format(var)
+	var = vars_to_delphes_form(var)
 	num_particle = 0
 	for candidate in getattr(event, particle.captialize()):
 		num_particle += 1
@@ -151,7 +151,7 @@ def preselect_fs_lepton_pair(event, particle_variable_criteria):
 		# store particle candidate's variables into a 2d array for 
 		# later selection based on criteria
 		candidates = []
-		delphes_variables = variables_to_delphes_format(variables)
+		delphes_variables = vars_to_delphes_form(variables)
 		for i_candidate, candidate in enumerate(
 		getattr(event, particle.capitalize())):
 			candidates[i_candidate] = ([getattr(candidate, variable)
@@ -196,7 +196,7 @@ def preselect_fs_lepton_pair(event, particle_variable_criteria):
 			for j in i_max[i:]:
 				if (j in i_minus):
 					new_sum = (candidates[i][i_criterium] + 
-					           candidates[j][i_criterium})
+					           candidates[j][i_criterium])
 					if new_sum > pair_sum:
 						pair_sum = new_sum
 						pair_indices = [i, j]
@@ -204,7 +204,7 @@ def preselect_fs_lepton_pair(event, particle_variable_criteria):
 			for j in i_max[i:]:
 				if (j in i_plus):
 					new_sum = (candidates[i][i_criterium] + 
-					           candidates[j][i_criterium})
+					           candidates[j][i_criterium]e
 					if new_sum > pair_sum:
 						pair_sum = new_sum
 						pair_indices = [i, j]
@@ -311,7 +311,7 @@ OUTPUT ------------------------------------------------------------------------
 def write_event_to_ntuple_tree(event, pair_indices, particle, 
                                delphes_var_dict, calc_var_dict, tree):
 	delphes_var = delphes_var_dict.keys()
-	delphes_format_var = variables_to_delphes_format(delphes_var) 
+	delphes_format_var = vars_to_delphes_form(delphes_var) 
 	calc_var = calc_var_dict.keys()
 	variables = delphes_var + calc_var
 	num_var = len(variables)

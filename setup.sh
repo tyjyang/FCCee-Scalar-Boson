@@ -32,6 +32,10 @@ else
 fi
 cd $CMSSW_VER/src && cmsenv && cd -
 
+# overwrite CMSSW enviroment
+source /cvmfs/sft.cern.ch/lcg/views/LCG_88/x86_64-slc6-gcc49-opt/setup.sh
+source /cvmfs/sft.cern.ch/lcg/app/releases/ROOT/6.06.00/x86_64-centos7-gcc49-opt/root/bin/thisroot.sh
+
 # export delphes and python library paths
 export DELPHES_PATH=$REPO_DIR/Delphes-3.4.2
 export LD_LIBRARY_PATH="$DELPHES_PATH:$LD_LIBRARY_PATH"
