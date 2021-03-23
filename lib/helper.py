@@ -150,7 +150,22 @@ OUTPUT ------------------------------------------------------------------------
 +------------------------------------------------------------------------------ 
 '''
 def calculate_mag_momentum(pt, eta):
-	return pt*np.cosh(eta) 
+	return pt * np.cosh(eta) 
+
+
+'''
+INPUT -------------------------------------------------------------------------
+|* (float) charge1, charge2: the electric charge of the 2 ptcls
+|  
+ROUTINE -----------------------------------------------------------------------
+|* calculate the product of the charges
+| 
+OUTPUT ------------------------------------------------------------------------
+|* (float) charge_prod: the product of the charges
++------------------------------------------------------------------------------ 
+''' 
+def calculate_charge_prod(charge1, charge2):
+	return charge1 * charge2
 
 calc_var_func_call = {"theta":calculate_theta,
                       "phi_a":calculate_acoplanarity,
@@ -158,7 +173,8 @@ calc_var_func_call = {"theta":calculate_theta,
                       "cos_theta":calculate_cos_theta;
                       "m_inv":calculate_inv_m,
                       "m_rec":calculate_recoil_m,
-                      "p_mag":calculate_mag_momentum}
+                      "p_mag":calculate_mag_momentum
+                      "charge_prod":calculate_charge_prod}
 
 calc_var_func_args = {"theta":"eta:1",
                       "phi_a":"phi:2",
@@ -166,7 +182,8 @@ calc_var_func_args = {"theta":"eta:1",
                       "cos_theta":"eta:1",
                       "m_inv":"pt,eta,phi,m:2",
                       "m_rec":"s:0-pt,eta,phi,m:2",
-                      "p_mag":"pt,eta:1"}
+                      "p_mag":"pt,eta:1"
+                      "charge_prod":"charge:2"}
 
 particle_mass = {"electron": 0.000511
                  "muon": 0.1057}
@@ -186,16 +203,56 @@ OUTPUT ------------------------------------------------------------------------
 |* (float) string: the list-lized string
 +------------------------------------------------------------------------------
 '''
-def to_list_of_string(string):
+def string_to_list(string):
 	if type(string) == str:
 		string = string.split(",") # items have to be comma-separated 
 		return string
 	elif type(string) == list:
 		return string
 	else:
-		sys.exit(("to_list_of_string(string): cannot convert an inpit that is"
+		sys.exit(("string_to_list(): cannot convert an inpit that is"
                   "neither a single string or a list of strings"))  
 
+'''
+INPUT -------------------------------------------------------------------------
+|* list(str): a list of strings
+|  
+ROUTINE -----------------------------------------------------------------------
+|* convert the list of string to a single string by join()
+| 
+OUTPUT ------------------------------------------------------------------------
+|* (str): the resulted string
++------------------------------------------------------------------------------ 
+''' 
+def list_to_string(list_str):
+	if type(list_str) == str:
+		return list_str
+	elif type(list_str) == list:
+		string = ""
+		return string.join(list_str)
+	else:
+		sys.exit(("list_to_string(): cannot convert an inpit that is"
+                  "neither a single string or a list of strings"))  
+
+'''
+INPUT -------------------------------------------------------------------------
+|* (int) integer 
+|  
+ROUTINE -----------------------------------------------------------------------
+|* converts a single integer to an element in a list
+| 
+OUTPUT ------------------------------------------------------------------------
+|* (list)
++------------------------------------------------------------------------------ 
+''' 
+def int_to_list(integer):
+	if type(integer) == list:
+		return integer
+	elif type(integer) == int:
+		return [integer]
+	else:
+		sys.exit(("int_to_list(): cannot convert an inpit that is"
+                  "neither a single integer or a list")) 
 
 '''
 INPUT -------------------------------------------------------------------------
@@ -212,7 +269,7 @@ OUTPUT ------------------------------------------------------------------------
 +------------------------------------------------------------------------------ 
 ''' 
 def sep_var_into_delphes_calculated(variables):
-	variables = to_list_of_string(variables)
+	variables = string_to_list(variables)
 	delphes_variables = []
 	calc_variables = []
 	for variable in variables:
@@ -238,7 +295,7 @@ OUTPUT ------------------------------------------------------------------------
 +------------------------------------------------------------------------------
 '''
 def vars_to_delphes_form(variables):
-	variables = to_list_of_string(variables)
+	variables = string_to_list(variables)
 	
 	Variables = [variable.capitalize() for variable in variables]
 	for i, Variable in enumerate(Variables):
@@ -301,7 +358,7 @@ INPUT -------------------------------------------------------------------------
 |* (str) var_calc: the variable to be calculated from delphes vars
 |  
 ROUTINE -----------------------------------------------------------------------
-|* fetch the value for the var_calc key in the dict calc_var_func_args
+|* fetch the value of the passed-in var_calc key in the dict calc_var_func_args
 |* separate the str of variables into var1,var2:num_ptcl entires, by -
 |* convert each entry to a tuple of the format (["var1","var2"],num_ptcl)
 |* return the list of tuples
@@ -316,25 +373,26 @@ def get_args_calc_var(var_calc):
 	args = []
 	for entry in args_in_list:
 		var, num_ptcl = entry.split(":")
-		var = to_list_of_string(var)
+		var = string_to_list(var)
 		num_ptcl = int(num_ptcl)
 		args.append((var,num_ptcl)) 
 	return args
-
 
 '''
 INPUT -------------------------------------------------------------------------
 |* (TObject) event: the delphes event to look at 
 |* (str) ptcl: the single particle of interst
 |* (int) or list(int) cand: the list of indices for particle candidates
+|                           the length of the list should be equal to the
+|                           max of num_ptcl in the args_tuple
 |* (str) var_calc: the single variable to be calculated
 |
 ROUTINE -----------------------------------------------------------------------
 |* call get_args_calc_var() to convert args need for var_calac to list of tuples
 |* for each element of the tuple, look at the 2nd element, which is the num of
-|  particles the variables in the 1st element takes.
+|  particles (N) the variables in the 1st element takes.
 |* Look at the first N particles in the candidate list, and fetch their vars
-|  put all vars of one particle before going to next var 
+|  put all vars of one particle before going to next one 
 |* if var == "m", look at the particle_mass dict to fetch particle mass
 |  if var == "s", look at consts dict to fetch center of mass energy^2
 |
@@ -355,7 +413,7 @@ def get_args_val(event, ptcl, cand_ind, var_calc):
 				for var in input_vars:
 					if var in delphes_variable_list:
 						var = vars_to_delphes_form(var)
-						args_val.append(cand.var)
+						args_val.append(getattr(cand, var))
 					if var == 's':
 						args_val.append(consts[var])
 					if var == 'm':
@@ -366,34 +424,101 @@ def get_args_val(event, ptcl, cand_ind, var_calc):
 '''
 INPUT -------------------------------------------------------------------------
 |* (TObject) event: the delphes event to look at
-|* (dict) ptcl_cands: keys are the particle of interst in the event.
-|                     values are the indices of candidates grouped in lists
-|                     	e.g. for calculating a var that takes in 2 particles,
-|                     	the candidate pairs should be: [[i_1,j_1], [i_2,j_2]] 
-|                     each element in the cand list is used to get the set of
-|                     ptcl cand to calc var
+|* (str) ptcl: the particle of interest
+|* list(int) or (int) cand: the indices for the candidate set
 |* (str) or list(str) var: the variable(s) of interest. 
 |                          must be COMMA-SEPARATED when passed in as str
-|                          same var(s) for all particles passed in
 |
 ROUTINE -----------------------------------------------------------------------
-|* 
-| 
+|* for the candidate idx of the particle tree, loop through every var to be
+|  calculated.
+|* for each variable to be calculated, pass in the particle type, candidate in-
+|  dices, and the variable name to get_args_val() to get the values of the args
+|  needed to return the variable to be calculated. 
+|* call the calculation function from the dictionary calc_var_func_call, which
+|  links name of calculated variable to the corresponding function.
+|* Note that if the var to be calculated only takes in N particles, and the 
+|  number of ptcl exceeds N in the cand idx list passed in, then this function
+|  will only look at the FIRST N ptcl for calculation of the var.  
 OUTPUT ------------------------------------------------------------------------
-|* 
+|* lsit(float) var_val
 +------------------------------------------------------------------------------ 
 ''' 
-def calc_var(event, ptcl_cands, var):
-	var = to_list_of_string(var)
-	for ptcl, cand_inds in ptcl_cand.items():
-		for cand_ind in cand_inds:
-			var_val = []
+def calc_ptcl_var_by_idx(event, ptcl, cand, var):
+	ptcl = list_to_string(ptcl)
+	cand = int_to_list(cand)
+	var = string_to_list(var)
+	var_val = []
+	for v in var:
+		args_val = get_args_val(event, ptcl, cand_ind, v)
+		var_val.append(calc_var_func_call[v](*args_val))
+	return var_val
+
+'''
+INPUT -------------------------------------------------------------------------
+|* (TObject) event: the delphes event to look at
+|* (str) particle: the single particle of interest
+|* (str) var: the single variable of interst
+|* (int) or list(int) idx: the particle indices
+|  
+ROUTINE -----------------------------------------------------------------------
+|* fetch the var values for particles with the given indices in a delphes event
+| 
+OUTPUT ------------------------------------------------------------------------
+|* list(float): the var values
++------------------------------------------------------------------------------ 
+''' 
+def get_ptcl_var_val_by_idx(event, particle, cand, var):
+	particle = list_to_string(particle)
+	var = list_to_string(vars_to_delphes_form(var))
+	cand = int_to_list(cand)
+	var_val = []
+	for i, ptcl in enumerate(getattr(event, particle.capitalize())):
+		if i in cand:
 			for v in var:
-				args_val = get_args_val(event, ptcl, cand_ind, v)
-				var_val.append(calc_var_func_call[v](*args_val))
-			result[ptcl].append(var_val)
+				var_val.append(getattr(ptcl, var))
+	return var_val
 
+'''
+INPUT -------------------------------------------------------------------------
+|* list(int) idx: the array of indices [0,1,2,3...N-1]
+|* (int) subset_size: the size of the set to be chosen from the N elements
+|  
+ROUTINE -----------------------------------------------------------------------
+|* From an array of size N, select all subsets of size M recursively
+| 
+OUTPUT ------------------------------------------------------------------------
+|* (tuple) set indices
+|  returned by yield, remember to use list(get_idx_candidate_sets()) when call  
++------------------------------------------------------------------------------ 
+''' 
+def get_idx_recur(idx, subset_size):
+	for i in xrange(len(idx)):
+		if subset_size == 1:
+			yield (idx[i],)
+		else:
+			for next in get_idx_recur(idx[i+1:len(idx)], subset_size-1):
+				yield (elements[i],) + next
 
-
-
+'''
+INPUT -------------------------------------------------------------------------
+|* (TObject) event: the delphes event to look at
+|* (str) particle: the particle tree of interest
+|* (int) subset_size: the size of the candidate set 
+|
+ROUTINE -----------------------------------------------------------------------
+|* from a delphes event, extract the number of particle X, denote as N
+|* from these N particles, find all subsets of M particles
+|* return a list of indices for particle subsets
+| 
+OUTPUT ------------------------------------------------------------------------
+|* list(tuple): the list of indices tuples
++------------------------------------------------------------------------------ 
+''' 
+def get_idx_candidate_sets(event, particle, subset_size):
+	particle = list_to_string(particle)
+	idx = []
+	for i, x in enumerate(getattr(event, particle.capitalize())):
+		idx.append(i)
+	return list(get_idx_recur(idx, subset_size))
 

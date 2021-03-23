@@ -51,11 +51,6 @@ INPUT -------------------------------------------------------------------------
 |* (str) threshold: The condition, when satisfied, vetos the event
 |                   takes the form {quantifier inequaility critical_val uint}
 |                   e.g. threshold = "highest > 10 GeV"
-|* (np.array) *candidates: the array of particle indices from previous selection
-|             - if nothing passed, then loop over all the candidates in the evt
-|             - if there are preselcted candidates, look over those
-|                                                   candidates in the evt only
-|             - if 0, return 0
 |  
 ROUTINE -----------------------------------------------------------------------
 |* parse the threshold string into quantifier, inequality, critical_val
@@ -68,7 +63,7 @@ OUTPUT ------------------------------------------------------------------------
 |* (int): 0 for vetoed event; 1 for passed event 
 +------------------------------------------------------------------------------ 
 '''
-def particle_var_veto(event, particle, var, threshold, *candidates):
+def particle_var_veto(event, particle, var, threshold):
 	if len(threshold.split()) != 4:
 		sys.exit("invalid threshold format for event veto")
 	else:
@@ -83,9 +78,10 @@ def particle_var_veto(event, particle, var, threshold, *candidates):
 	if quantifier == "highest":
 		for i_cand, cand in enumerate(getattr(event, particle.captialize())):
 			if i_cand = 0:
-				particle_var_max = cand.var
+				particle_var_max = getattr(cand,var)
 			else:
-				if cand.var > particle_var_max: particle_var_max = cand.var
+				if getattr(cand,var) > particle_var_max: 
+					particle_var_max = getattr(cand,var)
 		if inequality == ">":
 			if particle_var_max > crit_val: return 0
 			else: return 1
@@ -96,9 +92,10 @@ def particle_var_veto(event, particle, var, threshold, *candidates):
 	elif quantifier == "lowest":
 		for i_cand, cand in enumerate(getattr(event, particle.captialize())):
 			if i_cand = 0:
-				particle_var_min = cand.var
+				particle_var_min = getattr(cand,var)
 			else:
-				if cand.var < particle_var_min: particle_var_min = cand.var
+				if getattr(cand,var) < particle_var_min:
+					particle_var_min = getattr(cand,var)
 		if inequality == ">":
 			if particle_var_min > crit_val: return 0
 			else: return 1
@@ -108,9 +105,71 @@ def particle_var_veto(event, particle, var, threshold, *candidates):
 		else: sys.exit("invalid inequality for event veto")
 	else: sys.exit("invalid particle quantifier for event veto")
 
-def particle_var_opposite(event, particle, var, *candidates):
+'''
+INPUT -------------------------------------------------------------------------
+|* (TObject) event: the delphes event to look at
+|* (str) or list(str) particles: the particle type(s) for the selection
+|                      - NOTE that there can be more than one ptcl type, 
+|                        as opposed to ptcl var veto
+|                      - must be COMMA-SEPARATED when passed in as str
+|* (str) var: the variable based on which one makes the selection
+|             - NOTE that there can only be one variables passed in
+|               if the selection is based on a variable derived from multiple
+|               other variables, then the calculation should be done by calling
+|               calc_var().
+|* (bool) var_in_delphes: the boolean var to indicate whether the var passed in
+                          is already in delphes or needs to be calculated
+|* (dict) candidates: the dict of ptcl candidate indices. Keys are ptcl types,
+|                     values are lists of cand set indices
+|                     e.g. {'electron': [[1,2],[1,3]]}
+|  
+ROUTINE -----------------------------------------------------------------------
+|* check candidates passed in.
+|  - if "all", we make a list of all possible cand sets in the ptcl tree
+|  - if 0: previous steps in the selection have already ruled out all cands,
+|          return 0 to signal non-passing.
+|  - else, look at the candidate dict ptcl by ptcl
+|* for each cand set in a ptcl tree, check if their val of interst are opposite
+|  - if yes, append their indices to cand_selected[ptcl], which was declared to
+|    be an empty list
+|* for each cand_selected[ptcl], if len == 0, then drop from dict cand_select
+|* if cand_select is empty, i.e., no candidate set passed selection in any 
+|  ptcl tree, then return 0. Else, return the dict cand_select 
+| 
+OUTPUT ------------------------------------------------------------------------
+|* 0 or (dict) cand_selected: the list of cand set indices grouped in ptcls
++------------------------------------------------------------------------------ 
+'''
 
-def particle_var_highest(event, particle, var, *candidates):
+def select_ptcl_var_opposite(event, particles, var, var_in_delphes,
+                             candidates="all"):
+	particles = str_to_list(particles)
+	var = list_to_str(var)
+	cand_selected = {}
+	for ptcl in particles:
+		if candidates == "all":
+			ptcl_cands = get_idx_candidate_sets(event, ptcl, subset_size = 2)
+		elif candidates == 0:
+			return 0
+		else: 
+			ptcl_cands = candidates[ptcl]
+		cand_selected[ptcl] = []
+		for cand in ptcl_cands:
+			if var_in_delphes:
+				cand_var_val = get_ptcl_var_by_idx(event, ptcl, cand, var)
+				if cand_var_val[0] * cand_var_val[1] < 0:
+					cand_selected[ptcl].append(cand)
+			else:
+				var_calc = var + "_prod"
+				cand_var_val = calc_ptcl_var_by_idx(event, ptcl, cand, var_calc)
+				if cand_var_val < 0:
+					cand_selected[ptcl].append(cand)
+		if len(cand_selected[ptcl] == 0): del cand_selected[ptcl]
+	if len(cand_selected == 0): return 0
+	else: return cand_selected
+
+def select_particle_var_highest(event, particles, var, *candidates="all"):
+
 '''
 INPUT -------------------------------------------------------------------------
 |* (TObject) event: the delphes event object to look at
@@ -142,9 +201,9 @@ INPUT -------------------------------------------------------------------------
 '''
 def preselect_fs_lepton_pair(event, particle_variable_criteria):
 	# loop over candidates to extract variable of interest
-	particles = to_list_of_string(particles)
-	variables = to_list_of_string(variables)
-	criteria = to_list_of_string(criteria)
+	particles = string_to_list(particles)
+	variables = string_to_list(variables)
+	criteria = string_to_list(criteria)
 
 	# check that there is a criterium for each variable
 	if len(variable) == len(criteria):
@@ -204,7 +263,7 @@ def preselect_fs_lepton_pair(event, particle_variable_criteria):
 			for j in i_max[i:]:
 				if (j in i_plus):
 					new_sum = (candidates[i][i_criterium] + 
-					           candidates[j][i_criterium]e
+					           candidates[j][i_criterium])
 					if new_sum > pair_sum:
 						pair_sum = new_sum
 						pair_indices = [i, j]
