@@ -108,39 +108,31 @@ def particle_var_veto(event, particle, var, threshold):
 '''
 INPUT -------------------------------------------------------------------------
 |* (TObject) event: the delphes event to look at
-|* (str) or list(str) particles: the particle type(s) for the selection
-|                      - NOTE that there can be more than one ptcl type, 
-|                        as opposed to ptcl var veto
-|                      - must be COMMA-SEPARATED when passed in as str
-|* (str) var: the variable based on which one makes the selection
-|             - NOTE that there can only be one variables passed in
-|               if the selection is based on a variable derived from multiple
-|               other variables, then the calculation should be done by calling
-|               calc_var().
+|* (str) or list(str) particles: the list of particle trees to look at
+|                                must be COMMA-SEPARATED when passing in
+|                                multiple ptcls in a single str
+|* (str) var: the var of interest. Only one var, the final one used for select-
+|             ion, can be passed in 
 |* (bool) var_in_delphes: the boolean var to indicate whether the var passed in
-                          is already in delphes or needs to be calculated
-|* (dict) candidates: the dict of ptcl candidate indices. Keys are ptcl types,
-|                     values are lists of cand set indices
-|                     e.g. {'electron': [[1,2],[1,3]]}
+|                         in already in the delphes file
+|* list(list(int)) candidates: the list of candidate groups to look at
+|                              each group must contain 2 ptcls
+|                              when "all" is passed in, we generate all subsets
+|                              of candidates with size 2 and go through them
 |  
 ROUTINE -----------------------------------------------------------------------
-|* check candidates passed in.
-|  - if "all", we make a list of all possible cand sets in the ptcl tree
-|  - if 0: previous steps in the selection have already ruled out all cands,
-|          return 0 to signal non-passing.
-|  - else, look at the candidate dict ptcl by ptcl
-|* for each cand set in a ptcl tree, check if their val of interst are opposite
-|  - if yes, append their indices to cand_selected[ptcl], which was declared to
-|    be an empty list
-|* for each cand_selected[ptcl], if len == 0, then drop from dict cand_select
-|* if cand_select is empty, i.e., no candidate set passed selection in any 
-|  ptcl tree, then return 0. Else, return the dict cand_select 
+|* make sure the ptcls are in list(str) and var is in (str)
+|* for each ptcl, create all cand subsets if "all" candidates are passed in
+|* check if var is in delphes, calc the var if not
+|* if the var of interest is opposite (check by looking at product), append
+|  the cand idx to cand_selected[ptcl]
+|* remove cand_selected[ptcl] from (dict) cand_selected if none selected
 | 
 OUTPUT ------------------------------------------------------------------------
-|* 0 or (dict) cand_selected: the list of cand set indices grouped in ptcls
+|* 0: if cand_selected in empty
+|* (dict) cand_selected: {ptcl:[[i1,j1],[i2,j2]]}
 +------------------------------------------------------------------------------ 
-'''
-
+''' 
 def select_ptcl_var_opposite(event, particles, var, var_in_delphes,
                              candidates="all"):
 	particles = str_to_list(particles)
@@ -154,12 +146,13 @@ def select_ptcl_var_opposite(event, particles, var, var_in_delphes,
 		else: 
 			ptcl_cands = candidates[ptcl]
 		cand_selected[ptcl] = []
-		for cand in ptcl_cands:
-			if var_in_delphes:
+		if var_in_delphes:
+			for cand in ptcl_cands:
 				cand_var_val = get_ptcl_var_by_idx(event, ptcl, cand, var)
 				if cand_var_val[0] * cand_var_val[1] < 0:
 					cand_selected[ptcl].append(cand)
-			else:
+		else:
+			for cand in ptcl_cands:
 				var_calc = var + "_prod"
 				cand_var_val = calc_ptcl_var_by_idx(event, ptcl, cand, var_calc)
 				if cand_var_val < 0:
@@ -168,109 +161,74 @@ def select_ptcl_var_opposite(event, particles, var, var_in_delphes,
 	if len(cand_selected == 0): return 0
 	else: return cand_selected
 
-def select_particle_var_highest(event, particles, var, *candidates="all"):
-
 '''
 INPUT -------------------------------------------------------------------------
-|* (TObject) event: the delphes event object to look at
-|* (dict) particle_variable_criteria:
-|* (str) or list(str) particle: the particle type to be selected 
-|                               in the final state
-|                               must be COMMA-SEPARATED when passed in as str
-|* (dict) variable_criteria: the dictionary with variabels as keys and their
-|                            corresponding pre-selection criteria as values 
-|  - the criteria to select particles based on their variable
-|  - criteria can be one of the following:
-|    - "opposite": require the values of the variable to have opposite signs
-|    - "highest": select the lepton pair with the highest possible sum in the 
-|                 value of the variable while satisfying other criteria
-|
-|ROUTINE ----------------------------------------------------------------------
-|* within each event, look at the variables of a type of particles
-|* according to the criteria on each varialbe, select the pair of 
-|  particle from that type
-|* 
-|
-|OUTPUT -----------------------------------------------------------------------
-|* [pair indices, pair_sum]: The indices of the selected pair of particles 
-|                            as an integer list of length 2
-|                            And the sum of variable required to be "highest" 
-|* int 0: if the number of candidates is less than two, or if no pair
-|         from the candidate pool satisfy all the criteria
-+------------------------------------------------------------------------------
-'''
-def preselect_fs_lepton_pair(event, particle_variable_criteria):
-	# loop over candidates to extract variable of interest
-	particles = string_to_list(particles)
-	variables = string_to_list(variables)
-	criteria = string_to_list(criteria)
-
-	# check that there is a criterium for each variable
-	if len(variable) == len(criteria):
-		# store particle candidate's variables into a 2d array for 
-		# later selection based on criteria
-		candidates = []
-		delphes_variables = vars_to_delphes_form(variables)
-		for i_candidate, candidate in enumerate(
-		getattr(event, particle.capitalize())):
-			candidates[i_candidate] = ([getattr(candidate, variable)
-			                           for variable in delphes_variables])
-	else:
-		print("Number of variables and criteria do not match "
-			  "in selection of final state leptons, "
-			  "check parameters for fs_particle_selection()")
-		return 
-
-	candidates = np.array(candidates)
-	
-	# check if there are no less than 2 particle candidates to select from
-	if len(candidates[:, 0]) < 2:
-		print("Number of particle candidates is less than two.")
-		return 0
-	
-	# apply the criteria to make the selection
-	for i_criterium, criterium in enumerate(criteria):
-		if criterium == 'opposite':
-			i_plus = []
-			i_minus = []
-			for i_candidate, candidate in enumerate(candidates):
-				if candidate[i_criterium] < 0:
-					i_plus.append(i_candidate)
+|* (TObject) event: the delphes event to look at
+|* (str) or list(str) particles: the list of particle trees to look at
+|                                must be COMMA-SEPARATED when passing in
+|                                multiple ptcls in a single str
+|* (str) var: the var of interest. Only one var, the final one used for select-
+|             ion, can be passed in 
+|* (bool) var_in_delphes: the boolean var to indicate whether the var passed in
+|                         in already in the delphes file
+|* list(list(int)) candidates: the list of candidate groups to look at
+|                              if var_in_delphe == True, group size must be 1
+|                              when "all" is passed in, we generate all subsets
+|                              of candidates with size N and go through them
+|  
+ROUTINE -----------------------------------------------------------------------
+|* make sure the ptcls are in list(str) and var is in (str)
+|* for each ptcl, create all cand subsets if "all" candidates are passed in
+|* check if var is in delphes, calc the var if not
+|* set var_max to be the var_val of the 1st cand group in the 1st ptcl tree,
+|  update var_max if var_val from subsequent cnad group is larger
+|* store the ptcl and cand idx info in (dict) cand_max.
+|  update the dict if var_max is updated
+| 
+OUTPUT ------------------------------------------------------------------------
+|* 0: if candidate passed in == 0
+|* (dict) cand_max: {ptcl:[i,j]}
++------------------------------------------------------------------------------ 
+''' 
+def select_particle_var_highest(event, particles, var, var_in_delphes,
+                                candidates="all"):
+	particles = str_to_list(particles)
+	var = list_to_str(var)
+	cand_max = {}
+	var_max = 0
+	for i_ptcl, ptcl in enumerate(particles):
+		if candidates == "all":
+			ptcl_cands = get_idx_candidate_sets(event, ptcl, subset_size = 2)
+		elif candidates == 0:
+			return 0
+		else: 
+			ptcl_cands = candidates[ptcl]
+		if var_in_delphes:
+			for i_cand, cand in enumerate(ptcl_cands):
+				if len(cand) != 1:
+					sys.exit("cand group size must be 1 when passing delphes"
+                             "var into select_particle_var_highest(): [i, j..]") 
+				var_val = get_ptcl_var_by_idx(event, ptcl, cand, var)
+				if i_ptcl == 0 and i_cand == 0:
+					var_max = var_val
+					cand_max[ptcl] = cand
 				else:
-					i_minus.append(i_candidate)
-		if criterium == 'highest':
-			variable_col = candidates[:, i_criterium]
-			i_max = []
-			for i in np.arange(0, num_particle):
-				i_max.append(np.argmax(variable_col))
-				variable_col[np.argmax(variable_col)] = np.amin(variable_col)
-		
-	# select the parir of particles with highest possible value for the
-	# "leading" variable, while satisfy the "opposite" criterium for
-	# the other variable
-	pair_indices = []    
-	pair_sum = 0
-	for i in i_max:
-		if (i in i_plus):
-			for j in i_max[i:]:
-				if (j in i_minus):
-					new_sum = (candidates[i][i_criterium] + 
-					           candidates[j][i_criterium])
-					if new_sum > pair_sum:
-						pair_sum = new_sum
-						pair_indices = [i, j]
-		elif (i in i_minus):
-			for j in i_max[i:]:
-				if (j in i_plus):
-					new_sum = (candidates[i][i_criterium] + 
-					           candidates[j][i_criterium])
-					if new_sum > pair_sum:
-						pair_sum = new_sum
-						pair_indices = [i, j]
-	if len(pair_indices) > 0:
-		return [pair_indices, pair_sum]
-	else:
-		return 0
+					if var_val > var_max: 
+						var_max = var_val
+						cand_max.clear()
+						cand_max[ptcl] = cand
+		else:
+			for i_cand, cand in enumerate(ptcl_cands):
+				var_calc = calc_ptcl_var_by_idx(event, ptcl, cand, var)
+				if i_ptcl == 0 and i_cand == 0:
+					var_max = var_calc
+					cand_max[ptcl] = cand
+				else:
+					if var_calc > var_max: 
+						var_max = var_calc
+						cand_max.clear()
+						cand_max[ptcl] = cand
+	return cand_max
 
 '''
 INPUT -------------------------------------------------------------------------
@@ -336,57 +294,54 @@ INPUT -------------------------------------------------------------------------
 |  
 ROUTINE -----------------------------------------------------------------------
 |* split the variables into delphes and calc
-|* sort the two lists, and convert them to dict with ind as values
+|* sort the two lists
 OUTPUT ------------------------------------------------------------------------
-|* (dict) delphes_var_dict, calc_var_dict
+|* (list) delphes_var_sorted, calc_var_sorted
 +------------------------------------------------------------------------------ 
 ''' 
-def get_var_ind_dicts(variables):
+def get_delphes_calc_var_sorted(variables):
 	delphes_var, calc_var = sep_var_into_delphes_calculated(variables)
-	delphes_var_dict = {x: i for i, x in enumerate(sorted(delphes_var))}
-	calc_var_dict = {x: i for i, x in enumerate(sorted(calc_var))}
-	return delphes_var_dict, calc_var_dict
+	delphes_var_sorted = sorted(delphes_var)
+	calc_var_sorted = sorted(calc_var)
+	return delphes_var_sorted, calc_var_sorted
 
 '''
 INPUT -------------------------------------------------------------------------
+|* (dict) tree_chain: keys are ptcl name in str, values are TTree for the ptcl
 |* (TObject) event: the delphes event to look at
-|* list(int) pair_indices: the indices for the pair of leptons in the event
-|* (str) particle: the particle for the ntuple tree to be filled
-|* (dict) delphes_var_dict: the dict of delphes vars with var name as keys 
-|                           and indices as values
-|* (dict) calc)_var_dict: same as delphes_var_dict but with calc vars 
-|* (TNtuple) tree: the ntuple tree to be filled
+|* (dict) ptcl_cand: keys are ptcl name in str, values are list(int) cand idx
+|* list(str) var: the vars to be written to the ntuple tree. same for all ptcl
 |
 ROUTINE -----------------------------------------------------------------------
 |* separate variables into those alredy in delphes and those need to be 
 |  calculated by calling sep_var_into_delphes_calculated()
 |* calculate those variables
-|* fill the event as a row into the TNtuple tree for the particle
+|* fill the event as 2 rows into the TNtuple tree for each ptcl
+|* for calculated var that only returns one value for 2 particles, we fill the
+|  same value twice as a placeholder
 |
 OUTPUT ------------------------------------------------------------------------
 |* NONE
 +------------------------------------------------------------------------------
 '''
-def write_event_to_ntuple_tree(event, pair_indices, particle, 
-                               delphes_var_dict, calc_var_dict, tree):
-	delphes_var = delphes_var_dict.keys()
-	delphes_format_var = vars_to_delphes_form(delphes_var) 
-	calc_var = calc_var_dict.keys()
-	variables = delphes_var + calc_var
-	num_var = len(variables)
+def write_event_to_ntuple_tree(tree_chain, event, ptcl_cand, var):
+	particles = ptcl_cand.keys()
+	var = str_to_list(var)
+	delphes_var, calc_var = get_delphes_calc_var_sorted(var)
+	delphes_form_var = vars_to_delphes_form(delphes_var) 
+	num_var = len(var)
 	num_delphes_var = len(delphes_var)
 	var_data = np.empty([2,num_var])
 	
 	# select the lepton pair and fill their delphes data to the data array 
-	i = 0
-	for i_candidate, candidate in (
-	enumerate(getattr(event, particle.capitalize()))):
-		if i_candidate in pair_indices:
-			var_data[i][:num_delphes_var] = (
-			[getattr(candidate, variable) for variable in delphes_format_var])
-			i += 1
-	var_data = calculate_all_var(particle, delphes_var_dict, calc_var_dict, 
-                                 var_data[:,:num_delphes_var])
+	data_row = 0
+	for ptcl in particles:
+		for i, x in enumerate(getattr(event, ptcl.capitalize())):
+			if i in ptcl_cand[ptcl]:
+				var_data[data_row][:num_delphes_var] = (
+				[getattr(x, var) for var in delphes_form_var])
+				data_row += 1
+				
 	tree.Fill(*var_data[0,:])
 	tree.Fill(*var_data[1,:])
 

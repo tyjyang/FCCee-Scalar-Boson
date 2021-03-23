@@ -149,9 +149,24 @@ OUTPUT ------------------------------------------------------------------------
 |* (float): the magnitude of the 3-momentum
 +------------------------------------------------------------------------------ 
 '''
-def calculate_mag_momentum(pt, eta):
+def calculate_momentum(pt, eta):
 	return pt * np.cosh(eta) 
 
+'''
+INPUT -------------------------------------------------------------------------
+|*(float) pt1, eta1, pt2, eta2
+|  
+ROUTINE -----------------------------------------------------------------------
+|* get the sum of the momentum of 2 particles
+| 
+OUTPUT ------------------------------------------------------------------------
+|* (float) sum_p
++------------------------------------------------------------------------------ 
+'''
+def calculate_sum_momentum(pt1, eta1, pt2, eta2):
+	p_mag_1 = calculate_momentum(pt1, eta1)
+	p_mag_2 = calculate_momentum(pt2, eta2)
+	return p_mag_1 + p_mag_2
 
 '''
 INPUT -------------------------------------------------------------------------
@@ -173,7 +188,8 @@ calc_var_func_call = {"theta":calculate_theta,
                       "cos_theta":calculate_cos_theta;
                       "m_inv":calculate_inv_m,
                       "m_rec":calculate_recoil_m,
-                      "p_mag":calculate_mag_momentum
+                      "p_mag":calculate_momentum,
+                      "sum_p_mag":calculate_sum_momentum,
                       "charge_prod":calculate_charge_prod}
 
 calc_var_func_args = {"theta":"eta:1",
@@ -182,7 +198,8 @@ calc_var_func_args = {"theta":"eta:1",
                       "cos_theta":"eta:1",
                       "m_inv":"pt,eta,phi,m:2",
                       "m_rec":"s:0-pt,eta,phi,m:2",
-                      "p_mag":"pt,eta:1"
+                      "p_mag":"pt,eta:1",
+                      "sum_p_mag":"pt,eta:2",
                       "charge_prod":"charge:2"}
 
 particle_mass = {"electron": 0.000511
@@ -440,6 +457,7 @@ ROUTINE -----------------------------------------------------------------------
 |* Note that if the var to be calculated only takes in N particles, and the 
 |  number of ptcl exceeds N in the cand idx list passed in, then this function
 |  will only look at the FIRST N ptcl for calculation of the var.  
+|
 OUTPUT ------------------------------------------------------------------------
 |* lsit(float) var_val
 +------------------------------------------------------------------------------ 
@@ -458,25 +476,28 @@ def calc_ptcl_var_by_idx(event, ptcl, cand, var):
 INPUT -------------------------------------------------------------------------
 |* (TObject) event: the delphes event to look at
 |* (str) particle: the single particle of interest
+|* (int) or list(int) cand: the particle cand indices
 |* (str) var: the single variable of interst
-|* (int) or list(int) idx: the particle indices
 |  
 ROUTINE -----------------------------------------------------------------------
 |* fetch the var values for particles with the given indices in a delphes event
-| 
+|* we fetch one var_val per var per ptcl, as opposed to calc_ptcl_var_by_ind(),
+|  where we only return one var_val per var per cand group  
+|
 OUTPUT ------------------------------------------------------------------------
 |* list(float): the var values
 +------------------------------------------------------------------------------ 
 ''' 
-def get_ptcl_var_val_by_idx(event, particle, cand, var):
+def get_ptcl_var_by_idx(event, particle, cand, var):
 	particle = list_to_string(particle)
-	var = list_to_string(vars_to_delphes_form(var))
+	var = vars_to_delphes_form(var)
 	cand = int_to_list(cand)
-	var_val = []
+	var_val = np.empty([len(cand), len(var)])
+	row_num = 0
 	for i, ptcl in enumerate(getattr(event, particle.capitalize())):
 		if i in cand:
-			for v in var:
-				var_val.append(getattr(ptcl, var))
+			var_val[row_num,:] = [getattr(ptcl, v) for v in var]
+			row_num += 1
 	return var_val
 
 '''
