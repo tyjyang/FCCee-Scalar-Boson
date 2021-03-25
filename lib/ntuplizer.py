@@ -69,39 +69,39 @@ def particle_var_veto(event, particle, var, threshold):
 	else:
 		quantifier, inequality, crit_val, unit = threshold.split()
 	
-	var = vars_to_delphes_form(var)
+	var = list_to_string(vars_to_delphes_form(var))
 	num_particle = 0
-	for candidate in getattr(event, particle.captialize()):
+	for candidate in getattr(event, particle.capitalize()):
 		num_particle += 1
 	if num_particle == 0: return 1
 
 	if quantifier == "highest":
-		for i_cand, cand in enumerate(getattr(event, particle.captialize())):
-			if i_cand = 0:
+		for i_cand, cand in enumerate(getattr(event, particle.capitalize())):
+			if i_cand == 0:
 				particle_var_max = getattr(cand,var)
 			else:
 				if getattr(cand,var) > particle_var_max: 
 					particle_var_max = getattr(cand,var)
 		if inequality == ">":
-			if particle_var_max > crit_val: return 0
-			else: return 1
+			if particle_var_max > crit_val: return 1
+			else: return 0
 		elif inequality == "<":
-			if particle_var_max < crit_val: return 0
-			else: return 1
+			if particle_var_max < crit_val: return 1
+			else: return 0
 		else: sys.exit("invalid inequality for event veto")
 	elif quantifier == "lowest":
-		for i_cand, cand in enumerate(getattr(event, particle.captialize())):
-			if i_cand = 0:
+		for i_cand, cand in enumerate(getattr(event, particle.capitalize())):
+			if i_cand == 0:
 				particle_var_min = getattr(cand,var)
 			else:
 				if getattr(cand,var) < particle_var_min:
 					particle_var_min = getattr(cand,var)
 		if inequality == ">":
-			if particle_var_min > crit_val: return 0
-			else: return 1
+			if particle_var_min > crit_val: return 1
+			else: return 0
 		elif inequality == "<":
-			if particle_var_min < crit_val: return 0
-			else: return 1
+			if particle_var_min < crit_val: return 1
+			else: return 0
 		else: sys.exit("invalid inequality for event veto")
 	else: sys.exit("invalid particle quantifier for event veto")
 
@@ -135,8 +135,8 @@ OUTPUT ------------------------------------------------------------------------
 ''' 
 def select_ptcl_var_opposite(event, particles, var, var_in_delphes,
                              candidates="all"):
-	particles = str_to_list(particles)
-	var = list_to_str(var)
+	particles = string_to_list(particles)
+	var = string_to_list(var)
 	cand_selected = {}
 	for ptcl in particles:
 		if candidates == "all":
@@ -145,20 +145,22 @@ def select_ptcl_var_opposite(event, particles, var, var_in_delphes,
 			return 0
 		else: 
 			ptcl_cands = candidates[ptcl]
+		if len(ptcl_cands) == 0: continue
 		cand_selected[ptcl] = []
 		if var_in_delphes:
 			for cand in ptcl_cands:
 				cand_var_val = get_ptcl_var_by_idx(event, ptcl, cand, var)
-				if cand_var_val[0] * cand_var_val[1] < 0:
+				if cand_var_val[0,0] * cand_var_val[1,0] < 0:
 					cand_selected[ptcl].append(cand)
 		else:
 			for cand in ptcl_cands:
 				var_calc = var + "_prod"
-				cand_var_val = calc_ptcl_var_by_idx(event, ptcl, cand, var_calc)
+				cand_var_val = calc_ptcl_var_by_idx(event, ptcl, cand, 
+				                                    var_calc)[0]
 				if cand_var_val < 0:
 					cand_selected[ptcl].append(cand)
-		if len(cand_selected[ptcl] == 0): del cand_selected[ptcl]
-	if len(cand_selected == 0): return 0
+		if len(cand_selected[ptcl]) == 0: del cand_selected[ptcl]
+	if len(cand_selected) == 0: return 0
 	else: return cand_selected
 
 '''
@@ -190,10 +192,14 @@ OUTPUT ------------------------------------------------------------------------
 |* (dict) cand_max: {ptcl:[i,j]}
 +------------------------------------------------------------------------------ 
 ''' 
-def select_particle_var_highest(event, particles, var, var_in_delphes,
+def select_ptcl_var_highest(event, particles, var, var_in_delphes,
                                 candidates="all"):
-	particles = str_to_list(particles)
-	var = list_to_str(var)
+	particles = string_to_list(particles)
+	# overwrite particles passed in with particles contained in the pre-selected
+	# candidate set
+	if candidates != "all":
+		particles = candidates.keys()
+	var = string_to_list(var)
 	cand_max = {}
 	var_max = 0
 	for i_ptcl, ptcl in enumerate(particles):
@@ -201,31 +207,32 @@ def select_particle_var_highest(event, particles, var, var_in_delphes,
 			ptcl_cands = get_idx_candidate_sets(event, ptcl, subset_size = 2)
 		elif candidates == 0:
 			return 0
-		else: 
+		else:
 			ptcl_cands = candidates[ptcl]
+		if len(ptcl_cands) == 0: continue
 		if var_in_delphes:
 			for i_cand, cand in enumerate(ptcl_cands):
 				if len(cand) != 1:
-					sys.exit("cand group size must be 1 when passing delphes"
-                             "var into select_particle_var_highest(): [i, j..]") 
+					sys.exit(("cand group size must be 1 when passing delphes"
+					         "var into select_particle_var_highest(): [i, j..]")) 
 				var_val = get_ptcl_var_by_idx(event, ptcl, cand, var)
 				if i_ptcl == 0 and i_cand == 0:
-					var_max = var_val
+					var_max = var_val[0,0]
 					cand_max[ptcl] = cand
 				else:
 					if var_val > var_max: 
-						var_max = var_val
+						var_max = var_val[0,0]
 						cand_max.clear()
 						cand_max[ptcl] = cand
 		else:
 			for i_cand, cand in enumerate(ptcl_cands):
 				var_calc = calc_ptcl_var_by_idx(event, ptcl, cand, var)
 				if i_ptcl == 0 and i_cand == 0:
-					var_max = var_calc
+					var_max = var_calc[0]
 					cand_max[ptcl] = cand
 				else:
 					if var_calc > var_max: 
-						var_max = var_calc
+						var_max = var_calc[0]
 						cand_max.clear()
 						cand_max[ptcl] = cand
 	return cand_max
@@ -246,12 +253,14 @@ OUTPUT ------------------------------------------------------------------------
 |* (ROOT.TFile) the created ntuple file 
 +------------------------------------------------------------------------------
 ''' 
-def open_ntuple_file(ntuple_path, ntuple_filename):
-	if os.path.exists(ntuple_filename):
+def create_ntuple_file(ntuple_path, delphes_file_path, ptcl_var):
+	ntuple_filename = get_ntuple_filename(delphes_file_path, ptcl_var)
+	ntuple_file_path = ntuple_path + '/' + ntuple_filename
+	if os.path.exists(ntuple_file_path):
 		sys.exit("ntuple file:" + ntuple_filename + 
 		         " already exists under " + ntuple_path)
 	else: 
-		return ROOT.TFile(ntuple_filename, 'CREATE')
+		return ROOT.TFile(ntuple_file_path, 'CREATE')
 
 '''
 INPUT -------------------------------------------------------------------------
@@ -270,7 +279,7 @@ OUTPUT ------------------------------------------------------------------------
 |* {(str) "particle":(TNtuple) ntuple_Tree} the dict containing all trees
 +------------------------------------------------------------------------------ 
 ''' 
-def create_tntuple_trees(particle_variable):
+def create_ntuple_trees(particle_variable):
 	ntuple_tree = {}
 	particles = particle_variable.keys()
 	for particle in sorted(particles):
@@ -324,24 +333,28 @@ OUTPUT ------------------------------------------------------------------------
 |* NONE
 +------------------------------------------------------------------------------
 '''
-def write_event_to_ntuple_tree(tree_chain, event, ptcl_cand, var):
+def write_pair_to_ntuple_tree(tree_chain, event, ptcl_cand, var):
 	particles = ptcl_cand.keys()
-	var = str_to_list(var)
+	if len(particles) > 1: sys.exit("only one ptcl species can be wrtn per evt")
+	else: ptcl = list_to_string(particles)
+	cand = list(ptcl_cand[ptcl])
+	var = string_to_list(var)
 	delphes_var, calc_var = get_delphes_calc_var_sorted(var)
-	delphes_form_var = vars_to_delphes_form(delphes_var) 
 	num_var = len(var)
 	num_delphes_var = len(delphes_var)
 	var_data = np.empty([2,num_var])
 	
-	# select the lepton pair and fill their delphes data to the data array 
+	var_data[:,:num_delphes_var] = get_ptcl_var_by_idx(event, ptcl, cand, 
+	                                                  delphes_var)
+	# a workaround for filling 2 rows with different values, since some var only
+	# takes one ptcl to calculate 
 	data_row = 0
-	for ptcl in particles:
-		for i, x in enumerate(getattr(event, ptcl.capitalize())):
-			if i in ptcl_cand[ptcl]:
-				var_data[data_row][:num_delphes_var] = (
-				[getattr(x, var) for var in delphes_form_var])
-				data_row += 1
-				
-	tree.Fill(*var_data[0,:])
-	tree.Fill(*var_data[1,:])
+	var_data[data_row][num_delphes_var:] = calc_ptcl_var_by_idx(event, ptcl,
+	                                                            cand, calc_var)
+	cand.reverse()
+	data_row += 1
+	var_data[data_row][num_delphes_var:] = calc_ptcl_var_by_idx(event, ptcl,
+	                                                            cand, calc_var)
+	tree_chain[ptcl].Fill(*var_data[0,:])
+	tree_chain[ptcl].Fill(*var_data[1,:])
 

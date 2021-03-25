@@ -75,6 +75,20 @@ def calculate_mod_acoplanarity(eta_1, phi_1, eta_2, phi_2):
 
 '''
 INPUT -------------------------------------------------------------------------
+|* (float) theta
+|  
+ROUTINE -----------------------------------------------------------------------
+|* calcualte the cosine of the forward angle
+| 
+OUTPUT ------------------------------------------------------------------------
+|* (float) cos_theta
++------------------------------------------------------------------------------ 
+''' 
+def calculate_cos_theta(theta):
+	return np.cos(theta)
+
+'''
+INPUT -------------------------------------------------------------------------
 |* (float) pt: the transverse momentum of the particle
 |* (float) eta: the pseudorapidity of the particle
 |* (float) phi: the azimuthal angle of the particle
@@ -133,7 +147,7 @@ def calculate_recoil_m(s, pt_1, eta_1, phi_1, m_1, pt_2, eta_2, phi_2, m_2):
 	p4_sum = p4_1 + p4_2
 	E_ll = p4_sum.E()
 	m_ll = p4_sum.M()
-	m_rec_sq = s + m_ll ^ 2 - 2 * np.sqrt(s) * E_ll
+	m_rec_sq = s + m_ll ** 2 - 2 * np.sqrt(s) * E_ll
 	if m_rec_sq < 0: return -np.sqrt(-m_rec_sq)
 	else: return np.sqrt(m_rec_sq)
 
@@ -185,7 +199,7 @@ def calculate_charge_prod(charge1, charge2):
 calc_var_func_call = {"theta":calculate_theta,
                       "phi_a":calculate_acoplanarity,
                       "alpha":calculate_mod_acoplanarity,
-                      "cos_theta":calculate_cos_theta;
+                      "cos_theta":calculate_cos_theta,
                       "m_inv":calculate_inv_m,
                       "m_rec":calculate_recoil_m,
                       "p_mag":calculate_momentum,
@@ -197,12 +211,12 @@ calc_var_func_args = {"theta":"eta:1",
                       "alpha":"eta,phi:2",
                       "cos_theta":"eta:1",
                       "m_inv":"pt,eta,phi,m:2",
-                      "m_rec":"s:0-pt,eta,phi,m:2",
+                      "m_rec":"s:1-pt,eta,phi,m:2",
                       "p_mag":"pt,eta:1",
                       "sum_p_mag":"pt,eta:2",
                       "charge_prod":"charge:2"}
 
-particle_mass = {"electron": 0.000511
+particle_mass = {"electron": 0.000511,
                  "muon": 0.1057}
 
 delphes_variable_list = ['pt', 'eta', 'phi', 'energy', 'charge']
@@ -263,12 +277,13 @@ OUTPUT ------------------------------------------------------------------------
 +------------------------------------------------------------------------------ 
 ''' 
 def int_to_list(integer):
-	if type(integer) == list:
+	if (type(integer) == list or type(integer) == np.ndarray
+	    or type(integer) == tuple):
 		return integer
 	elif type(integer) == int:
 		return [integer]
 	else:
-		sys.exit(("int_to_list(): cannot convert an inpit that is"
+		sys.exit(("int_to_list(): cannot convert an input that is "
                   "neither a single integer or a list")) 
 
 '''
@@ -356,14 +371,14 @@ OUTPUT ------------------------------------------------------------------------
 +------------------------------------------------------------------------------ 
 ''' 
 def get_ntuple_filename(delphes_file_path, particle_variable):
-	delphes_file = delphes_path.split("/")[-1] # get rid of path
+	delphes_file = delphes_file_path.split("/")[-1] # get rid of path
 	delphes_file = delphes_file.split(".")[0]  # get rid of file suffix
 	ntuple_content = delphes_file + ':'
 	variable_separator = '_'
 	particles = particle_variable.keys()
 
 	for particle in sorted(particles):
-		variables = list(particle_variable[particle])
+		variables = string_to_list(particle_variable[particle])
 		ntuple_content += particle + "_" + variable_separator.join(variables)
 		if particle != sorted(particles)[-1]: # use "-" btwn particles
 			ntuple_content += "-"
@@ -429,7 +444,7 @@ def get_args_val(event, ptcl, cand_ind, var_calc):
 				num_ptcl_checked += 1
 				for var in input_vars:
 					if var in delphes_variable_list:
-						var = vars_to_delphes_form(var)
+						var = list_to_string(vars_to_delphes_form(var))
 						args_val.append(getattr(cand, var))
 					if var == 's':
 						args_val.append(consts[var])
@@ -468,7 +483,7 @@ def calc_ptcl_var_by_idx(event, ptcl, cand, var):
 	var = string_to_list(var)
 	var_val = []
 	for v in var:
-		args_val = get_args_val(event, ptcl, cand_ind, v)
+		args_val = get_args_val(event, ptcl, cand, v)
 		var_val.append(calc_var_func_call[v](*args_val))
 	return var_val
 
@@ -519,7 +534,7 @@ def get_idx_recur(idx, subset_size):
 			yield (idx[i],)
 		else:
 			for next in get_idx_recur(idx[i+1:len(idx)], subset_size-1):
-				yield (elements[i],) + next
+				yield (idx[i],) + next
 
 '''
 INPUT -------------------------------------------------------------------------
