@@ -2,6 +2,14 @@ import sys,os
 import ROOT
 import numpy as np
 
+delphes_gen_info = {
+'eeTollS_0p5_inc.root':{'s':91, 'nevt':300000, 'xsec':3.348},
+'eeTollS_5_inc.root':{'s':91, 'nevt':300000, 'xsec':1.586},
+'eeTollS_25_inc.root':{'s':91, 'nevt':300000, 'xsec':2.186},
+'eeTo2fermion.root':{'s':91, 'nevt':1000000, 'xsec':8530},
+'eeTo4lepton.root':{'s':91, 'nevt':1000000, 'xsec':3.88}
+}
+
 '''
 INPUT -------------------------------------------------------------------------
 |* (float) eta: the pseudorapidity
@@ -377,11 +385,11 @@ def get_ntuple_filename(delphes_file_path, particle_variable):
 	variable_separator = '_'
 	particles = particle_variable.keys()
 
-	for particle in sorted(particles):
-		variables = string_to_list(particle_variable[particle])
-		ntuple_content += particle + "_" + variable_separator.join(variables)
-		if particle != sorted(particles)[-1]: # use "-" btwn particles
-			ntuple_content += "-"
+	for i, particle in enumerate(sorted(particles)):
+		ntuple_content += particle + "-"
+		if i == len(particles) - 1: # use "-" btwn particles
+			variables = string_to_list(particle_variable[particle])
+			ntuple_content += particle + "_" + variable_separator.join(variables)
 
 	return ntuple_content + '.root'
 
@@ -447,7 +455,7 @@ def get_args_val(event, ptcl, cand_ind, var_calc):
 						var = list_to_string(vars_to_delphes_form(var))
 						args_val.append(getattr(cand, var))
 					if var == 's':
-						args_val.append(consts[var])
+						args_val.append(delphes_gen_info[delphes_file][var])
 					if var == 'm':
 						args_val.append(particle_mass[ptcl])
 			if num_ptcl_checked == num_ptcl: break

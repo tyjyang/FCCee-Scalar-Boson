@@ -68,11 +68,12 @@ def particle_var_veto(event, particle, var, threshold):
 		sys.exit("invalid threshold format for event veto")
 	else:
 		quantifier, inequality, crit_val, unit = threshold.split()
-	
+		crit_val = int(crit_val)
 	var = list_to_string(vars_to_delphes_form(var))
 	num_particle = 0
 	for candidate in getattr(event, particle.capitalize()):
 		num_particle += 1
+		break
 	if num_particle == 0: return 1
 
 	if quantifier == "highest":
