@@ -134,7 +134,7 @@ OUTPUT ------------------------------------------------------------------------
 |* (dict) cand_selected: {ptcl:[[i1,j1],[i2,j2]]}
 +------------------------------------------------------------------------------ 
 ''' 
-def select_ptcl_var_opposite(event, particles, var, var_in_delphes,
+def select_ptcl_var_opposite(delphes_file, event, particles, var, var_in_delphes,
                              candidates="all"):
 	particles = string_to_list(particles)
 	var = string_to_list(var)
@@ -156,8 +156,8 @@ def select_ptcl_var_opposite(event, particles, var, var_in_delphes,
 		else:
 			for cand in ptcl_cands:
 				var_calc = var + "_prod"
-				cand_var_val = calc_ptcl_var_by_idx(event, ptcl, cand, 
-				                                    var_calc)[0]
+				cand_var_val = calc_ptcl_var_by_idx(delphes_file, event, ptcl,
+				                                    cand, var_calc)[0]
 				if cand_var_val < 0:
 					cand_selected[ptcl].append(cand)
 		if len(cand_selected[ptcl]) == 0: del cand_selected[ptcl]
@@ -193,7 +193,7 @@ OUTPUT ------------------------------------------------------------------------
 |* (dict) cand_max: {ptcl:[i,j]}
 +------------------------------------------------------------------------------ 
 ''' 
-def select_ptcl_var_highest(event, particles, var, var_in_delphes,
+def select_ptcl_var_highest(delphes_file, event, particles, var, var_in_delphes,
                                 candidates="all"):
 	particles = string_to_list(particles)
 	# overwrite particles passed in with particles contained in the pre-selected
@@ -227,7 +227,8 @@ def select_ptcl_var_highest(event, particles, var, var_in_delphes,
 						cand_max[ptcl] = cand
 		else:
 			for i_cand, cand in enumerate(ptcl_cands):
-				var_calc = calc_ptcl_var_by_idx(event, ptcl, cand, var)
+				var_calc = calc_ptcl_var_by_idx(delphes_file, event,
+				                                ptcl, cand, var)
 				if i_ptcl == 0 and i_cand == 0:
 					var_max = var_calc[0]
 					cand_max[ptcl] = cand
@@ -334,7 +335,7 @@ OUTPUT ------------------------------------------------------------------------
 |* NONE
 +------------------------------------------------------------------------------
 '''
-def write_pair_to_ntuple_tree(tree_chain, event, ptcl_cand, var):
+def write_pair_to_ntuple_tree(delphes_file, tree_chain, event, ptcl_cand, var):
 	particles = ptcl_cand.keys()
 	if len(particles) > 1: sys.exit("only one ptcl species can be wrtn per evt")
 	else: ptcl = list_to_string(particles)
@@ -350,12 +351,12 @@ def write_pair_to_ntuple_tree(tree_chain, event, ptcl_cand, var):
 	# a workaround for filling 2 rows with different values, since some var only
 	# takes one ptcl to calculate 
 	data_row = 0
-	var_data[data_row][num_delphes_var:] = calc_ptcl_var_by_idx(event, ptcl,
-	                                                            cand, calc_var)
+	var_data[data_row][num_delphes_var:] = calc_ptcl_var_by_idx(delphes_file,
+	                                        event, ptcl, cand, calc_var)
 	cand.reverse()
 	data_row += 1
-	var_data[data_row][num_delphes_var:] = calc_ptcl_var_by_idx(event, ptcl,
-	                                                            cand, calc_var)
+	var_data[data_row][num_delphes_var:] = calc_ptcl_var_by_idx(delphes_file,
+	                                        event, ptcl, cand, calc_var)
 	tree_chain[ptcl].Fill(*var_data[0,:])
 	tree_chain[ptcl].Fill(*var_data[1,:])
 

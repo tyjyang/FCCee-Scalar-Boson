@@ -440,7 +440,7 @@ OUTPUT ------------------------------------------------------------------------
 |* list(float) args: the list of args in their numerical value 
 +------------------------------------------------------------------------------ 
 ''' 
-def get_args_val(event, ptcl, cand_ind, var_calc):
+def get_args_val(delphes_file, event, ptcl, cand_ind, var_calc):
 	args = get_args_calc_var(var_calc)
 	args_val = []
 	for arg_tuple in args:
@@ -485,13 +485,13 @@ OUTPUT ------------------------------------------------------------------------
 |* lsit(float) var_val
 +------------------------------------------------------------------------------ 
 ''' 
-def calc_ptcl_var_by_idx(event, ptcl, cand, var):
+def calc_ptcl_var_by_idx(delphes_file, event, ptcl, cand, var):
 	ptcl = list_to_string(ptcl)
 	cand = int_to_list(cand)
 	var = string_to_list(var)
 	var_val = []
 	for v in var:
-		args_val = get_args_val(event, ptcl, cand, v)
+		args_val = get_args_val(delphes_file, event, ptcl, cand, v)
 		var_val.append(calc_var_func_call[v](*args_val))
 	return var_val
 

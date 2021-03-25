@@ -2,6 +2,7 @@ import ROOT
 import numpy
 import time
 from ntuplizer import *
+from helper import *
 
 
 
@@ -33,15 +34,16 @@ for delphes_file in delphes_file_list:
 	for ievt, evt in enumerate(evt_chain):
 		if particle_var_veto(evt, 'photon', 'energy', 'highest < 10 GeV'):
 			
-			opposite_charge_pairs = select_ptcl_var_opposite(
+			opposite_charge_pairs = select_ptcl_var_opposite(delphes_file,
 			evt, ['electron', 'muon'], 'charge', var_in_delphes = True
 			)
 			if opposite_charge_pairs != 0:
-				final_cand = select_ptcl_var_highest(
+				final_cand = select_ptcl_var_highest(delphes_file,
 				evt, ['electron', 'muon'], 'sum_p_mag',
 				var_in_delphes = False, candidates = opposite_charge_pairs
 				)
-				write_pair_to_ntuple_tree(ntuple_trees, evt, final_cand, var_to_wrt)
+				write_pair_to_ntuple_tree(delphes_file,
+				                    ntuple_trees, evt, final_cand, var_to_wrt)
 			else:
 				 num_evts_failed_oppo_charge_req += 1
 		else:
