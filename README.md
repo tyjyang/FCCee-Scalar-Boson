@@ -5,25 +5,41 @@ git clone https://github.com/tyjyang/FCCee-Scalar-Boson -b dev-justin
 cd FCCee-Scalar-Boson
 source setup.sh
 ```
-Add `from ntuplizer import *` to access functions under `lib`
+# Modules
+This repository provides pre-written functions that aims to modularize the 
+analysis process and allow easy customization of the analysis workflow.
 
-[TODO: modify `__init.py__` under `lib` so the user doesn't need to import all
-files in the library.]
+Functions are grouped into python files under the `lib` folder. 
+- `helper.py`: The helper functions including calculation of variables such as
+acoplanarity, selection of particle subsets of size n from all N candidates, 
+and string parsing. It also includes dictionaries for generation level
+information for the delphes files, and other physical constants.
+- `ntuplizer.py`: Functions used to extract the information of interest from 
+delphes files and write them into ntuple files. This include loading the delphes
+data, creating and opening the ntuple trees for writing, and functions to make
+selection from final state particles.
 
-Make sure to call `load_delphes_lib()` in order for ROOT to understand data
-in the delphes files.
+# Writing Scripts
+We use the event loop model, where we look at all information from one event at
+once before moving to the next event (row by row). The scripts call functions 
+from the `lib` files, and by putting in customary parameters into those 
+function, one can quickly implement analysis procedures for different physics
+purposes.
 
-# Filename
-## ntuple files
-We name our ntuple files in the following format:
+Any script should contain the following elements:
+- Import files under `lib`. e.g. `from ntuplizer import *`
+- Call `load_delphes_lib()` to access the delphes-formatted data.
+- Customary variables like delphes filename and particles/variables of interest.
+- An event loop to go through all the events within a delphes file.
 
-`[delphes_file_name]:part1_var11_var12-part2-var21-var22.root`
+Other optional components include:
+- Pre-select particle candidates to be written into the ntuple tree, by calling
+the selection functions under `lib/ntuplizer.py` with customary parameters.
+- Efficiency counters for those selection functions.
 
-- the colon `:` is to separate the delphes file name with the actual 
-ntuple content
-- the dash `-` is to separate ntuple trees, each containing info of one
-particle
-- underscore sign `_` is to separate variables for the same particle
+Below are more detailed documentation. Read until this point to learn the basic
+use of the code.
+---
 
 # Variables
 
@@ -56,8 +72,3 @@ functions are linked to the variable name in another dict `calc_var_func_args`.
     - "m_inv"
     - "m_rec"
 
-# Selection
-## Criteria
-Selection criteria is passed in as a dict to the event chain of a delphes file.
-The criteria takes the format:
-`{"criteria":"part1-part2_var"}`
