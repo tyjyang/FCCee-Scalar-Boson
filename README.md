@@ -1,7 +1,7 @@
 # Setup
 To use this repo,
 ```bash
-git clone https://github.com/tyjyang/FCCee-Scalar-Boson -b dev-justin
+git clone https://github.com/tyjyang/FCCee-Scalar-Boson
 cd FCCee-Scalar-Boson
 source setup.sh
 ```
