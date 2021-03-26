@@ -17,7 +17,7 @@ information for the delphes files, and other physical constants.
 - `ntuplizer.py`: Functions used to extract the information of interest from 
 delphes files and write them into ntuple files. This include loading the delphes
 data, creating and opening the ntuple trees for writing, and functions to make
-selection from final state particles.
+selections on final state particles.
 
 # Writing Scripts
 We use the event loop model, where we look at all information from one event at
