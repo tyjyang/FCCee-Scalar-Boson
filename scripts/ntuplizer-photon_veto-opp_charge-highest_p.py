@@ -10,8 +10,9 @@ from helper import *
 # Global Variables
 #-----------------
 delphes_path = '/scratch5/arapyan/fcc_ee/'
-delphes_file_list = ['eeTollS_0p5_inc.root', 'eeTollS_5_inc.root',
-                     'eeTollS_25_inc.root', 'four_lepton.root']
+#delphes_file_list = ['eeTollS_0p5_inc.root', 'eeTollS_5_inc.root', 'eeTollS_25_inc.root',
+#                     'eeTo2fermion.root', 'four_lepton.root']
+delphes_file_list = ['eeTollS_0p5_inc.root']
 ntuple_path = '../ntuples'
 particles =  ['electron', 'muon', 'photon']
 var_to_wrt = ['pt', 'eta', 'phi', 'charge', 'theta', 'phi_a', 'alpha',
@@ -54,4 +55,6 @@ for delphes_file in delphes_file_list:
 			print (end-start), " seconds has elapsed. ", ievt, " events has been processed"
 	print num_evts_failed_photon_veto, " evts failed the photon veto"
 	print num_evts_failed_oppo_charge_req, " evts failed the opposite charge requirement"
+	for tree in ntuple_trees.values(): tree.Write()
 	ntuple_file.Close()
+
