@@ -10,9 +10,9 @@ from helper import *
 # Global Variables
 #-----------------
 delphes_path = '/scratch5/arapyan/fcc_ee/'
-#delphes_file_list = ['eeTollS_0p5_inc.root', 'eeTollS_5_inc.root', 'eeTollS_25_inc.root',
-#                     'eeTo2fermion.root', 'four_lepton.root']
-delphes_file_list = ['eeTollS_0p5_inc.root']
+delphes_file_list = ['eeTollS_0p5_inc.root', 'eeTollS_5_inc.root', 'eeTollS_25_inc.root',
+                     'eeTo2fermion.root', 'four_lepton.root']
+#delphes_file_list = ['eeTollS_0p5_inc.root']
 ntuple_path = '../ntuples'
 particles =  ['electron', 'muon', 'photon']
 var_to_wrt = ['pt', 'eta', 'phi', 'charge', 'theta', 'phi_a', 'alpha',
