@@ -3,11 +3,11 @@ import ROOT
 import numpy as np
 
 delphes_gen_info = {
-'eeTollS_0p5_inc.root':{'s':91, 'nevt':300000, 'xsec':3.348},
-'eeTollS_5_inc.root':{'s':91, 'nevt':300000, 'xsec':1.586},
-'eeTollS_25_inc.root':{'s':91, 'nevt':300000, 'xsec':2.186},
-'eeTo2fermion.root':{'s':91, 'nevt':1000000, 'xsec':8530},
-'four_lepton.root':{'s':91, 'nevt':1000000, 'xsec':3.88}
+'eeTollS_0p5_inc.root':{'s':91**2, 'nevt':300000, 'xsec':3.348},
+'eeTollS_5_inc.root':{'s':91**2, 'nevt':300000, 'xsec':1.586},
+'eeTollS_25_inc.root':{'s':91**2, 'nevt':300000, 'xsec':2.186},
+'eeTo2fermion.root':{'s':91**2, 'nevt':1000000, 'xsec':8530},
+'four_lepton.root':{'s':91**2, 'nevt':1000000, 'xsec':3.88}
 }
 
 '''
