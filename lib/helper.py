@@ -388,7 +388,7 @@ def get_ntuple_filename(delphes_file_path, particle_variable):
 	for i, particle in enumerate(sorted(particles)):
 		if i == len(particles) - 1: # use "-" btwn particles
 			variables = string_to_list(particle_variable[particle])
-			ntuple_content += ':' + variable_separator.join(variables)
+			ntuple_content += particle + ':' + variable_separator.join(variables)
 		else: ntuple_content += particle + "-"
 
 	return ntuple_content + '.root'
