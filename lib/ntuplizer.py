@@ -45,6 +45,24 @@ def load_delphes_file(delphes_file_path, particles):
 
 '''
 INPUT -------------------------------------------------------------------------
+|* (TObject) event: the delphes event to look at
+|* (str) particle: the particle of interest 
+|  
+ROUTINE -----------------------------------------------------------------------
+|* look through the particle candidates in the event and record the number of
+|  that particle in the event
+| 
+OUTPUT ------------------------------------------------------------------------
+|* (int) num_ptcl: the number of the input type of particle in the event
++------------------------------------------------------------------------------ 
+''' 
+def get_num_ptcl(event, particle):
+	num_ptcl = 0
+	for x in getattr(event, particle.capitalize()): num_ptcl += 1
+	return num_ptcl
+
+'''
+INPUT -------------------------------------------------------------------------
 |* (TObject) event: the delphes event object to look at
 |* (str) particle: the particle to be used for the veto
 |* (str) var: the variable of that particle to be used for the veto

@@ -5,6 +5,9 @@ git clone https://github.com/tyjyang/FCCee-Scalar-Boson
 cd FCCee-Scalar-Boson
 source setup.sh
 ```
+It should be noted here that you'd have to **remove any CMSSW setup** and start 
+from a clean shell before `setup.sh` can properly install delphes.
+
 # Modules
 This repository provides pre-written functions that aims to modularize the 
 analysis process and allow easy customization of the analysis workflow.
