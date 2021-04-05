@@ -1,6 +1,7 @@
 import sys,os
 import ROOT
 import numpy as np
+from collections import OrderedDict
 
 delphes_gen_info = {
 'eeTollS_0p5_inc.root':{'s':91**2, 'nevt':300000, 'xsec':3.348},
@@ -503,7 +504,7 @@ def dvd_ptcl_cand_into_size_n(ptcl_cand, var_calc):
 	for ptcl, idx in ptcl_cand.items():
 		idx = int_to_list(idx)
 		if r != 0 and r + len(idx) >= n:
-			x_block_piece = {}
+			x_block_piece = OrderedDict()
 			x_block_piece[prev_ptcl] = idx_block[-(n - r):]
 			x_block_piece[ptcl] = idx[:r]
 			ptcl_cand_list.append(x_block_piece)
