@@ -408,6 +408,7 @@ OUTPUT ------------------------------------------------------------------------
 +------------------------------------------------------------------------------ 
 ''' 
 def get_args_calc_var(var_calc):
+	var_calc = list_to_string(var_calc)
 	args_in_str = calc_var_func_args[var_calc]
 	args_in_list = args_in_str.split("-")
 	args = []
@@ -417,6 +418,21 @@ def get_args_calc_var(var_calc):
 		num_ptcl = int(num_ptcl)
 		args.append((var,num_ptcl)) 
 	return args
+
+'''
+INPUT -------------------------------------------------------------------------
+|* (str) var_calc: 
+|  
+ROUTINE -----------------------------------------------------------------------
+|* 
+| 
+OUTPUT ------------------------------------------------------------------------
+|* 
++------------------------------------------------------------------------------ 
+'''
+def get_num_ptcl_to_calc_var(var_calc):
+	args = get_args_calc_var(var_calc)
+	return max([arg_tuple[1] for arg_tuple in args])
 
 '''
 INPUT -------------------------------------------------------------------------
@@ -440,27 +456,66 @@ OUTPUT ------------------------------------------------------------------------
 |* list(float) args: the list of args in their numerical value 
 +------------------------------------------------------------------------------ 
 ''' 
-def get_args_val(delphes_file, event, ptcl, cand_ind, var_calc):
+def get_args_val(delphes_file, event, ptcl_cand, var_calc):
 	args = get_args_calc_var(var_calc)
+	ptcls = ptcl_cand.keys()
 	args_val = []
+	max_num_ptcl = max([arg_tuple[1] for arg_tuple in args])
 	for arg_tuple in args:
 		input_vars = arg_tuple[0]
 		num_ptcl = arg_tuple[1]
 		num_ptcl_checked = 0
-		for i_cand, cand in enumerate(getattr(event, ptcl.capitalize())):
-			if i_cand in cand_ind:
-				num_ptcl_checked += 1
-				for var in input_vars:
-					if var in delphes_variable_list:
-						var = list_to_string(vars_to_delphes_form(var))
-						args_val.append(getattr(cand, var))
-					if var == 's':
-						args_val.append(delphes_gen_info[delphes_file][var])
-					if var == 'm':
-						args_val.append(particle_mass[ptcl])
-			if num_ptcl_checked == num_ptcl: break
+		for ptcl in ptcls:
+			for i_cand, cand in enumerate(getattr(event, ptcl.capitalize())):
+				if i_cand in cand_ind:
+					num_ptcl_checked += 1
+					for var in input_vars:
+						if var in delphes_variable_list:
+							var = list_to_string(vars_to_delphes_form(var))
+							args_val.append(getattr(cand, var))
+						if var == 's':
+							args_val.append(delphes_gen_info[delphes_file][var])
+						if var == 'm':
+							args_val.append(particle_mass[ptcl])
+				if num_ptcl_checked == num_ptcl:
+					args_val_list.append(args_val)
+					args_val = []
+					num_ptcl_checked = 0
 	return args_val
 
+'''
+INPUT -------------------------------------------------------------------------
+|* 
+|  
+ROUTINE -----------------------------------------------------------------------
+|* 
+| 
+OUTPUT ------------------------------------------------------------------------
+|* 
++------------------------------------------------------------------------------ 
+''' 
+def dvd_ptcl_cand_into_size_n(ptcl_cand, var_calc):
+	ptcl_cand_list = []
+	num_block_in_ptcl_cand = len(ptcl_cand.keys())
+	i_block = 0
+	n = get_num_ptcl_to_calc_var(var_calc)
+	r = 0
+	for ptcl, idx in ptcl_cand.items():
+		idx = int_to_list(idx)
+		if r != 0 and r + len(idx) >= n:
+			x_block_piece = {}
+			x_block_piece[prev_ptcl] = idx_block[-(n - r):]
+			x_block_piece[ptcl] = idx[:r]
+			ptcl_cand_list.append(x_block_piece)
+		idx_block = idx[r:]
+		r = len(idx_block) % n
+		q = len(idx_block) / n
+		for i in range(q):
+			ptcl_cand_list.append({ptcl:idx_block[i*n:(i + 1)*n]})
+		if idx_block == num_block_in_ptcl_cand: break
+		i_block += 1
+		prev_ptcl = ptcl
+	return ptcl_cand_list
 '''
 INPUT -------------------------------------------------------------------------
 |* (TObject) event: the delphes event to look at
@@ -482,7 +537,7 @@ ROUTINE -----------------------------------------------------------------------
 |  will only look at the FIRST N ptcl for calculation of the var.  
 |
 OUTPUT ------------------------------------------------------------------------
-|* lsit(float) var_val
+|* list(float) var_val
 +------------------------------------------------------------------------------ 
 ''' 
 def calc_ptcl_var_by_idx(delphes_file, event, ptcl, cand, var):

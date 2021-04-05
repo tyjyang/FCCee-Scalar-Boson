@@ -75,3 +75,39 @@ functions are linked to the variable name in another dict `calc_var_func_args`.
     - "m_inv"
     - "m_rec"
 
+# Particle Candidates
+Particles within a delphes event are stored as TTree objects, each containing 
+one particle type. 
+Within each particle tree, individual particles are arranged in a sequential order. 
+We assign to each individual particle an index counting from zero, based on the 
+order it's stored in the delphes file. 
+For calculation of certain variables, a group of N particles might be needed.
+We call this group of N particle a "candidate". Note that the N particles do not
+need to be of the same type.
+
+To access the particle candidates, we use `ptcl_cand` dictionaries of the form:
+ `OrderedDict([('particle_type_1',[indices1]), ('particle_type_2',[indices2])])`. 
+Note that we use the ordered dictionary for reasons that will become clear later.
+For convenience, when multiple candidate groups are all of the same particle 
+type, we will put them together in a dictionary of the form:
+`{'particle":[ [idx1], [idx2], ...]}`. When calculating for variables, we then
+dissemble it into dictionaries with values containing only one list of indices.
+
+We usually pass a group of N particle for calculation of multiple variables at
+once, as it fits the data format to be written to the ntuple trees, which are
+rectangular arrays of floats. One issue with this approach is that different 
+variables takes in differnt number of particles to calculate. For example, it 
+takes two particles to calculate the invariant mass on the lepton pair, while it
+only takes one to calculate the forward angle theta from the pseudorapidity eta.
+Also, like in this example, we want to calculate theta twice, for each particle.
+For this reason, when the number of particles it takes to calculate a variable 
+(n) differs from the number of particles in the candidate group passed in (N). 
+We do the following:
+- If `(N mod n) == 0`, we divide the N particles into groups of size n. And for
+each group, we calculate the variable
+- If `(N mod n) == r != 0 and N > n`, we ignore the last `r` particles, can do
+the same thing as above for the `N-r` particles. 
+- If `N < n`, we return an error message.
+Note that since both the division of the groups and the discard of the remaining
+particles depend on the order of the dictionary passed in, we have to use 
+OrderedDict, as said before.

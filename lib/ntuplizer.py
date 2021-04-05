@@ -64,14 +64,17 @@ def get_num_ptcl(event, particle):
 '''
 INPUT -------------------------------------------------------------------------
 |* (TObject) event: the delphes event object to look at
-|* (str) particle: the particle to be used for the veto
-|* (str) var: the variable of that particle to be used for the veto
-|* (str) threshold: The condition, when satisfied, vetos the event
+|* (str) particle: the particle(s) to be used for the veto
+|* (str) var: the one variable of that particle(s) to be used for the veto
+|* (str) threshold: The condition which, when satisfied, allow the event to pass
 |                   takes the form {quantifier inequaility critical_val uint}
-|                   e.g. threshold = "highest > 10 GeV"
+|                   e.g. threshold = "highest < 10 GeV"
 |  
 ROUTINE -----------------------------------------------------------------------
 |* parse the threshold string into quantifier, inequality, critical_val
+|* when no ptcl found
+|  - return 1 for "for all, there doesn't exist" logic 
+|  - return 0 for "there must exist" logic in the threshold clause
 |* fetch the particle value with event.particle[quantifier].Var
 |* check if the threshold condition is met
 |  - if yes, return 0 to signal veto of the event
@@ -81,48 +84,62 @@ OUTPUT ------------------------------------------------------------------------
 |* (int): 0 for vetoed event; 1 for passed event 
 +------------------------------------------------------------------------------ 
 '''
-def particle_var_veto(event, particle, var, threshold):
+def particle_var_veto(event, particles, var, var_in_delphes, threshold):
+	var = list_to_string(vars_to_delphes_form(var))
+	particles = string_to_list(particles)
+	# check if threshold is corrected formatted
 	if len(threshold.split()) != 4:
 		sys.exit("invalid threshold format for event veto")
 	else:
 		quantifier, inequality, crit_val, unit = threshold.split()
 		crit_val = int(crit_val)
-	var = list_to_string(vars_to_delphes_form(var))
+	# for the case where no ptcl of the type in (list) particles is found
 	num_particle = 0
-	for candidate in getattr(event, particle.capitalize()):
-		num_particle += 1
-		break
-	if num_particle == 0: return 1
-
-	if quantifier == "highest":
-		for i_cand, cand in enumerate(getattr(event, particle.capitalize())):
-			if i_cand == 0:
-				particle_var_max = getattr(cand,var)
-			else:
-				if getattr(cand,var) > particle_var_max: 
+	for ptcl in particles:
+		for candidate in getattr(event, particle.capitalize()):
+			num_particle += 1
+			break
+	if num_particle == 0: 
+		# these conditions translate to: for all ptcls, there do not exist ...
+		# such that ... So if no ptcl found, the event passes the veto
+		if ((quantifier == "highest" and inequality == "<") or
+		    (quantifier == "lowest" and inequality == ">")):
+			return 1
+		# these translate to: there exist some ptcl such that ...
+		# So if no ptcl found, the event is vetoed
+		else: 
+			return 0
+		
+	for ptcl in particles:
+		if quantifier == "highest":
+			for i_cand, cand in enumerate(getattr(event, particle.capitalize())):
+				if i_cand == 0:
 					particle_var_max = getattr(cand,var)
-		if inequality == ">":
-			if particle_var_max > crit_val: return 1
-			else: return 0
-		elif inequality == "<":
-			if particle_var_max < crit_val: return 1
-			else: return 0
-		else: sys.exit("invalid inequality for event veto")
-	elif quantifier == "lowest":
-		for i_cand, cand in enumerate(getattr(event, particle.capitalize())):
-			if i_cand == 0:
-				particle_var_min = getattr(cand,var)
-			else:
-				if getattr(cand,var) < particle_var_min:
+				else:
+					if getattr(cand,var) > particle_var_max: 
+						particle_var_max = getattr(cand,var)
+			if inequality == ">":
+				if particle_var_max > crit_val: return 1
+				else: return 0
+			elif inequality == "<":
+				if particle_var_max < crit_val: return 1
+				else: return 0
+			else: sys.exit("invalid inequality for event veto")
+		elif quantifier == "lowest":
+			for i_cand, cand in enumerate(getattr(event, particle.capitalize())):
+				if i_cand == 0:
 					particle_var_min = getattr(cand,var)
-		if inequality == ">":
-			if particle_var_min > crit_val: return 1
-			else: return 0
-		elif inequality == "<":
-			if particle_var_min < crit_val: return 1
-			else: return 0
-		else: sys.exit("invalid inequality for event veto")
-	else: sys.exit("invalid particle quantifier for event veto")
+				else:
+					if getattr(cand,var) < particle_var_min:
+						particle_var_min = getattr(cand,var)
+			if inequality == ">":
+				if particle_var_min > crit_val: return 1
+				else: return 0
+			elif inequality == "<":
+				if particle_var_min < crit_val: return 1
+				else: return 0
+			else: sys.exit("invalid inequality for event veto")
+		else: sys.exit("invalid particle quantifier for event veto")
 
 '''
 INPUT -------------------------------------------------------------------------
@@ -156,7 +173,7 @@ def select_ptcl_var_opposite(delphes_file, event, particles, var, var_in_delphes
                              candidates="all"):
 	particles = string_to_list(particles)
 	var = string_to_list(var)
-	cand_selected = {}
+	cand_selected = OrderedDict()
 	for ptcl in particles:
 		if candidates == "all":
 			ptcl_cands = get_idx_candidate_sets(event, ptcl, subset_size = 2)
@@ -212,14 +229,14 @@ OUTPUT ------------------------------------------------------------------------
 +------------------------------------------------------------------------------ 
 ''' 
 def select_ptcl_var_highest(delphes_file, event, particles, var, var_in_delphes,
-                                candidates="all"):
+                                candidates="all", ):
 	particles = string_to_list(particles)
 	# overwrite particles passed in with particles contained in the pre-selected
 	# candidate set
 	if candidates != "all":
 		particles = candidates.keys()
 	var = string_to_list(var)
-	cand_max = {}
+	cand_max = OrderedDict()
 	var_max = 0
 	for i_ptcl, ptcl in enumerate(particles):
 		if candidates == "all":
