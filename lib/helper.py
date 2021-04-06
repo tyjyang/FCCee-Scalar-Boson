@@ -422,13 +422,14 @@ def get_args_calc_var(var_calc):
 
 '''
 INPUT -------------------------------------------------------------------------
-|* (str) var_calc: 
+|* (str) or list(str) var_calc: the single varialbe of interest
 |  
 ROUTINE -----------------------------------------------------------------------
-|* 
+|* look over all parameters it takes to calculate the variable, and get the 
+|  number of ptcls these parameters come from. 
 | 
 OUTPUT ------------------------------------------------------------------------
-|* 
+|* (int) the number of ptcls it takes to calculat the variable
 +------------------------------------------------------------------------------ 
 '''
 def get_num_ptcl_to_calc_var(var_calc):
@@ -448,8 +449,9 @@ ROUTINE -----------------------------------------------------------------------
 |* call get_args_calc_var() to convert args need for var_calac to list of tuples
 |* for each element of the tuple, look at the 2nd element, which is the num of
 |  particles (N) the variables in the 1st element takes.
-|* Look at the first N particles in the candidate list, and fetch their vars
-|  put all vars of one particle before going to next one 
+|* Look at the N particles in the candidate list, and fetch their vars.
+|  put all vars of one particle before going to next one.
+|  for input vars that takes n < N particles, look at the first n entries
 |* if var == "m", look at the particle_mass dict to fetch particle mass
 |  if var == "s", look at consts dict to fetch center of mass energy^2
 |
@@ -459,16 +461,14 @@ OUTPUT ------------------------------------------------------------------------
 ''' 
 def get_args_val(delphes_file, event, ptcl_cand, var_calc):
 	args = get_args_calc_var(var_calc)
-	ptcls = ptcl_cand.keys()
 	args_val = []
-	max_num_ptcl = max([arg_tuple[1] for arg_tuple in args])
 	for arg_tuple in args:
 		input_vars = arg_tuple[0]
 		num_ptcl = arg_tuple[1]
 		num_ptcl_checked = 0
-		for ptcl in ptcls:
+		for ptcl in ptcl_cand.keys():
 			for i_cand, cand in enumerate(getattr(event, ptcl.capitalize())):
-				if i_cand in cand_ind:
+				if i_cand in ptcl_cand[ptcl]:
 					num_ptcl_checked += 1
 					for var in input_vars:
 						if var in delphes_variable_list:
@@ -486,13 +486,26 @@ def get_args_val(delphes_file, event, ptcl_cand, var_calc):
 
 '''
 INPUT -------------------------------------------------------------------------
-|* 
+|* (OrderedDict) ptcl_cand: of the format 'particle_type':[indices]. The element
+|                           of the indices list has to be int.
+|* list(str) or (str) var_calc: the variable based on which to get the size n
 |  
 ROUTINE -----------------------------------------------------------------------
-|* 
-| 
+|* Get the number of particles it takes to calculate the var passed in, call it N
+|* Get a subset of the list by excluding the first r elements, or the remainder
+|  from division on the length of the previous list by N. 
+|  For the first list, r = 0 as there is no remainder from the previous list.
+|* For all lists,  we do the division on the subset with the first r elements
+|  excluded. The quotient is q and the remainder is r.
+|* For a number of q size-n blocks within a list, we write the key-value pair.
+|  Key is just the key of that list.
+|* For blocks that cross two lists, we write the keys of the two lists and their
+|  corresponding values.
+|* Remainder of the last list is discarded.
+|  
 OUTPUT ------------------------------------------------------------------------
-|* 
+|* list(OrderedDict()): each element of the format 'ptcl_type':[indices], with
+|                       len of the indices lists sum up to N
 +------------------------------------------------------------------------------ 
 ''' 
 def dvd_ptcl_cand_into_size_n(ptcl_cand, var_calc):
@@ -512,45 +525,85 @@ def dvd_ptcl_cand_into_size_n(ptcl_cand, var_calc):
 		r = len(idx_block) % n
 		q = len(idx_block) / n
 		for i in range(q):
-			ptcl_cand_list.append({ptcl:idx_block[i*n:(i + 1)*n]})
+			b = OrderedDict([(ptcl,idx_block[i*n:(i + 1)*n])])
+			ptcl_cand_list.append(b)
 		if idx_block == num_block_in_ptcl_cand: break
 		i_block += 1
 		prev_ptcl = ptcl
 	return ptcl_cand_list
+
 '''
 INPUT -------------------------------------------------------------------------
+|* (str) delphes_file: the name of the delphes file containing relevant data
 |* (TObject) event: the delphes event to look at
-|* (str) ptcl: the particle of interest
-|* list(int) or (int) cand: the indices for the candidate set
+|* (OrderedDict) ptcl_cand: of the format 'particle_type':[indices]. 
+|                           elements of the indices list have to be int
 |* (str) or list(str) var: the variable(s) of interest. 
 |                          must be COMMA-SEPARATED when passed in as str
 |
 ROUTINE -----------------------------------------------------------------------
 |* for the candidate idx of the particle tree, loop through every var to be
 |  calculated.
+|* for each variable to be calculated, divide the ptcl_cand passed in into 
+|  pieces of size N, where N is the number of particles it takes to calculate
+|  this variable.
 |* for each variable to be calculated, pass in the particle type, candidate in-
 |  dices, and the variable name to get_args_val() to get the values of the args
 |  needed to return the variable to be calculated. 
 |* call the calculation function from the dictionary calc_var_func_call, which
 |  links name of calculated variable to the corresponding function.
-|* Note that if the var to be calculated only takes in N particles, and the 
-|  number of ptcl exceeds N in the cand idx list passed in, then this function
-|  will only look at the FIRST N ptcl for calculation of the var.  
+|* put values of one var into a list, and values of all vars into a list of lists
 |
 OUTPUT ------------------------------------------------------------------------
-|* list(float) var_val
+|* list(list(float)) var val: grouped column-wise (one list == vals for one var)
 +------------------------------------------------------------------------------ 
 ''' 
-def calc_ptcl_var_by_idx(delphes_file, event, ptcl, cand, var):
+def calc_ptcl_var_by_idx(delphes_file, event, ptcl_cand, var):
 	ptcl = list_to_string(ptcl)
 	cand = int_to_list(cand)
 	var = string_to_list(var)
 	var_val = []
-	for v in var:
-		args_val = get_args_val(delphes_file, event, ptcl, cand, v)
-		var_val.append(calc_var_func_call[v](*args_val))
+	for i, v in enumerate(var):
+		var_val[i] = []
+		n = get_num_ptcl_to_calc_var(v)
+		ptcl_cand_list = dvd_ptcl_cand_into_size_n(ptcl_cand, n)
+		for ptcl_cand_size_n in ptcl_cand_list:
+			args_val = get_args_val(delphes_file, event, ptcl_cand_size_n, v)
+			var_val[i].append(calc_var_func_call[v](*args_val))
 	return var_val
 
+'''
+INPUT -------------------------------------------------------------------------
+|* list(list(float)) jagged_array: an array of arrays with varied lengths
+|* fill: the variable to fill the holes in the rectangularized array
+|  
+ROUTINE -----------------------------------------------------------------------
+|* get the number of row of the rect_array from the number of vars (arrays) in
+|  the jagged array; get the number of col of the rect_array from length of the
+|  longest array in jagged_array.
+|* loop over elements in jagged_array, which corresponds to columns in the rect
+|  array. For each col, fill in the data from jagged_array in an evenly-spaced
+|  fashion, and fill the gaps + ends with the variable fill (defaulted to be 
+|  float("NaN"))
+| 
+OUTPUT ------------------------------------------------------------------------
+|* (np.ndarray) rect_arraay: a 2D numpy array containing rectangularized data
++------------------------------------------------------------------------------ 
+''' 
+def rectangularize_jagged_array(jagged_array, fill=float("NaN")):
+	num_row = max([len(col) for col in jagged_array])
+	num_col = len(jagged_array)
+	rect_array = np.empty([num_row, num_col])
+	for i_col, col in enumerate(jagged_array):
+		spacing = num_row / len(col)
+		for data_idx in range(len(col)):
+			rect_array[0 + data_idx * spacing][i_col] = col[data_idx]
+			for fill_idx in range(spacing - 1):
+				rect_array[1 + data_idx * spacing + fill_idx][i_col] = fill
+		if len(col) * spacing != num_row:
+			rect_array[(len(col) * spacing):,i_col] = fill
+	return rect_array 
+ 
 '''
 INPUT -------------------------------------------------------------------------
 |* (TObject) event: the delphes event to look at
