@@ -111,3 +111,5 @@ the same thing as above for the `N-r` particles.
 Note that since both the division of the groups and the discard of the remaining
 particles depend on the order of the dictionary passed in, we have to use 
 OrderedDict, as said before.
+
+## Particle vs. Event Variables

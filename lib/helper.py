@@ -205,6 +205,21 @@ OUTPUT ------------------------------------------------------------------------
 def calculate_charge_prod(charge1, charge2):
 	return charge1 * charge2
 
+'''
+INPUT -------------------------------------------------------------------------
+|* (float) eta_p_missing: the pseudorapidity of the missing momentum, fetched
+|                         from the MissingET.Eta branch in delphes.
+|  
+ROUTINE -----------------------------------------------------------------------
+|* calculate the theta angle, then take cosine of that.
+| 
+OUTPUT ------------------------------------------------------------------------
+|* (float) cosine of the forrward angle of the misssing momentum
++------------------------------------------------------------------------------ 
+''' 
+def calculate_cos_theta_p_missing(eta_p_missing):
+	return np.cos(calculate_theta(eta_p_missing))
+
 calc_var_func_call = {"theta":calculate_theta,
                       "phi_a":calculate_acoplanarity,
                       "alpha":calculate_mod_acoplanarity,
@@ -213,7 +228,8 @@ calc_var_func_call = {"theta":calculate_theta,
                       "m_rec":calculate_recoil_m,
                       "p_mag":calculate_momentum,
                       "sum_p_mag":calculate_sum_momentum,
-                      "charge_prod":calculate_charge_prod}
+                      "charge_prod":calculate_charge_prod,
+                      "cos_theta_p_missing":calculate_cos_theta_p_missing}
 
 calc_var_func_args = {"theta":"eta:1",
                       "phi_a":"phi:2",
@@ -223,14 +239,16 @@ calc_var_func_args = {"theta":"eta:1",
                       "m_rec":"s:1-pt,eta,phi,m:2",
                       "p_mag":"pt,eta:1",
                       "sum_p_mag":"pt,eta:2",
-                      "charge_prod":"charge:2"}
+                      "charge_prod":"charge:2",
+                      "cos_theta_p_missing":"eta_p_missing:1"}
 
 particle_mass = {"electron": 0.000511,
                  "muon": 0.1057}
 
-delphes_variable_list = ['pt', 'eta', 'phi', 'energy', 'charge']
-
-consts = {"s":91**2}
+delphes_ptcl_var_list = ['pt', 'eta', 'phi', 'energy', 'charge']
+delphes_evt_var_list = ['eta_p_missing']
+# the location of the event variable in forms of "treename:tree_var"
+delphes_evt_var_location = {'eta_p_missing':'MissingET,eta'} 
 
 '''
 INPUT -------------------------------------------------------------------------
@@ -297,31 +315,6 @@ def int_to_list(integer):
 
 '''
 INPUT -------------------------------------------------------------------------
-|* (str) or list(str) variables: the list of variables of interest in lowercase
-|                                must be COMMA-SEPARATED when passed in as str
-|  
-ROUTINE -----------------------------------------------------------------------
-|* select out the variables that can be found in delphes, pu them into list(str)
-|* put the rest into another list(str)
-| 
-OUTPUT ------------------------------------------------------------------------
-|* list(str) delphes_variables: the list of variables already in delphes
-|* list(str) calc_variables: the list of variables need to be calculated
-+------------------------------------------------------------------------------ 
-''' 
-def sep_var_into_delphes_calculated(variables):
-	variables = string_to_list(variables)
-	delphes_variables = []
-	calc_variables = []
-	for variable in variables:
-		if (variable in delphes_variable_list):
-			delphes_variables.append(variable)
-		else:
-			calc_variables.append(variable)
-	return delphes_variables, calc_variables
-
-'''
-INPUT -------------------------------------------------------------------------
 |* (str) or list(str) variables: the lowercase variables to be converted to the 
 |                                delphes format, must be COMMA-SEPARATED
 |                                and contained in the delphes sample
@@ -348,24 +341,6 @@ def vars_to_delphes_form(variables):
 
 '''
 INPUT -------------------------------------------------------------------------
-|* list(str) delphes_var: the delphes variables
-|* list(str) calc_var: the variables to be calculated from delphes variables
-|  
-ROUTINE -----------------------------------------------------------------------
-|* sort the two lists of strings, then combine the sorted two lists, with  
-|  the delphes variables before the calculated variables
-| 
-OUTPUT ------------------------------------------------------------------------
-|* list(str) the sorted variables 
-+------------------------------------------------------------------------------ 
-''' 
-def sort_delphes_and_calc_var(delphes_var, calc_var):
-	delphes_var = sorted(delphes_var)
-	calc_var = sorted(calc_var)
-	return delphes_var + calc_var
-
-'''
-INPUT -------------------------------------------------------------------------
 |* (str) delphes_file_path: the full absolute path to the delphes file
 |* (dict) particle_variable: particles are in the keys, with values of 
 |                            their corresponding variables in an array
@@ -385,14 +360,66 @@ def get_ntuple_filename(delphes_file_path, particle_variable):
 	ntuple_content = delphes_file + ':'
 	variable_separator = '_'
 	particles = particle_variable.keys()
-
+	
 	for i, particle in enumerate(sorted(particles)):
 		if i == len(particles) - 1: # use "-" btwn particles
 			variables = string_to_list(particle_variable[particle])
 			ntuple_content += particle + ':' + variable_separator.join(variables)
 		else: ntuple_content += particle + "-"
-
+	
 	return ntuple_content + '.root'
+
+'''
+INPUT -------------------------------------------------------------------------
+|* (TObject) event: the delphes event to look at
+|* (str) particle: the single particle of interest
+|* (int) or list(int) cand: the particle cand indices
+|* (str) or list(str) var: the variables of interst
+|  
+ROUTINE -----------------------------------------------------------------------
+|* fetch the var values for particles with the given indices in a delphes event
+|* we fetch one var_val per var per ptcl candidate
+|
+OUTPUT ------------------------------------------------------------------------
+|* np.ndarray(floats): The 2D numpy array of variable values with each particle
+|                      taking a row and each variable taking a column.
++------------------------------------------------------------------------------ 
+''' 
+def get_ptcl_var_by_idx(event, particle, cand, var):
+	particle = list_to_string(particle)
+	var = vars_to_delphes_form(var)
+	i_cand = int_to_list(cand)
+	var_val = np.empty([len(var), len(i_cand)])
+	ptcl_idx = 0
+	for i, cand in enumerate(getattr(event, particle.capitalize())):
+		if i in i_cand:
+			var_val[:, ptcl_idx] = [getattr(cand, v) for v in var]
+			ptcl_idx += 1
+	return var_val
+
+'''
+INPUT -------------------------------------------------------------------------
+|* (TObject) event: the delphes event to look at
+|* (str) or list(str) var: the event variables of interst
+|  
+ROUTINE -----------------------------------------------------------------------
+|* look for the delphes tree and tree-variable name in order to access the
+|  event variable
+|* One value is obtained per event variable, an empty numpy array of length
+|  equal to the number of event vars passed in is filled with the values obtained.
+|
+OUTPUT ------------------------------------------------------------------------
+|* np.ndarray(floats): The 1D numpy array of evt variable values.
++------------------------------------------------------------------------------ 
+''' 
+def get_delphes_evt_var(event, var):
+	var = string_to_list(var)
+	var_val = np.empty(len(var))
+	for i, v in enumerate(var):
+		tree, tree_var = delphes_evt_var_location[v].split(',')
+		tree_var = list_to_string(vars_to_delphes_form(tree_var))
+		var_val[i] = [getattr(data, tree_var) for data in getattr(event, tree)][0]
+	return var_val
 
 '''
 INPUT -------------------------------------------------------------------------
@@ -453,7 +480,7 @@ ROUTINE -----------------------------------------------------------------------
 |  put all vars of one particle before going to next one.
 |  for input vars that takes n < N particles, look at the first n entries
 |* if var == "m", look at the particle_mass dict to fetch particle mass
-|  if var == "s", look at consts dict to fetch center of mass energy^2
+|  if var == "s", look at delphes_gen_info for center of mass energy^2
 |
 OUTPUT ------------------------------------------------------------------------
 |* list(float) args: the list of args in their numerical value 
@@ -471,12 +498,15 @@ def get_args_val(delphes_file, event, ptcl_cand, var_calc):
 				if i_cand in ptcl_cand[ptcl]:
 					num_ptcl_checked += 1
 					for var in input_vars:
-						if var in delphes_variable_list:
-							var = list_to_string(vars_to_delphes_form(var))
-							args_val.append(getattr(cand, var))
-						if var == 's':
+						if var in delphes_ptcl_var_list:
+							val = get_ptcl_var_by_idx(event, ptcl, cand, var)
+							args_val.append(*val)
+						elif var in delphes_evt_var_list:
+							val = get_delphes_evt_var(event, var)
+							args_val.append(*val)
+						elif var == 's':
 							args_val.append(delphes_gen_info[delphes_file][var])
-						if var == 'm':
+						elif var == 'm':
 							args_val.append(particle_mass[ptcl])
 				if num_ptcl_checked == num_ptcl:
 					args_val_list.append(args_val)
@@ -555,14 +585,14 @@ ROUTINE -----------------------------------------------------------------------
 |* put values of one var into a list, and values of all vars into a list of lists
 |
 OUTPUT ------------------------------------------------------------------------
-|* list(list(float)) var val: grouped column-wise (one list == vals for one var)
+|* (np.ndarray) var_val: grouped column-wise (one list == vals for one var)
 +------------------------------------------------------------------------------ 
 ''' 
 def calc_ptcl_var_by_idx(delphes_file, event, ptcl_cand, var):
 	ptcl = list_to_string(ptcl)
 	cand = int_to_list(cand)
 	var = string_to_list(var)
-	var_val = []
+	var_val = [i for i,v in enumerate(var)] # init a list with length len(var)
 	for i, v in enumerate(var):
 		var_val[i] = []
 		n = get_num_ptcl_to_calc_var(v)
@@ -570,7 +600,57 @@ def calc_ptcl_var_by_idx(delphes_file, event, ptcl_cand, var):
 		for ptcl_cand_size_n in ptcl_cand_list:
 			args_val = get_args_val(delphes_file, event, ptcl_cand_size_n, v)
 			var_val[i].append(calc_var_func_call[v](*args_val))
+	return np.array(var_val)
+
+'''
+INPUT -------------------------------------------------------------------------
+|* (TObject) evt: the delphes evt to look at
+|* (str) or list(str) var: the variable(s) of interest
+|  
+ROUTINE -----------------------------------------------------------------------
+|* loop through variables, for each variable:
+|  - call get_args_val(), which calls get_delphes_evt_var(), which looks at
+|    the delphes_evt_var_location dict for particle tree and tree var to fetch
+|    the value of the variables to calculate the evt variable
+|  - Use the calc_var_func_call dict to look up for function to calculate the 
+|    evt variable
+|  - write the calculation result to a numpy array
+|* note that all input var to calculate evt var are themselves evt var. All
+|  input var to calculate ptcl var are all ptcl vars. 
+| 
+OUTPUT ------------------------------------------------------------------------
+|* (np.ndarray) the 1D numpy array containing vals for the calculated vars
++------------------------------------------------------------------------------ 
+''' 
+def calc_evt_var(evt, var):
+	var = string_to_list(var)
+	var_val = np.empty(len(var))
+	for i, v in enumerate(var):
+		args_val = get_args_val(delphes_file, evt, {"placeholder":0}, v)
+		var_val[i] = calc_var_func_call[v](*args_val)
 	return var_val
+
+'''
+INPUT -------------------------------------------------------------------------
+|* (np.ndarray) arrays: 2D numpy arrays with each array containing values for
+|                       one variable.
+|  
+ROUTINE -----------------------------------------------------------------------
+|* take all the 1D arrays, each corresponding to values of one var for all ptcl,
+|  out of the 2D arrays.
+|* put all these 1D arrays together into one 2D array
+| 
+OUTPUT ------------------------------------------------------------------------
+|* (np.ndarray) arr: the 2D numpy array with each array containing values of one
+|  var for the ptcls
++------------------------------------------------------------------------------ 
+''' 
+def concatenate_var_val_arrays(*arrays):
+	arr = []
+	for array in arrays:
+		for i in array:
+			arr.append(i)
+	return np.array(arr)
 
 '''
 INPUT -------------------------------------------------------------------------
@@ -585,12 +665,13 @@ ROUTINE -----------------------------------------------------------------------
 |  array. For each col, fill in the data from jagged_array in an evenly-spaced
 |  fashion, and fill the gaps + ends with the variable fill (defaulted to be 
 |  float("NaN"))
+|* Note: the jagged array is transposed before being rectangularized
 | 
 OUTPUT ------------------------------------------------------------------------
 |* (np.ndarray) rect_arraay: a 2D numpy array containing rectangularized data
 +------------------------------------------------------------------------------ 
 ''' 
-def rectangularize_jagged_array(jagged_array, fill=float("NaN")):
+def rectangularize_jagged_array_T(jagged_array, fill=float("NaN")):
 	num_row = max([len(col) for col in jagged_array])
 	num_col = len(jagged_array)
 	rect_array = np.empty([num_row, num_col])
@@ -604,34 +685,6 @@ def rectangularize_jagged_array(jagged_array, fill=float("NaN")):
 			rect_array[(len(col) * spacing):,i_col] = fill
 	return rect_array 
  
-'''
-INPUT -------------------------------------------------------------------------
-|* (TObject) event: the delphes event to look at
-|* (str) particle: the single particle of interest
-|* (int) or list(int) cand: the particle cand indices
-|* (str) var: the single variable of interst
-|  
-ROUTINE -----------------------------------------------------------------------
-|* fetch the var values for particles with the given indices in a delphes event
-|* we fetch one var_val per var per ptcl, as opposed to calc_ptcl_var_by_ind(),
-|  where we only return one var_val per var per cand group  
-|
-OUTPUT ------------------------------------------------------------------------
-|* list(float): the var values
-+------------------------------------------------------------------------------ 
-''' 
-def get_ptcl_var_by_idx(event, particle, cand, var):
-	particle = list_to_string(particle)
-	var = vars_to_delphes_form(var)
-	cand = int_to_list(cand)
-	var_val = np.empty([len(cand), len(var)])
-	row_num = 0
-	for i, ptcl in enumerate(getattr(event, particle.capitalize())):
-		if i in cand:
-			var_val[row_num,:] = [getattr(ptcl, v) for v in var]
-			row_num += 1
-	return var_val
-
 '''
 INPUT -------------------------------------------------------------------------
 |* list(int) idx: the array of indices [0,1,2,3...N-1]

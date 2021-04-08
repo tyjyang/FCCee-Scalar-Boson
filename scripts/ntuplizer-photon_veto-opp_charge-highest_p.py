@@ -16,7 +16,7 @@ delphes_file_list = ['eeTollS_0p5_inc.root', 'eeTollS_5_inc.root', 'eeTollS_25_i
 ntuple_path = '../ntuples'
 particles =  ['electron', 'muon', 'photon']
 var_to_wrt = ['pt', 'eta', 'phi', 'charge', 'theta', 'phi_a', 'alpha',
-              'p_mag', 'm_inv', 'm_rec']  
+              'p_mag', 'm_inv', 'm_rec','cos_theta_p_missing']  
 ptcl_var_to_wrt = {'electron':var_to_wrt, 'muon':var_to_wrt}
 
 load_delphes_lib()

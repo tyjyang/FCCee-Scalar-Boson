@@ -38,6 +38,7 @@ OUTPUT ------------------------------------------------------------------------
 def load_delphes_file(delphes_file_path, particles):
 	chain = ROOT.TChain("Delphes")
 	chain.Add(delphes_file_path)
+	particles = string_to_list(particles)
 	Particles = [particle.capitalize() for particle in particles]
 	Particle_pointers = [(Particle + "*") for Particle in Particles]
 	for pointer in Particle_pointers: chain.SetBranchStatus(pointer, 1) 
@@ -229,7 +230,7 @@ OUTPUT ------------------------------------------------------------------------
 +------------------------------------------------------------------------------ 
 ''' 
 def select_ptcl_var_highest(delphes_file, event, particles, var, var_in_delphes,
-                                candidates="all", ):
+                                candidates="all"):
 	particles = string_to_list(particles)
 	# overwrite particles passed in with particles contained in the pre-selected
 	# candidate set
@@ -301,6 +302,67 @@ def create_ntuple_file(ntuple_path, delphes_file_path, ptcl_var):
 
 '''
 INPUT -------------------------------------------------------------------------
+|* (str) or list(str) variables: the list of variables of interest in lowercase
+|                                must be COMMA-SEPARATED when passed in as str
+|  
+ROUTINE -----------------------------------------------------------------------
+|* seperate the variables into delphes and calculated vars
+|* for delphes vars, separate into ptcl and evt vars, based on list of vars from
+|  delphes_ptcl_var_list and delphes_evt_var_list
+|* for calculated vars, check the input vars needed to calculate them
+|  if input vars are delphes evt vars, then put calculated var to calc_evt_var
+|  otherwise, put it into calc_ptcl_var
+| 
+OUTPUT ------------------------------------------------------------------------
+|* list(str) the four lists of variables
++------------------------------------------------------------------------------ 
+''' 
+def sep_vars_into_delph_calc_ptcl_evt(variables):
+	variables = string_to_list(variables)
+	delphes_ptcl_var, delphes_evt_var, calc_ptcl_var, calc_evt_var = [[],[],[],[]]
+	for var in variables:
+		if var in delphes_ptcl_var_list:
+			delphes_ptcl_var.append(var)
+		elif var in delphes_evt_var_list:
+			delphes_evt_var.append(var)
+		
+	for var in delphes_ptcl_var: variables.remove(var)
+	for var in delphes_evt_var: variables.remove(var)
+	
+	for var in variables:
+		input_var_list = []
+		args = get_args_calc_var(var)
+		for arg_tuple in args:
+			for input_var in arg_tuple[0]:
+				input_var_list.append(input_var)
+		for input_var in input_var_list:
+			if input_var in delphes_evt_var_list:
+				calc_evt_var.append(var)
+	
+	for var in calc_evt_var: variables.remove(var)
+	calc_ptcl_var = variables
+	return delphes_ptcl_var, delphes_evt_var, calc_ptcl_var, calc_evt_var
+
+'''
+INPUT -------------------------------------------------------------------------
+|* list(str) var_lists: the variables separated into lists of delphes_ptcl,
+|                       delphes_evt, calc_ptcl, and calc_evt
+|  
+ROUTINE -----------------------------------------------------------------------
+|* sort each list passed in
+| 
+OUTPUT ------------------------------------------------------------------------
+|* list(str) the sorted variables 
++------------------------------------------------------------------------------ 
+''' 
+def sort_separated_vars(*var_lists):
+	sorted_var_lists = []
+	for var_list in var_lists:
+		sorted_var_lists.append(sorted(var_list))
+	return sorted_var_lists
+
+'''
+INPUT -------------------------------------------------------------------------
 |* (dict) particle_variable: the dictionary specifying which 
 |         variables are to be extracted from each particle.
 |         e.g. particle_variable = {"electron":["pt", "eta", "phi"]}
@@ -324,32 +386,18 @@ def create_ntuple_trees(particle_variable):
 		# create a ROOT Ntuple tree to store all variables of desire for 
 		# each particle
 		variables = particle_variable[particle]
-		delphes, calc = sep_var_into_delphes_calculated(variables)
-		sorted_var = sort_delphes_and_calc_var(delphes, calc)
-		particle_variables = [particle + '_' + variable 
-		                      for variable in sorted_var]
+		a,b,c,d = sep_vars_into_delph_calc_ptcl_evt(variables)
+		sorted_var_lists = sort_separated_vars(a,b,c,d)
+		sorted_var = []
+		for var_list in sorted_var_lists:
+			for var in var_list:
+				sorted_var.append(var)
+		particle_variables = [variable for variable in sorted_var]
 		column_separator = ":"
 		variables_combined = column_separator.join(particle_variables)
 		ntuple_tree[particle] = ROOT.TNtuple(particle, "Flat ntuple tree for " 
 		                                     + particle, variables_combined)
 	return ntuple_tree
-
-'''
-INPUT -------------------------------------------------------------------------
-|* (str) or list(str) variables
-|  
-ROUTINE -----------------------------------------------------------------------
-|* split the variables into delphes and calc
-|* sort the two lists
-OUTPUT ------------------------------------------------------------------------
-|* (list) delphes_var_sorted, calc_var_sorted
-+------------------------------------------------------------------------------ 
-''' 
-def get_delphes_calc_var_sorted(variables):
-	delphes_var, calc_var = sep_var_into_delphes_calculated(variables)
-	delphes_var_sorted = sorted(delphes_var)
-	calc_var_sorted = sorted(calc_var)
-	return delphes_var_sorted, calc_var_sorted
 
 '''
 INPUT -------------------------------------------------------------------------
@@ -370,28 +418,25 @@ OUTPUT ------------------------------------------------------------------------
 |* NONE
 +------------------------------------------------------------------------------
 '''
-def write_pair_to_ntuple_tree(delphes_file, tree_chain, event, ptcl_cand, var):
+def write_pair_to_ntuple_tree(delphes_file, tree_chain, event, ptcl_cand,
+                              variables):
 	particles = ptcl_cand.keys()
 	if len(particles) > 1: sys.exit("only one ptcl species can be wrtn per evt")
 	else: ptcl = list_to_string(particles)
 	cand = list(ptcl_cand[ptcl])
 	var = string_to_list(var)
-	delphes_var, calc_var = get_delphes_calc_var_sorted(var)
-	num_var = len(var)
-	num_delphes_var = len(delphes_var)
-	var_data = np.empty([2,num_var])
+	a,b,c,d = sep_vars_into_delph_calc_ptcl_evt(var)
+	delphes_ptcl_var, delphes_evt_var, calc_ptcl_var, calc_evt_var = (
+	sort_separated_vars(a,b,c,d))
 	
-	var_data[:,:num_delphes_var] = get_ptcl_var_by_idx(event, ptcl, cand, 
-	                                                  delphes_var)
-	# a workaround for filling 2 rows with different values, since some var only
-	# takes one ptcl to calculate 
-	data_row = 0
-	var_data[data_row][num_delphes_var:] = calc_ptcl_var_by_idx(delphes_file,
-	                                        event, ptcl, cand, calc_var)
-	cand.reverse()
-	data_row += 1
-	var_data[data_row][num_delphes_var:] = calc_ptcl_var_by_idx(delphes_file,
-	                                        event, ptcl, cand, calc_var)
+	arr_delphes_ptcl = get_ptcl_var_by_idx(event, ptcl, cand, delphes_ptcl_var)
+	arr_delphes_evt = get_delphes_evt_var(event, delphes_evt_var)
+	arr_calc_ptcl = calc_ptcl_var_by_idx(delphes_file, event, ptcl_cand,
+	                                     calc_ptcl_var)
+	arr_calc_evt = calc_evt_var(event, calc_evt_var)
+	arr_all_var = concatenate_var_val_arrays(arr_delphes_ptcl, arr_delphes_evt,
+	                                         arr_calc_ptcl, arr_calc_evt)
+	var_data = rectangularize_jagged_array_T(arr_all_var)
 	tree_chain[ptcl].Fill(*var_data[0,:])
 	tree_chain[ptcl].Fill(*var_data[1,:])
 
