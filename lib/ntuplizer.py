@@ -97,7 +97,7 @@ def particle_var_veto(event, particles, var, var_in_delphes, threshold):
 	# for the case where no ptcl of the type in (list) particles is found
 	num_particle = 0
 	for ptcl in particles:
-		for candidate in getattr(event, particle.capitalize()):
+		for candidate in getattr(event, ptcl.capitalize()):
 			num_particle += 1
 			break
 	if num_particle == 0: 
@@ -113,7 +113,7 @@ def particle_var_veto(event, particles, var, var_in_delphes, threshold):
 		
 	for ptcl in particles:
 		if quantifier == "highest":
-			for i_cand, cand in enumerate(getattr(event, particle.capitalize())):
+			for i_cand, cand in enumerate(getattr(event, ptcl.capitalize())):
 				if i_cand == 0:
 					particle_var_max = getattr(cand,var)
 				else:
@@ -127,7 +127,7 @@ def particle_var_veto(event, particles, var, var_in_delphes, threshold):
 				else: return 0
 			else: sys.exit("invalid inequality for event veto")
 		elif quantifier == "lowest":
-			for i_cand, cand in enumerate(getattr(event, particle.capitalize())):
+			for i_cand, cand in enumerate(getattr(event, ptcl.capitalize())):
 				if i_cand == 0:
 					particle_var_min = getattr(cand,var)
 				else:
