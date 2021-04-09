@@ -499,7 +499,7 @@ def get_args_val(delphes_file, event, ptcl_cand, var_calc):
 					num_ptcl_checked += 1
 					for var in input_vars:
 						if var in delphes_ptcl_var_list:
-							val = get_ptcl_var_by_idx(event, ptcl, cand, var)
+							val = get_ptcl_var_by_idx(event, ptcl, i_cand, var)
 							args_val.append(*val)
 						elif var in delphes_evt_var_list:
 							val = get_delphes_evt_var(event, var)
