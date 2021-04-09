@@ -674,10 +674,11 @@ OUTPUT ------------------------------------------------------------------------
 +------------------------------------------------------------------------------ 
 ''' 
 def rectangularize_jagged_array_T(jagged_array, fill=float("NaN")):
-	num_row = max([len(col) for col in jagged_array])
+	num_row = max([len(np.array(col)) for col in jagged_array])
 	num_col = len(jagged_array)
 	rect_array = np.empty([num_row, num_col])
 	for i_col, col in enumerate(jagged_array):
+		col = np.array(col)
 		spacing = num_row / len(col)
 		for data_idx in range(len(col)):
 			rect_array[0 + data_idx * spacing][i_col] = col[data_idx]
