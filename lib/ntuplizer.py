@@ -440,7 +440,7 @@ def write_to_ntuple_tree(delphes_file, tree_chain, event, ptcl_cand, variables):
 	arr_delphes_evt = get_delphes_evt_var(event, evt_var_delphes)
 	arr_calc_ptcl = calc_ptcl_var_by_idx(delphes_file, event, ptcl_cand,
 	                                     ptcl_var_calc)
-	arr_calc_evt = calc_evt_var(event, calc_evt_var)
+	arr_calc_evt = calc_evt_var(event, evt_var_calc)
 	arr_all_var = concatenate_var_val_arrays(arr_delphes_ptcl, arr_delphes_evt,
 	                                         arr_calc_ptcl, arr_calc_evt)
 	var_data = rectangularize_jagged_array_T(arr_all_var)
