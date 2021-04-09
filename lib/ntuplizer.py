@@ -263,7 +263,7 @@ def select_ptcl_var_highest(delphes_file, event, particles, var, var_in_delphes,
 						cand_max[ptcl] = cand
 		else:
 			for i_cand, cand in enumerate(ptcl_cands):
-				ptcl_cands = {ptcl:cands}
+				ptcl_cands = {ptcl:cand}
 				var_calc = calc_ptcl_var_by_idx(delphes_file, event,
 				                                ptcl_cands, var)
 				if i_ptcl == 0 and i_cand == 0:
