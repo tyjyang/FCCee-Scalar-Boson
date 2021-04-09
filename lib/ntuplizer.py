@@ -319,18 +319,18 @@ OUTPUT ------------------------------------------------------------------------
 +------------------------------------------------------------------------------ 
 ''' 
 def sep_vars_into_delph_calc_ptcl_evt(variables):
-	variables = string_to_list(variables)
+	variables_to_sep = string_to_list(variables)
 	ptcl_var_delphes, evt_var_delphes, ptcl_var_calc, evt_var_calc = [[],[],[],[]]
-	for var in variables:
+	for var in variables_to_sep:
 		if var in ptcl_var_delphes_list:
 			ptcl_var_delphes.append(var)
 		elif var in evt_var_delphes_list:
 			evt_var_delphes.append(var)
 		
-	for var in ptcl_var_delphes: variables.remove(var)
-	for var in evt_var_delphes: variables.remove(var)
+	for var in ptcl_var_delphes: variables_to_sep.remove(var)
+	for var in evt_var_delphes: variables_to_sep.remove(var)
 	
-	for var in variables:
+	for var in variables_to_sep:
 		input_var_list = []
 		args = get_args_calc_var(var)
 		for arg_tuple in args:
@@ -340,8 +340,8 @@ def sep_vars_into_delph_calc_ptcl_evt(variables):
 			if input_var in evt_var_delphes_list:
 				evt_var_calc.append(var)
 	
-	for var in evt_var_calc: variables.remove(var)
-	ptcl_var_calc = variables
+	for var in evt_var_calc: variables_to_sep.remove(var)
+	ptcl_var_calc = variables_to_sep
 	return ptcl_var_delphes, evt_var_delphes, ptcl_var_calc, evt_var_calc
 
 '''
