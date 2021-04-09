@@ -499,9 +499,9 @@ def get_args_val(delphes_file, event, ptcl_cand, var_calc):
 					if num_ptcl_checked == num_ptcl: break
 					for i_cand, cand in enumerate(getattr(event, ptcl.capitalize())):
 						if i_cand in ptcl_cand[ptcl]:
-							num_ptcl_checked += 1
 							val = get_ptcl_var_by_idx(event, ptcl, i_cand, var)
 							args_val.append(*val)
+							num_ptcl_checked += 1
 							if num_ptcl_checked == num_ptcl: break
 			elif var in evt_var_delphes_list:
 				val = get_delphes_evt_var(event, var)
@@ -509,8 +509,12 @@ def get_args_val(delphes_file, event, ptcl_cand, var_calc):
 			elif var == 's':
 				args_val.append(delphes_gen_info[delphes_file][var])
 			elif var == 'm':
-				args_val.append(particle_mass[ptcl])
-				
+				for ptcl in ptcl_cand.keys():
+					if num_ptcl_checked == num_ptcl: break
+					for cand in ptcl_cand[ptcl]:
+						args_val.append(particle_mass[ptcl])
+						num_ptcl_checked += 1
+						if num_ptcl_checked == num_ptcl: break
 	return args_val
 
 '''
