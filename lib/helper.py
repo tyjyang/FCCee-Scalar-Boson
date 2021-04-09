@@ -75,7 +75,7 @@ OUTPUT ------------------------------------------------------------------------
 |* (float) the modified acoplanarity
 +------------------------------------------------------------------------------ 
 ''' 
-def calculate_mod_acoplanarity(eta_1, phi_1, eta_2, phi_2):
+def calculate_mod_acoplanarity(eta_1, eta_2, phi_1, phi_2):
 	theta_1 = calculate_theta(eta_1)
 	theta_2 = calculate_theta(eta_2)
 	w = 0.5 * (np.sin(theta_1) + np.sin(theta_2))
@@ -129,7 +129,7 @@ OUTPUT ------------------------------------------------------------------------
 |* (float) inv_m: the invariant mass
 +------------------------------------------------------------------------------
 '''
-def calculate_inv_m(pt_1, eta_1, phi_1, m_1, pt_2, eta_2, phi_2, m_2):
+def calculate_inv_m(pt_1, pt_2, eta_1, eta_2, phi_1, phi_2, m_1, m_2):
 	p4_1 = to_TLorentzVector(pt_1, eta_1, phi_1, m_1)
 	p4_2 = to_TLorentzVector(pt_2, eta_2, phi_2, m_2)
 	return (p4_1 + p4_2).M()
@@ -150,7 +150,7 @@ OUTPUT ------------------------------------------------------------------------
 |* (float) the mass of the recoiling particle
 +------------------------------------------------------------------------------
 '''
-def calculate_recoil_m(s, pt_1, eta_1, phi_1, m_1, pt_2, eta_2, phi_2, m_2):
+def calculate_recoil_m(s, pt_1, pt_2, eta_1, eta_2, phi_1, phi_2, m_1, m_2):
 	p4_1 = to_TLorentzVector(pt_1, eta_1, phi_1, m_1)
 	p4_2 = to_TLorentzVector(pt_2, eta_2, phi_2, m_2)
 	p4_sum = p4_1 + p4_2
@@ -186,9 +186,9 @@ OUTPUT ------------------------------------------------------------------------
 |* (float) sum_p
 +------------------------------------------------------------------------------ 
 '''
-def calculate_sum_momentum(pt1, eta1, pt2, eta2):
-	p_mag_1 = calculate_momentum(pt1, eta1)
-	p_mag_2 = calculate_momentum(pt2, eta2)
+def calculate_sum_momentum(pt_1, pt_2, eta_1, eta_2):
+	p_mag_1 = calculate_momentum(pt_1, eta_1)
+	p_mag_2 = calculate_momentum(pt_2, eta_2)
 	return p_mag_1 + p_mag_2
 
 '''
@@ -202,8 +202,8 @@ OUTPUT ------------------------------------------------------------------------
 |* (float) charge_prod: the product of the charges
 +------------------------------------------------------------------------------ 
 ''' 
-def calculate_charge_prod(charge1, charge2):
-	return charge1 * charge2
+def calculate_charge_prod(charge_1, charge_2):
+	return charge_1 * charge_2
 
 '''
 INPUT -------------------------------------------------------------------------
@@ -477,7 +477,7 @@ ROUTINE -----------------------------------------------------------------------
 |* for each element of the tuple, look at the 2nd element, which is the num of
 |  particles (N) the variables in the 1st element takes.
 |* Look at the N particles in the candidate list, and fetch their vars.
-|  put all vars of one particle before going to next one.
+|  put all values of one variable before going to next one.
 |  for input vars that takes n < N particles, look at the first n entries
 |* if var == "m", look at the particle_mass dict to fetch particle mass
 |  if var == "s", look at delphes_gen_info for center of mass energy^2
@@ -492,25 +492,25 @@ def get_args_val(delphes_file, event, ptcl_cand, var_calc):
 	for arg_tuple in args:
 		input_vars = arg_tuple[0]
 		num_ptcl = arg_tuple[1]
-		num_ptcl_checked = 0
-		for ptcl in ptcl_cand.keys():
-			if num_ptcl_checked == num_ptcl: break
-			for i_cand, cand in enumerate(getattr(event, ptcl.capitalize())):
-				if i_cand in ptcl_cand[ptcl]:
-					num_ptcl_checked += 1
-					for var in input_vars:
-						if var in ptcl_var_delphes_list:
+		for var in input_vars:
+			num_ptcl_checked = 0
+			if var in ptcl_var_delphes_list:
+				for ptcl in ptcl_cand.keys():
+					if num_ptcl_checked == num_ptcl: break
+					for i_cand, cand in enumerate(getattr(event, ptcl.capitalize())):
+						if i_cand in ptcl_cand[ptcl]:
+							num_ptcl_checked += 1
 							val = get_ptcl_var_by_idx(event, ptcl, i_cand, var)
 							args_val.append(*val)
-						elif var in evt_var_delphes_list:
-							val = get_delphes_evt_var(event, var)
-							args_val.append(*val)
-						elif var == 's':
-							args_val.append(delphes_gen_info[delphes_file][var])
-						elif var == 'm':
-							args_val.append(particle_mass[ptcl])
-				if num_ptcl_checked == num_ptcl: break
-		
+							if num_ptcl_checked == num_ptcl: break
+			elif var in evt_var_delphes_list:
+				val = get_delphes_evt_var(event, var)
+				args_val.append(*val)
+			elif var == 's':
+				args_val.append(delphes_gen_info[delphes_file][var])
+			elif var == 'm':
+				args_val.append(particle_mass[ptcl])
+				
 	return args_val
 
 '''
