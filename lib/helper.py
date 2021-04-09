@@ -494,6 +494,7 @@ def get_args_val(delphes_file, event, ptcl_cand, var_calc):
 		num_ptcl = arg_tuple[1]
 		num_ptcl_checked = 0
 		for ptcl in ptcl_cand.keys():
+			if num_ptcl_checked == num_ptcl: break
 			for i_cand, cand in enumerate(getattr(event, ptcl.capitalize())):
 				if i_cand in ptcl_cand[ptcl]:
 					num_ptcl_checked += 1
@@ -508,10 +509,8 @@ def get_args_val(delphes_file, event, ptcl_cand, var_calc):
 							args_val.append(delphes_gen_info[delphes_file][var])
 						elif var == 'm':
 							args_val.append(particle_mass[ptcl])
-				if num_ptcl_checked == num_ptcl:
-					args_val_list.append(args_val)
-					args_val = []
-					num_ptcl_checked = 0
+				if num_ptcl_checked == num_ptcl: break
+		
 	return args_val
 
 '''
