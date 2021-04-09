@@ -405,20 +405,20 @@ INPUT -------------------------------------------------------------------------
 ROUTINE -----------------------------------------------------------------------
 |* look for the delphes tree and tree-variable name in order to access the
 |  event variable
-|* One value is obtained per event variable, an empty numpy array of length
-|  equal to the number of event vars passed in is filled with the values obtained.
+|* One value is obtained per event variable, an empty 2D numpy array with
+|  len(var) rows and 1 col is filled with the values
 |
 OUTPUT ------------------------------------------------------------------------
-|* np.ndarray(floats): The 1D numpy array of evt variable values.
+|* np.ndarray(floats): The 2D numpy array (1 col) of evt variable values.
 +------------------------------------------------------------------------------ 
 ''' 
 def get_delphes_evt_var(event, var):
 	var = string_to_list(var)
-	var_val = np.empty(len(var))
+	var_val = np.empty([len(var),1])
 	for i, v in enumerate(var):
 		tree, tree_var = evt_var_delphes_location[v].split(',')
 		tree_var = list_to_string(vars_to_delphes_form(tree_var))
-		var_val[i] = [getattr(data, tree_var) for data in getattr(event, tree)][0]
+		var_val[i][0] = [getattr(data, tree_var) for data in getattr(event, tree)][0]
 	return var_val
 
 '''
@@ -588,7 +588,7 @@ ROUTINE -----------------------------------------------------------------------
 |* put values of one var into a list, and values of all vars into a list of lists
 |
 OUTPUT ------------------------------------------------------------------------
-|* (np.ndarray) var_val: grouped column-wise (one list == vals for one var)
+|* (np.ndarray) var_val: 2D grouped column-wise (one list == vals for one var)
 +------------------------------------------------------------------------------ 
 ''' 
 def calc_ptcl_var_by_idx(delphes_file, event, ptcl_cand, var):
@@ -616,20 +616,21 @@ ROUTINE -----------------------------------------------------------------------
 |    the value of the variables to calculate the evt variable
 |  - Use the calc_var_func_call dict to look up for function to calculate the 
 |    evt variable
-|  - write the calculation result to a numpy array
+|  - write the calculation result to a row of a 2D numpy array, with col size
+|    == 1 since evt vars only have one value
 |* note that all input var to calculate evt var are themselves evt var. All
 |  input var to calculate ptcl var are all ptcl vars. 
 | 
 OUTPUT ------------------------------------------------------------------------
-|* (np.ndarray) the 1D numpy array containing vals for the calculated vars
+|* (np.ndarray) the 2D numpy array containing vals for the calculated vars
 +------------------------------------------------------------------------------ 
 ''' 
 def calc_evt_var(delphes_file, evt, var):
 	var = string_to_list(var)
-	var_val = np.empty(len(var))
+	var_val = np.empty([len(var),1])
 	for i, v in enumerate(var):
 		args_val = get_args_val(delphes_file, evt, {"placeholder":0}, v)
-		var_val[i] = calc_var_func_call[v](*args_val)
+		var_val[i][0] = calc_var_func_call[v](*args_val)
 	return var_val
 
 '''
@@ -674,11 +675,10 @@ OUTPUT ------------------------------------------------------------------------
 +------------------------------------------------------------------------------ 
 ''' 
 def rectangularize_jagged_array_T(jagged_array, fill=float("NaN")):
-	num_row = max([len(np.array(col)) for col in jagged_array])
+	num_row = max([len(col) for col in jagged_array])
 	num_col = len(jagged_array)
 	rect_array = np.empty([num_row, num_col])
 	for i_col, col in enumerate(jagged_array):
-		col = np.array(col)
 		spacing = num_row / len(col)
 		for data_idx in range(len(col)):
 			rect_array[0 + data_idx * spacing][i_col] = col[data_idx]
