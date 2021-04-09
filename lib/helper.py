@@ -245,10 +245,10 @@ calc_var_func_args = {"theta":"eta:1",
 particle_mass = {"electron": 0.000511,
                  "muon": 0.1057}
 
-delphes_ptcl_var_list = ['pt', 'eta', 'phi', 'energy', 'charge']
-delphes_evt_var_list = ['eta_p_missing']
+ptcl_var_delphes_list = ['pt', 'eta', 'phi', 'energy', 'charge']
+evt_var_delphes_list = ['eta_p_missing']
 # the location of the event variable in forms of "treename:tree_var"
-delphes_evt_var_location = {'eta_p_missing':'MissingET,eta'} 
+evt_var_delphes_location = {'eta_p_missing':'MissingET,eta'} 
 
 '''
 INPUT -------------------------------------------------------------------------
@@ -416,7 +416,7 @@ def get_delphes_evt_var(event, var):
 	var = string_to_list(var)
 	var_val = np.empty(len(var))
 	for i, v in enumerate(var):
-		tree, tree_var = delphes_evt_var_location[v].split(',')
+		tree, tree_var = evt_var_delphes_location[v].split(',')
 		tree_var = list_to_string(vars_to_delphes_form(tree_var))
 		var_val[i] = [getattr(data, tree_var) for data in getattr(event, tree)][0]
 	return var_val
@@ -499,10 +499,10 @@ def get_args_val(delphes_file, event, ptcl_cand, var_calc):
 				if i_cand in ptcl_cand[ptcl]:
 					num_ptcl_checked += 1
 					for var in input_vars:
-						if var in delphes_ptcl_var_list:
+						if var in ptcl_var_delphes_list:
 							val = get_ptcl_var_by_idx(event, ptcl, i_cand, var)
 							args_val.append(*val)
-						elif var in delphes_evt_var_list:
+						elif var in evt_var_delphes_list:
 							val = get_delphes_evt_var(event, var)
 							args_val.append(*val)
 						elif var == 's':

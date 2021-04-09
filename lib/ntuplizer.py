@@ -309,10 +309,10 @@ INPUT -------------------------------------------------------------------------
 ROUTINE -----------------------------------------------------------------------
 |* seperate the variables into delphes and calculated vars
 |* for delphes vars, separate into ptcl and evt vars, based on list of vars from
-|  delphes_ptcl_var_list and delphes_evt_var_list
+|  ptcl_var_delphes_list and evt_var_delphes_list
 |* for calculated vars, check the input vars needed to calculate them
-|  if input vars are delphes evt vars, then put calculated var to calc_evt_var
-|  otherwise, put it into calc_ptcl_var
+|  if input vars are delphes evt vars, then put calculated var to evt_var_calc
+|  otherwise, put it into ptcl_var_calc
 | 
 OUTPUT ------------------------------------------------------------------------
 |* list(str) the four lists of variables
@@ -320,15 +320,15 @@ OUTPUT ------------------------------------------------------------------------
 ''' 
 def sep_vars_into_delph_calc_ptcl_evt(variables):
 	variables = string_to_list(variables)
-	delphes_ptcl_var, delphes_evt_var, calc_ptcl_var, calc_evt_var = [[],[],[],[]]
+	ptcl_var_delphes, evt_var_delphes, ptcl_var_calc, evt_var_calc = [[],[],[],[]]
 	for var in variables:
-		if var in delphes_ptcl_var_list:
-			delphes_ptcl_var.append(var)
-		elif var in delphes_evt_var_list:
-			delphes_evt_var.append(var)
+		if var in ptcl_var_delphes_list:
+			ptcl_var_delphes.append(var)
+		elif var in evt_var_delphes_list:
+			evt_var_delphes.append(var)
 		
-	for var in delphes_ptcl_var: variables.remove(var)
-	for var in delphes_evt_var: variables.remove(var)
+	for var in ptcl_var_delphes: variables.remove(var)
+	for var in evt_var_delphes: variables.remove(var)
 	
 	for var in variables:
 		input_var_list = []
@@ -337,12 +337,12 @@ def sep_vars_into_delph_calc_ptcl_evt(variables):
 			for input_var in arg_tuple[0]:
 				input_var_list.append(input_var)
 		for input_var in input_var_list:
-			if input_var in delphes_evt_var_list:
-				calc_evt_var.append(var)
+			if input_var in evt_var_delphes_list:
+				evt_var_calc.append(var)
 	
-	for var in calc_evt_var: variables.remove(var)
-	calc_ptcl_var = variables
-	return delphes_ptcl_var, delphes_evt_var, calc_ptcl_var, calc_evt_var
+	for var in evt_var_calc: variables.remove(var)
+	ptcl_var_calc = variables
+	return ptcl_var_delphes, evt_var_delphes, ptcl_var_calc, evt_var_calc
 
 '''
 INPUT -------------------------------------------------------------------------
@@ -411,8 +411,8 @@ INPUT -------------------------------------------------------------------------
 |* list(str) var: the vars to be written to the ntuple tree. same for all ptcl
 |
 ROUTINE -----------------------------------------------------------------------
-|* separate variables into delphes_ptcl_var, delphes_evt_var, calc_ptcl_var,
-|  and calc_evt_var. Each sorted to match the var order in the ntuple tree.
+|* separate variables into ptcl_var_delphes, evt_var_delphes, ptcl_var_calc,
+|  and evt_var_calc. Each sorted to match the var order in the ntuple tree.
 |* fetch/calculate those variables by calling:
 |  - get_ptcl_var_by_idx()
 |  - get_delphes_evt_var()
@@ -433,13 +433,13 @@ def write_to_ntuple_tree(delphes_file, tree_chain, event, ptcl_cand, variables):
 	cand = list(ptcl_cand[ptcl])
 	variables = string_to_list(variables)
 	a,b,c,d = sep_vars_into_delph_calc_ptcl_evt(variables)
-	delphes_ptcl_var, delphes_evt_var, calc_ptcl_var, calc_evt_var = (
+	ptcl_var_delphes, evt_var_delphes, ptcl_var_calc, evt_var_calc = (
 	sort_separated_vars(a,b,c,d))
 	
-	arr_delphes_ptcl = get_ptcl_var_by_idx(event, ptcl, cand, delphes_ptcl_var)
-	arr_delphes_evt = get_delphes_evt_var(event, delphes_evt_var)
+	arr_delphes_ptcl = get_ptcl_var_by_idx(event, ptcl, cand, ptcl_var_delphes)
+	arr_delphes_evt = get_delphes_evt_var(event, evt_var_delphes)
 	arr_calc_ptcl = calc_ptcl_var_by_idx(delphes_file, event, ptcl_cand,
-	                                     calc_ptcl_var)
+	                                     ptcl_var_calc)
 	arr_calc_evt = calc_evt_var(event, calc_evt_var)
 	arr_all_var = concatenate_var_val_arrays(arr_delphes_ptcl, arr_delphes_evt,
 	                                         arr_calc_ptcl, arr_calc_evt)
