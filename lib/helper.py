@@ -600,6 +600,8 @@ def calc_ptcl_var_by_idx(delphes_file, event, ptcl_cand, var):
 
 '''
 INPUT -------------------------------------------------------------------------
+|* (str) delphes_file: the name of the delphes file for fetching gen-level info
+|                      to calculate vars
 |* (TObject) evt: the delphes evt to look at
 |* (str) or list(str) var: the variable(s) of interest
 |  
@@ -618,7 +620,7 @@ OUTPUT ------------------------------------------------------------------------
 |* (np.ndarray) the 1D numpy array containing vals for the calculated vars
 +------------------------------------------------------------------------------ 
 ''' 
-def calc_evt_var(evt, var):
+def calc_evt_var(delphes_file, evt, var):
 	var = string_to_list(var)
 	var_val = np.empty(len(var))
 	for i, v in enumerate(var):
