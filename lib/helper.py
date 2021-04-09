@@ -593,8 +593,7 @@ def calc_ptcl_var_by_idx(delphes_file, event, ptcl_cand, var):
 	var_val = [i for i,v in enumerate(var)] # init a list with length len(var)
 	for i, v in enumerate(var):
 		var_val[i] = []
-		n = get_num_ptcl_to_calc_var(v)
-		ptcl_cand_list = dvd_ptcl_cand_into_size_n(ptcl_cand, n)
+		ptcl_cand_list = dvd_ptcl_cand_into_size_n(ptcl_cand, v)
 		for ptcl_cand_size_n in ptcl_cand_list:
 			args_val = get_args_val(delphes_file, event, ptcl_cand_size_n, v)
 			var_val[i].append(calc_var_func_call[v](*args_val))
