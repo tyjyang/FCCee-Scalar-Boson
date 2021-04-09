@@ -435,6 +435,7 @@ def write_to_ntuple_tree(delphes_file, tree_chain, event, ptcl_cand, variables):
 	a,b,c,d = sep_vars_into_delph_calc_ptcl_evt(variables)
 	ptcl_var_delphes, evt_var_delphes, ptcl_var_calc, evt_var_calc = (
 	sort_separated_vars(a,b,c,d))
+	print ptcl_var_delphes, evt_var_delphes, ptcl_var_calc, evt_var_calc
 	
 	arr_delphes_ptcl = get_ptcl_var_by_idx(event, ptcl, cand, ptcl_var_delphes)
 	arr_delphes_evt = get_delphes_evt_var(event, evt_var_delphes)
