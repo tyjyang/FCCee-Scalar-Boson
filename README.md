@@ -74,6 +74,7 @@ functions are linked to the variable name in another dict `calc_var_func_args`.
     - "cos_theta"
     - "m_inv"
     - "m_rec"
+    - "cos_theta_p_missing"
 
 # Particle Candidates
 Particles within a delphes event are stored as TTree objects, each containing 
@@ -113,3 +114,33 @@ particles depend on the order of the dictionary passed in, we have to use
 OrderedDict, as said before.
 
 ## Particle vs. Event Variables
+We divide delphes variables into particle and event variables. Particle variables 
+are stored under the tree of the particle name, while event variables are
+generally stored in a separate tree that are not associated with any one type
+of particles.
+
+We can derive variables based on both particle and event variables in delphes.
+We call the functions `calc_ptcl_var_by_idx()` and `calc_evt_var()` to calculate
+variables based on particle and event variables. The functions to get the value
+of these variables are `get_ptcl_var_by_idx()` and `get_delphes_evt_var()`
+
+## 2D array for multiple variables over multiple particle candidates
+The four functions:
+- `get_ptcl_var_by_idx()`
+- `get_delphes_evt_var()`
+- `calc_ptcl_var_by_idx()`
+- `calc_evt_var()`
+all return 2D numpy arrays for multiple variables over multiple particles. The
+rows are for variables, and the columns are for particle candidates. The reason
+for writing the data in this way is because in `calc_ptcl_var_by_idx()`, we get
+different number of variable values for the same number of input particle
+candidates. Therefore, it is more convenient to group values of one variable
+into a 1D array, and group all such 1D arrays into a 2D array. And for 
+consistency, we keep the output the same format over all four functions.
+
+When writing to the ntuple tree, however, we'd require each row to represent all
+variables of one particle candidate, and we need a rectangular array. For this
+reason, we call the `rectangularize_jagged_array_T()` to rectangularize and 
+transpose the fucntion returns. This data is then ready to me written to the
+ntuple file.
+ 

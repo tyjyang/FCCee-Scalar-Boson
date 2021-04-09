@@ -187,7 +187,7 @@ def select_ptcl_var_opposite(delphes_file, event, particles, var, var_in_delphes
 		if var_in_delphes:
 			for cand in ptcl_cands:
 				cand_var_val = get_ptcl_var_by_idx(event, ptcl, cand, var)
-				if cand_var_val[0,0] * cand_var_val[1,0] < 0:
+				if cand_var_val[0,0] * cand_var_val[0,1] < 0:
 					cand_selected[ptcl].append(cand)
 		else:
 			for cand in ptcl_cands:
