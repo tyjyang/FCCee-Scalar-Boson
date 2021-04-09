@@ -402,31 +402,37 @@ def create_ntuple_trees(particle_variable):
 
 '''
 INPUT -------------------------------------------------------------------------
+|* (str) delphes_file: the name of the delphes file. Passed in for 
+|                      calc_ptcl_var_by_idx() to fetch gen-level info relevant
+|                      to calculation of vars (e.g. sqrt(s))
 |* (dict) tree_chain: keys are ptcl name in str, values are TTree for the ptcl
 |* (TObject) event: the delphes event to look at
 |* (dict) ptcl_cand: keys are ptcl name in str, values are list(int) cand idx
 |* list(str) var: the vars to be written to the ntuple tree. same for all ptcl
 |
 ROUTINE -----------------------------------------------------------------------
-|* separate variables into those alredy in delphes and those need to be 
-|  calculated by calling sep_var_into_delphes_calculated()
-|* calculate those variables
-|* fill the event as 2 rows into the TNtuple tree for each ptcl
-|* for calculated var that only returns one value for 2 particles, we fill the
-|  same value twice as a placeholder
+|* separate variables into delphes_ptcl_var, delphes_evt_var, calc_ptcl_var,
+|  and calc_evt_var. Each sorted to match the var order in the ntuple tree.
+|* fetch/calculate those variables by calling:
+|  - get_ptcl_var_by_idx()
+|  - get_delphes_evt_var()
+|  - calc_ptcl_var_by_idx()
+|  - calc_evt_var()
+|* Concatenate the four arrays, rectangularize and then transpose the result
+|  array so each particle info takes one row, and the columns are vars
+|* write the rectangular array to the ntuple tree row by row
 |
 OUTPUT ------------------------------------------------------------------------
 |* NONE
 +------------------------------------------------------------------------------
 '''
-def write_pair_to_ntuple_tree(delphes_file, tree_chain, event, ptcl_cand,
-                              variables):
+def write_to_ntuple_tree(delphes_file, tree_chain, event, ptcl_cand, variables):
 	particles = ptcl_cand.keys()
 	if len(particles) > 1: sys.exit("only one ptcl species can be wrtn per evt")
 	else: ptcl = list_to_string(particles)
 	cand = list(ptcl_cand[ptcl])
-	var = string_to_list(var)
-	a,b,c,d = sep_vars_into_delph_calc_ptcl_evt(var)
+	variables = string_to_list(variables)
+	a,b,c,d = sep_vars_into_delph_calc_ptcl_evt(variables)
 	delphes_ptcl_var, delphes_evt_var, calc_ptcl_var, calc_evt_var = (
 	sort_separated_vars(a,b,c,d))
 	
@@ -438,6 +444,6 @@ def write_pair_to_ntuple_tree(delphes_file, tree_chain, event, ptcl_cand,
 	arr_all_var = concatenate_var_val_arrays(arr_delphes_ptcl, arr_delphes_evt,
 	                                         arr_calc_ptcl, arr_calc_evt)
 	var_data = rectangularize_jagged_array_T(arr_all_var)
-	tree_chain[ptcl].Fill(*var_data[0,:])
-	tree_chain[ptcl].Fill(*var_data[1,:])
+	for i in range(len(var_data)):
+		tree_chain[ptcl].Fill(*var_data[i,:])
 

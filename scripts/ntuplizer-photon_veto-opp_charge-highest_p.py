@@ -44,7 +44,7 @@ for delphes_file in delphes_file_list:
 				evt, ['electron', 'muon'], 'sum_p_mag',
 				var_in_delphes = False, candidates = opposite_charge_pairs
 				)
-				write_pair_to_ntuple_tree(delphes_file,
+				write_to_ntuple_tree(delphes_file,
 				                    ntuple_trees, evt, final_cand, var_to_wrt)
 			else:
 				 num_evts_failed_oppo_charge_req += 1
