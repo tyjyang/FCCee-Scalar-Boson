@@ -289,8 +289,8 @@ def list_to_string(list_str):
 		string = ""
 		return string.join(list_str)
 	else:
-		sys.exit(("list_to_string(): cannot convert an inpit that is"
-                  "neither a single string or a list of strings"))  
+		sys.exit(("list_to_string(): cannot convert an input that is"
+                  " neither a single string or a list of strings"))  
 
 '''
 INPUT -------------------------------------------------------------------------
