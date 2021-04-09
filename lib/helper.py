@@ -589,8 +589,6 @@ OUTPUT ------------------------------------------------------------------------
 +------------------------------------------------------------------------------ 
 ''' 
 def calc_ptcl_var_by_idx(delphes_file, event, ptcl_cand, var):
-	ptcl = list_to_string(ptcl)
-	cand = int_to_list(cand)
 	var = string_to_list(var)
 	var_val = [i for i,v in enumerate(var)] # init a list with length len(var)
 	for i, v in enumerate(var):
