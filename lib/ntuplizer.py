@@ -319,7 +319,7 @@ OUTPUT ------------------------------------------------------------------------
 +------------------------------------------------------------------------------ 
 ''' 
 def sep_vars_into_delph_calc_ptcl_evt(variables):
-	variables_to_sep = string_to_list(variables).copy()
+	variables_to_sep = [v for v in string_to_list(variables)]
 	ptcl_var_delphes, evt_var_delphes, ptcl_var_calc, evt_var_calc = [[],[],[],[]]
 	for var in variables_to_sep:
 		if var in ptcl_var_delphes_list:
