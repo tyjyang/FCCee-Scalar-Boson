@@ -319,7 +319,7 @@ OUTPUT ------------------------------------------------------------------------
 +------------------------------------------------------------------------------ 
 ''' 
 def sep_vars_into_delph_calc_ptcl_evt(variables):
-	variables_to_sep = [v for v in string_to_list(variables)]
+	variables_to_sep = [v for v in string_to_list(variables)] #pass by value
 	ptcl_var_delphes, evt_var_delphes, ptcl_var_calc, evt_var_calc = [[],[],[],[]]
 	for var in variables_to_sep:
 		if var in ptcl_var_delphes_list:
@@ -372,30 +372,47 @@ ROUTINE -----------------------------------------------------------------------
 |* create an enpty dict of TNtuple trees
 |* create a TNtuple tree for each particle with their corresponding variables
 |  to be written, put it into the dict with the particle name as key
-|* for each tree, the columns are ordered in sorted delphes var in lowercase +
-|  sorted calc var in lowercase
+|* for each tree, the columns are ordered in sorted delphes ptcl+ evt var in 
+|  lowercase + sorted calc ptcl+evt var in lowercase
+|* there is an option to flatten event to one line. In this case, variables
+|  with more than one value are written to multiple columns within one row.
+|  The column names are "leading_var" and "trailing_var"
 | 
 OUTPUT ------------------------------------------------------------------------
 |* {(str) "particle":(TNtuple) ntuple_Tree} the dict containing all trees
 +------------------------------------------------------------------------------ 
 ''' 
-def create_ntuple_trees(particle_variable):
+def create_ntuple_trees(particle_variable, flatten_vars = False,
+                        num_ptcl_per_evt = 2):
 	ntuple_tree = {}
 	particles = particle_variable.keys()
 	for particle in sorted(particles):
 		
-		# create a ROOT Ntuple tree to store all variables of desire for 
-		# each particle
+		# separate and sort the vars, return sorted vars in one list
 		variables = particle_variable[particle]
 		a,b,c,d = sep_vars_into_delph_calc_ptcl_evt(variables)
 		sorted_var_lists = sort_separated_vars(a,b,c,d)
-		sorted_var = []
+		sorted_vars = []
 		for var_list in sorted_var_lists:
 			for var in var_list:
-				sorted_var.append(var)
-		particle_variables = [variable for variable in sorted_var]
+				sorted_vars.append(var)
+		# flatten vars that passed in more than one value for an event
+		if flatten_vars:
+			for i_var, var in enumerate(sorted_vars):
+				if var in a:
+					num_ptcl_for_var = 1
+				elif var in b or var in d:
+					num_ptcl_for_var = num_ptcl_per_evt
+				else:
+					num_ptcl_for_var = get_num_ptcl_to_calc_var(var)
+				num_val = num_ptcl_per_evt / num_ptcl_for_var
+				if num_val == 2:
+					sorted_vars[i_var] = ['leading_'+var, 'trailing_'+var]
+			for i_var, var in enumerate(sorted_vars): 
+				sorted_vars[i_var] = string_to_list(sorted_vars[i_var])
+			sorted_vars = flatten_var_val_arrays(sorted_vars)
 		column_separator = ":"
-		variables_combined = column_separator.join(particle_variables)
+		variables_combined = column_separator.join(sorted_vars)
 		ntuple_tree[particle] = ROOT.TNtuple(particle, "Flat ntuple tree for " 
 		                                     + particle, variables_combined)
 	return ntuple_tree
@@ -421,12 +438,15 @@ ROUTINE -----------------------------------------------------------------------
 |* Concatenate the four arrays, rectangularize and then transpose the result
 |  array so each particle info takes one row, and the columns are vars
 |* write the rectangular array to the ntuple tree row by row
+|* if flatten_vars == True, we flatten the var vals into one row. For each var,
+|  we sort the vals so they are in leading-trailing order
 |
 OUTPUT ------------------------------------------------------------------------
 |* NONE
 +------------------------------------------------------------------------------
 '''
-def write_to_ntuple_tree(delphes_file, tree_chain, event, ptcl_cand, variables):
+def write_to_ntuple_tree(delphes_file, tree_chain, event, ptcl_cand, variables,
+                         flatten_vars = False):
 	particles = ptcl_cand.keys()
 	if len(particles) > 1: sys.exit("only one ptcl species can be wrtn per evt")
 	else: ptcl = list_to_string(particles)
@@ -443,7 +463,11 @@ def write_to_ntuple_tree(delphes_file, tree_chain, event, ptcl_cand, variables):
 	arr_calc_evt = calc_evt_var(delphes_file, event, evt_var_calc)
 	arr_all_var = concatenate_var_val_arrays(arr_delphes_ptcl, arr_delphes_evt,
 	                                         arr_calc_ptcl, arr_calc_evt)
-	var_data = rectangularize_jagged_array_T(arr_all_var)
-	for i in range(len(var_data)):
-		tree_chain[ptcl].Fill(*var_data[i,:])
+	if flatten_vars:
+		var_data = flatten_var_val_arrays(arr_all_var)
+		tree_chain[ptcl].Fill(*var_data)
+	else:
+		var_data = rectangularize_jagged_array_T(arr_all_var)
+		for i in range(len(var_data)):
+			tree_chain[ptcl].Fill(*var_data[i,:])
 

@@ -246,9 +246,10 @@ particle_mass = {"electron": 0.000511,
                  "muon": 0.1057}
 
 ptcl_var_delphes_list = ['pt', 'eta', 'phi', 'energy', 'charge']
-evt_var_delphes_list = ['eta_p_missing']
+evt_var_delphes_list = ['p_mag_missing','eta_p_missing']
 # the location of the event variable in forms of "treename:tree_var"
-evt_var_delphes_location = {'eta_p_missing':'MissingET,eta'} 
+evt_var_delphes_location = {'eta_p_missing':'MissingET,eta',
+                            'p_mag_missing':'MissingET,met'} 
 
 '''
 INPUT -------------------------------------------------------------------------
@@ -337,6 +338,8 @@ def vars_to_delphes_form(variables):
 			Variables[i] = 'PT'
 		if Variable == 'Energy':
 			Variables[i] = 'E'
+		if Variable == 'Met':
+			Variables[i] = 'MET'
 	return Variables
 
 '''
@@ -358,7 +361,7 @@ def get_ntuple_filename(delphes_file_path, particle_variable):
 	delphes_file = delphes_file_path.split("/")[-1] # get rid of path
 	delphes_file = delphes_file.split(".")[0]  # get rid of file suffix
 	ntuple_content = delphes_file + ':'
-	variable_separator = '_'
+	variable_separator = '-'
 	particles = particle_variable.keys()
 	
 	for i, particle in enumerate(sorted(particles)):
@@ -366,8 +369,26 @@ def get_ntuple_filename(delphes_file_path, particle_variable):
 			variables = string_to_list(particle_variable[particle])
 			ntuple_content += particle + ':' + variable_separator.join(variables)
 		else: ntuple_content += particle + "-"
-	
+			
 	return ntuple_content + '.root'
+
+'''
+INPUT -------------------------------------------------------------------------
+|* (str) ntuple_file_path: the ntuple filename, with or without the path
+|  
+ROUTINE -----------------------------------------------------------------------
+|* strip off the path and var content after the ":" in the ntuple filename to
+|  get the physics process
+|* append the file suffix (".root") to get the original delphes file name 
+|
+OUTPUT ------------------------------------------------------------------------
+|* (str) delphes_filename
++------------------------------------------------------------------------------ 
+''' 
+def get_delphes_filename(ntuple_file_path):
+	ntuple = ntuple_file_path.split("/")[-1]
+	ntuple = ntuple.split(":")[0]
+	return ntuple + '.root'
 
 '''
 INPUT -------------------------------------------------------------------------
@@ -635,8 +656,8 @@ def calc_evt_var(delphes_file, evt, var):
 
 '''
 INPUT -------------------------------------------------------------------------
-|* (np.ndarray) arrays: 2D numpy arrays with each array containing values for
-|                       one variable.
+|* (np.ndarray) arrays: 2D numpy arrays each with 1D arrays containing values 
+|                       for one variable each.
 |  
 ROUTINE -----------------------------------------------------------------------
 |* take all the 1D arrays, each corresponding to values of one var for all ptcl,
@@ -654,6 +675,33 @@ def concatenate_var_val_arrays(*arrays):
 		for i in array:
 			arr.append(i)
 	return np.array(arr)
+
+'''
+INPUT -------------------------------------------------------------------------
+|* (np.ndarray) arrays: 2D numpy arrays each with 1D arrays containing values 
+|                       for one variable each.
+|  
+ROUTINE -----------------------------------------------------------------------
+|* take all the 1D arrays, each corresponding to values of one var for all ptcl,,
+|  from the 2D array passed in
+|* sort each 1D array of floats in descending order
+|* put all elements of these 1D arrays together into one 1D array
+| 
+OUTPUT ------------------------------------------------------------------------
+|* (np.ndarray) flat_arr: the 1D numpy array of flattened values for vars
++------------------------------------------------------------------------------ 
+''' 
+def flatten_var_val_arrays(*arrays):
+	arrays = concatenate_var_val_arrays(*arrays)
+	flat_arr = []
+	for array in arrays:
+		if all(isinstance(n, float) for n in array):
+			array = sorted(array, key = float)
+			array.reverse()
+		for i in array:
+			flat_arr.append(i)
+	flat_arr = np.array(flat_arr)
+	return flat_arr
 
 '''
 INPUT -------------------------------------------------------------------------
