@@ -32,14 +32,17 @@ INPUT -------------------------------------------------------------------------
 |* (float) phi2: the azimuthla angle of teh second particle
 |
 ROUTINE -----------------------------------------------------------------------
-|* calculate the acoplanarity angle betwen the 2 particles
+|* calculate the opening angle in the azimuthal plane by
+|  - taking the absolute difference in the two azimuthal angles
+|  - define the opening angle to be always less than pi
+|* calculate the acoplanarity angle by (pi - phi_{open})
 |
 OUTPUT ------------------------------------------------------------------------
 |* (float) phi_a: the acoplanarity angle
 +------------------------------------------------------------------------------
 '''
 def calculate_acoplanarity(phi_1, phi_2):
-	return np.pi - np.absolute(phi_1 - phi_2)
+	return np.absolute(np.pi - np.absolute(phi_1 - phi_2))
 
 ''' 
 INPUT -------------------------------------------------------------------------
