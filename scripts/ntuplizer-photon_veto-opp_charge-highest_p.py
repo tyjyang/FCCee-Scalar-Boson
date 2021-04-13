@@ -13,7 +13,7 @@ delphes_path = '/uscms/home/tyang/nobackup/data/FCCee-Scalar-Boson-delphes-sampl
 delphes_file_list = ['eeTollS_0p5_inc.root', 'eeTollS_5_inc.root', 'eeTollS_25_inc.root',
                      'eeTo2fermion.root', 'four_lepton.root']
 #delphes_file_list = ['eeTollS_0p5_inc.root']
-ntuple_path = '../ntuple_in_prep'
+ntuple_path = '../ntuples'
 particles =  ['electron', 'muon', 'photon']
 var_to_wrt = ['pt', 'eta', 'phi', 'cos_theta', 'alpha',
               'p_mag', 'm_inv', 'm_rec','p_mag_missing', 'cos_theta_p_missing']  

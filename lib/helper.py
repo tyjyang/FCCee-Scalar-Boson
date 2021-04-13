@@ -87,7 +87,7 @@ def calculate_mod_acoplanarity(eta_1, eta_2, phi_1, phi_2):
 
 '''
 INPUT -------------------------------------------------------------------------
-|* (float) theta
+|* (float) eta
 |  
 ROUTINE -----------------------------------------------------------------------
 |* calcualte the cosine of the forward angle
@@ -96,7 +96,8 @@ OUTPUT ------------------------------------------------------------------------
 |* (float) cos_theta
 +------------------------------------------------------------------------------ 
 ''' 
-def calculate_cos_theta(theta):
+def calculate_cos_theta(eta):
+	theta = calculate_theta(eta)
 	return np.cos(theta)
 
 '''
