@@ -34,7 +34,7 @@ for delphes_file in delphes_file_list:
 
 	start = time.time()
 	for ievt, evt in enumerate(evt_chain):
-		if particle_var_veto(evt, 'photon', 'energy',True, 'highest < 10 GeV'):
+		if particle_var_veto(evt, 'photon', 'energy',True, 'highest < 1 GeV'):
 			
 			opposite_charge_pairs = select_ptcl_var_opposite(delphes_file,
 			evt, ['electron', 'muon'], 'charge', var_in_delphes = True
