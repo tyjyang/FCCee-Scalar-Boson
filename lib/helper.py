@@ -211,6 +211,28 @@ def calculate_charge_prod(charge_1, charge_2):
 
 '''
 INPUT -------------------------------------------------------------------------
+|* (float): pseudorapidity and azimuthal angle of 2 particle tracks
+|  
+ROUTINE -----------------------------------------------------------------------
+|* WLOG, make the 1st track pointing in (1,0,0)
+|* The 2nd track then points in the direction
+|  (cos_phi*sin_theta, sin_phi*sin_theta, cos_theta), where phi and theta are
+|  the absolute difference between the azimuthal and forward angles
+|* Use the law of cosine to get the angle between the 2 tracks
+| 
+OUTPUT ------------------------------------------------------------------------
+|* (float) alpha_sep: the separation angle between the two tracks
++------------------------------------------------------------------------------ 
+''' 
+def calculate_alpha_sep(eta_1, eta_2, phi_1, phi_2):
+	theta_1 = calculate_theta(eta_1)
+	theta_2 = calculate_theta(eta_2)
+	d_theta = np.absolute(theta_1 - theta_2)
+	d_phi = np.absolute(phi_1 - phi_2)
+	return np.arccos(np.cos(d_phi) * np.sin(d_theta))
+
+'''
+INPUT -------------------------------------------------------------------------
 |* (float) eta_p_missing: the pseudorapidity of the missing momentum, fetched
 |                         from the MissingET.Eta branch in delphes.
 |  
@@ -234,6 +256,7 @@ calc_var_func_call = {"theta":calculate_theta,
                       "p_mag":calculate_momentum,
                       "sum_p_mag":calculate_sum_momentum,
                       "charge_prod":calculate_charge_prod,
+                      "alpha_sep":calculate_alpha_sep,
                       "cos_theta_p_missing":calculate_cos_theta_p_missing}
 
 calc_var_func_args = {"theta":"eta:1",
@@ -246,6 +269,7 @@ calc_var_func_args = {"theta":"eta:1",
                       "p_mag":"pt,eta:1",
                       "sum_p_mag":"pt,eta:2",
                       "charge_prod":"charge:2",
+                      "alpha_sep":"eta,phi:2",
                       "cos_theta_p_missing":"eta_p_missing:1"}
 
 particle_mass = {"electron": 0.000511,
