@@ -225,6 +225,7 @@ def calculate_cos_theta_p_missing(eta_p_missing):
 	return np.cos(calculate_theta(eta_p_missing))
 
 calc_var_func_call = {"theta":calculate_theta,
+                      "theta_a":calculate_acolinearity,
                       "phi_a":calculate_acoplanarity,
                       "alpha":calculate_mod_acoplanarity,
                       "cos_theta":calculate_cos_theta,
@@ -236,6 +237,7 @@ calc_var_func_call = {"theta":calculate_theta,
                       "cos_theta_p_missing":calculate_cos_theta_p_missing}
 
 calc_var_func_args = {"theta":"eta:1",
+                      "theta_a":"eta:2",
                       "phi_a":"phi:2",
                       "alpha":"eta,phi:2",
                       "cos_theta":"eta:1",
