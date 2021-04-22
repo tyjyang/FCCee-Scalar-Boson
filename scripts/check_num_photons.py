@@ -11,7 +11,7 @@ from helper import *
 #-----------------
 delphes_path = '/uscms/home/tyang/nobackup/data/FCCee-Scalar-Boson-delphes-samples/'
 delphes_file_list = ['eeTollS_0p5_inc.root', 'eeTollS_5_inc.root', 'eeTollS_25_inc.root',
-                     'eeTo2fermion.root', 'four_lepton.root']
+                     '2fermion_whizard.root', 'four_lepton.root']
 #delphes_file_list = ['eeTollS_0p5_inc.root']
 ntuple_path = '../ntuples'
 particles =  ['particle', 'photon']
@@ -39,4 +39,4 @@ c1.cd(1)
 reco_photon_num.Draw()
 c1.cd(2)
 gen_photon_num.Draw()
-c1.SaveAs("../plots/num_photons_2f.pdf")
+c1.SaveAs("../plots/num_photons_2f_whizard.pdf")

@@ -7,15 +7,15 @@ from cutflow import *
 
 # load ROOT ntuples
 ntuple_path = '../ntuples/'
-ntuple_sig_files = [('eeTollS_0p5_inc:electron-muon:pt-eta-phi-cos_theta-'
+ntuple_sig_files = [('eeTollS_0p5_inc:electron-muon:pt-eta-alpha_sep-cos_theta-'
                      'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-                    ('eeTollS_5_inc:electron-muon:pt-eta-phi-cos_theta-'
+                    ('eeTollS_5_inc:electron-muon:pt-eta-alpha_sep-cos_theta-'
                      'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-                    ('eeTollS_25_inc:electron-muon:pt-eta-phi-cos_theta-'
+                    ('eeTollS_25_inc:electron-muon:pt-eta-alpha_sep-cos_theta-'
                      'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root')]
-ntuple_bkg_files = [('eeTo2fermion:electron-muon:pt-eta-phi-cos_theta-'
+ntuple_bkg_files = [('eeTo2fermion:electron-muon:pt-eta-alpha_sep-cos_theta-'
                      'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-                    ('four_lepton:electron-muon:pt-eta-phi-cos_theta-'
+                    ('four_lepton:electron-muon:pt-eta-alpha_sep-cos_theta-'
                      'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root')]
 ntuple_sig_filepath = []
 ntuple_bkg_filepath = []
@@ -106,7 +106,7 @@ num_hist_y = 3
 c_electron = ROOT.TCanvas("electron_cutflow","cutflow plots for Z -> ee at 91.2 GeV",
                            hist_pixel_x * num_hist_x, hist_pixel_y * num_hist_y)
 c_electron.Divide(num_hist_x, num_hist_y)
-
+print  electrons['0p5'].GetEntries()
 print ('normalized num of Z-> ee evts from singal with m_s = 0.5 GeV: ',
        electrons['0p5'].GetEntries()*w['0p5'])
 print ('normalized num of Z-> ee evts from singal with m_s = 5 GeV: ',
