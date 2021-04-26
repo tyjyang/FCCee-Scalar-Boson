@@ -433,7 +433,7 @@ ROUTINE -----------------------------------------------------------------------
 |
 OUTPUT ------------------------------------------------------------------------
 |* np.ndarray(floats): The 2D numpy array of variable values with each particle
-|                      taking a row and each variable taking a column.
+|                      taking a col and each variable taking a row.
 +------------------------------------------------------------------------------ 
 ''' 
 def get_ptcl_var_by_idx(event, particle, cand, var):
@@ -792,20 +792,25 @@ INPUT -------------------------------------------------------------------------
 |* (TObject) event: the delphes event to look at
 |* (str) particle: the particle tree of interest
 |* (int) subset_size: the size of the candidate set 
+|* list(int) superset: the indices for the particle superset
 |
 ROUTINE -----------------------------------------------------------------------
-|* from a delphes event, extract the number of particle X, denote as N
-|* from these N particles, find all subsets of M particles
-|* return a list of indices for particle subsets
+|* from a delphes event, select a set of particle candidates from one particle
+|  tree by the indices passed in from "superset". The size of this superset is N
+|* from these N particles, find all subsets of size M
+|* return a list of indices for these subsets
 | 
 OUTPUT ------------------------------------------------------------------------
 |* list(tuple): the list of indices tuples
 +------------------------------------------------------------------------------ 
 ''' 
-def get_idx_candidate_sets(event, particle, subset_size):
+def get_idx_candidate_sets(event, particle, subset_size, superset = "all"):
 	particle = list_to_string(particle)
-	idx = []
-	for i, x in enumerate(getattr(event, particle.capitalize())):
-		idx.append(i)
+	if superset == "all":
+		idx = []
+		for i, x in enumerate(getattr(event, particle.capitalize())):
+			idx.append(i)
+	else:
+		idx = superset
 	return list(get_idx_recur(idx, subset_size))
 
