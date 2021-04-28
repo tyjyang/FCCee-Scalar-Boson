@@ -5,6 +5,7 @@ git clone https://github.com/tyjyang/FCCee-Scalar-Boson
 cd FCCee-Scalar-Boson
 source setup.sh
 ```
+Note that you'd have to run `source setup.sh` everything you log in to a new shell.
 It should be noted here that you'd have to **remove any CMSSW setup** and start 
 from a clean shell before `setup.sh` can properly install delphes.
 

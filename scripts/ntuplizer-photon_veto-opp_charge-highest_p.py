@@ -10,18 +10,24 @@ from helper import *
 # Global Variables
 #-----------------
 delphes_path = '/uscms/home/tyang/nobackup/data/FCCee-Scalar-Boson-delphes-samples/'
-delphes_file_list = ['eeTollS_0p5_inc.root', 'eeTollS_5_inc.root', 'eeTollS_25_inc.root',
-                     'eeTo2fermion.root', 'four_lepton.root']
-#delphes_file_list = ['eeTollS_0p5_inc.root']
-ntuple_path = '../ntuples_in_prep'
+#delphes_file_list = ['eeTollS_0p5_inc.root', 'eeTollS_5_inc.root', 'eeTollS_25_inc.root',
+#                     'ee2fermion_mutau.root', 'four_lepton.root']
+delphes_file_list = ['eeZS_p5.root', 
+                     'eeZS_2.root', 
+                     'eeZS_5.root', 
+                     'eeZS_15.root',
+                     'eeZS_25.root',
+                     'ee2fermion_mutau.root',
+                     'ee4lepton_muon.root']
+ntuple_path = '../ntuples'
 particles =  ['electron', 'muon', 'photon']
-var_to_wrt = ['pt', 'eta', 'alpha_sep', 'cos_theta', 'alpha',
+var_to_wrt = ['pt', 'eta', 'phi', 'cos_theta', 'alpha',
               'p_mag', 'm_inv', 'm_rec','p_mag_missing', 'cos_theta_p_missing']  
 ptcl_var_to_wrt = {'electron':var_to_wrt, 'muon':var_to_wrt}
 
 load_delphes_lib()
 
-for delphes_file in delphes_file_list:
+for delphes_file in string_to_list(delphes_file_list):
 	delphes_file_path = delphes_path + delphes_file
 	print "ntuplizing delphes file: ", delphes_file_path
 	print "-------------------------------------------------------------------"
