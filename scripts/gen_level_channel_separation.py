@@ -6,8 +6,13 @@ import time
 # Global Variables
 #-----------------
 delphes_path = '/uscms/home/tyang/nobackup/data/FCCee-Scalar-Boson-delphes-samples/'
-delphes_file_list = ['eeTollS_0p5_inc.root', 'eeTollS_5_inc.root', 'eeTollS_25_inc.root',
-                     'eeTo2fermion.root', 'four_lepton.root']
+delphes_file_list = ['eeZS_p5.root', 
+                     'eeZS_2.root', 
+                     'eeZS_5.root', 
+                     'eeZS_15.root',
+                     'eeZS_25.root',
+                     'ee2fermion_mutau.root',
+                     'ee4lepton_muon.root']
 electron_PID = 11
 muon_PID = 13
 tau_PID = 15
@@ -22,7 +27,7 @@ ptcl_var_to_wrt = {'electron':var_to_wrt, 'muon':var_to_wrt}
 
 load_delphes_lib()
 
-for delphes_file in delphes_file_list[:3]:
+for delphes_file in delphes_file_list:
 	delphes_file_path = delphes_path + delphes_file
 	print "separating e and mu channel evts in ", delphes_file_path
 	print "-------------------------------------------------------------------"

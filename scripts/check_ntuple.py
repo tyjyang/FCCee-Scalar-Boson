@@ -103,6 +103,7 @@ hist_pixel_x = 600
 hist_pixel_y = 450
 num_hist_x = 2
 num_hist_y = 3
+'''
 c_electron = ROOT.TCanvas("electron_cutflow","cutflow plots for Z -> ee at 91.2 GeV",
                            hist_pixel_x * num_hist_x, hist_pixel_y * num_hist_y)
 c_electron.Divide(num_hist_x, num_hist_y)
@@ -118,7 +119,7 @@ print ('normalized num of Z-> ee evts from 2-fermion background: ',
 print ('normalized num of Z-> ee evts from 4-fermion background: ',
        electrons['4f'].GetEntries()*w['4f'])
 
-''' first cut for the ee channel '''
+### first cut for the ee channel ###
 c_electron.cd(1)
 # get the entrylist after the cut
 electrons['0p5'].Draw(">>e_0p5_cutlist1",electron_cuts['alpha'],"entrylist")
@@ -242,7 +243,7 @@ hist_e_25_1.Write()
 hist_e_2f_1.Write()
 hist_e_4f_1.Write()
 
-''' second cut for the ee channel '''
+### second cut for the ee channel ###
 c_electron.cd(2)
 e_cut_2 = electron_cuts['alpha']+'&&'+electron_cuts['angle']
 # get the entrylist after the cut
@@ -358,7 +359,7 @@ hist_e_25_2.Write()
 hist_e_2f_2.Write()
 hist_e_4f_2.Write()
 
-''' third cut for the ee channel '''
+### third cut for the ee channel ###
 c_electron.cd(3)
 e_cut_3 = e_cut_2+'&&'+electron_cuts['momentum']
 # get the entrylist after the cut
@@ -474,7 +475,7 @@ hist_e_25_3.Write()
 hist_e_2f_3.Write()
 hist_e_4f_3.Write()
 
-''' fourth cut for the ee channel '''
+### fourth cut for the ee channel ###
 c_electron.cd(4)
 e_cut_4 = e_cut_3+'&&'+electron_cuts['cos_theta_p_missing']
 # get the entrylist after the cut
@@ -591,7 +592,7 @@ hist_e_25_4.Write()
 hist_e_2f_4.Write()
 hist_e_4f_4.Write()
 
-''' fifth cut for the ee channel '''
+### fifth cut for the ee channel ###
 c_electron.cd(5)
 e_cut_5 = e_cut_4+'&&'+electron_cuts['m_inv']
 # get the entrylist after the cut
@@ -730,7 +731,7 @@ legend.Draw()
 e_title.Draw()
 
 c_electron.Print("../plots/ZToee.png")
-
+'''
 ###################################
 ######### muon channel ############
 ###################################
@@ -1362,3 +1363,78 @@ mu_title.Draw()
 
 c_muon.Print("../plots/ZTomumu.png")
 cutflow_file.Close()
+
+# plot the recoil mass for the muon channel 
+c_muon_rec = ROOT.TCanvas()
+c_muon_rec.cd()
+hs_sig_mu_rec = ROOT.THStack("hs_sig_mu_rec","")
+hs_bkg_mu_rec = ROOT.THStack("hs_bkg_mu_rec","")
+mu_rec_xlow = -40
+mu_rec_xhigh = 60
+mu_rec_nbins = 20
+mu_rec_descrp = "Z #rightarrow #mu^{+}#mu^{-} vs. m_{mumu} @ 91.2 GeV"
+hist_mu_0p5_rec = ROOT.TH1F("mu_0p5_m_rec",
+mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
+hist_mu_5_rec = ROOT.TH1F("mu_5_m_rec",
+mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
+hist_mu_25_rec = ROOT.TH1F("mu_25_m_rec",
+mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
+hist_mu_2f_rec = ROOT.TH1F("mu_2f_m_rec",
+mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
+hist_mu_4f_rec = ROOT.TH1F("mu_4f_m_rec",
+mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
+muons['0p5'].Draw("m_rec>>mu_0p5_m_rec", mu_cut_5, "goff")
+muons['5'].Draw("m_rec>>mu_5_m_rec", mu_cut_5, "goff")
+muons['25'].Draw("m_rec>>mu_25_m_rec", mu_cut_5, "goff")
+muons['2f'].Draw("m_rec>>mu_2f_m_rec", mu_cut_5, "goff")
+muons['4f'].Draw("m_rec>>mu_4f_m_rec", mu_cut_5, "goff")
+#hist_mu_0p5_5.SetDirectory(0)
+#hist_mu_5_5.SetDirectory(0)
+#hist_mu_25_5.SetDirectory(0)
+#hist_mu_2f_5.SetDirectory(0)
+#hist_mu_4f_5.SetDirectory(0)
+hist_mu_0p5_rec.SetLineColor(ROOT.kRed)
+hist_mu_0p5_rec.SetLineWidth(2)
+hist_mu_0p5_rec.SetLineStyle(1)
+hist_mu_5_rec.SetLineColor(ROOT.kBlue+2)
+hist_mu_5_rec.SetLineWidth(2)
+hist_mu_5_rec.SetLineStyle(1)
+hist_mu_25_rec.SetLineColor(ROOT.kGreen+2)
+hist_mu_25_rec.SetLineWidth(2)
+hist_mu_25_rec.SetLineStyle(1)
+hist_mu_2f_rec.SetLineColor(ROOT.kBlack)
+hist_mu_2f_rec.SetFillColor(ROOT.kGreen)
+hist_mu_2f_rec.SetLineWidth(1)
+hist_mu_2f_rec.SetLineStyle(1)
+hist_mu_4f_rec.SetLineColor(ROOT.kBlack)
+hist_mu_4f_rec.SetFillColor(ROOT.kYellow)
+hist_mu_4f_rec.SetLineWidth(1)
+hist_mu_4f_rec.SetLineStyle(1)
+
+hs_bkg_mu_rec.SetMinimum(0)
+hs_sig_mu_rec.SetMinimum(0)
+
+
+hs_sig_mu_rec.Add(hist_mu_0p5_rec)
+hs_sig_mu_rec.Add(hist_mu_5_rec)
+hs_sig_mu_rec.Add(hist_mu_25_rec)
+hs_bkg_mu_rec.Add(hist_mu_2f_rec)
+hs_bkg_mu_rec.Add(hist_mu_4f_rec)
+
+ymin = []
+ymax = []
+xmin = []
+xmax = []
+#ROOT.gPad.SetLogy()
+hs_bkg_mu_rec.Draw("hist")
+hs_bkg_mu_rec.GetHistogram().SetXTitle('m_{rec} [GeV]')
+hs_bkg_mu_rec.GetHistogram().SetYTitle('Events/5 GeV')
+hs_bkg_mu_rec.GetHistogram().SetTitleSize(0.05, "xy")
+ROOT.gPad.Update()
+ymin.append(ROOT.gPad.GetUymin())
+ymax.append(ROOT.gPad.GetUymax())
+xmin.append(ROOT.gPad.GetUxmin())
+xmax.append(ROOT.gPad.GetUxmax())
+hs_sig_mu_rec.Draw("hist, nostack, same")
+ROOT.gPad.Update()
+c_muon_rec.Print("../plots/ZTomumu_rec.png")
