@@ -78,8 +78,8 @@ ROUTINE -----------------------------------------------------------------------
 |  - return 0 for "there must exist" logic in the threshold clause
 |* fetch the particle value with event.particle[quantifier].Var
 |* check if the threshold condition is met
-|  - if yes, return 0 to signal veto of the event
-|  - if no, return 1 to signal passing 
+|  - if no, return 0 to signal veto of the event
+|  - if yes, return 1 to signal passing 
 |
 OUTPUT ------------------------------------------------------------------------
 |* (int): 0 for vetoed event; 1 for passed event 

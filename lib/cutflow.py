@@ -22,16 +22,20 @@ def get_normalization_factor(ntuple_file_path, lumi_in_inverse_pb):
 	xsec = delphes_gen_info[delphes_filename]['xsec']
 	return xsec * lumi_in_inverse_pb / nevts
 
-def get_ntuple_tree(sig_filepaths, bkg_filepaths, channels):
-	channels = string_to_list(channel)
+def get_ntuple_trees(sig_filepaths, bkg_filepaths, channels):
+	channels = string_to_list(channels)
 	sig_files = {}
 	bkg_files = {}
-	trees = {}
-	for chn in channels: tree[chn] = {}
-	#for key, f in sig_filepaths.items():
-	#	sig_files[key] = ROOT.TFile.Open(f)
-	#for key, f in bkg_filepaths.items():
-	#	bkg_files[key] = ROOT.TFile.Open(f)
+	sig_trees = {}
+	bkg_trees = {}
+	for chn in channels: 
+		sig_trees[chn] = {}
+		bkg_trees[chn] = {}
+	for key, f in sig_filepaths.items():
+		sig_files[key] = ROOT.TFile.Open(f)
+		
+	for key, f in bkg_filepaths.items():
+		bkg_files[key] = ROOT.TFile.Open(f)
 	return trees
 		
 # pointer to files + trees
