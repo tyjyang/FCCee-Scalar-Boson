@@ -1360,5 +1360,5 @@ c_muon.cd(6)
 legend.Draw()
 mu_title.Draw()
 
-c_electron.Print("../plots/ZTomumu.png")
+c_muon.Print("../plots/ZTomumu.png")
 cutflow_file.Close()
