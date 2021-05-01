@@ -1,0 +1,288 @@
+ntuplizing delphes file:  /uscms/home/tyang/nobackup/data/FCCee-Scalar-Boson-delphes-samples/eeZS_p5.root
+-------------------------------------------------------------------
+0.396893978119  seconds has elapsed.  0  events has been processed
+17.0896809101  seconds has elapsed.  10000  events has been processed
+33.6359639168  seconds has elapsed.  20000  events has been processed
+50.2801208496  seconds has elapsed.  30000  events has been processed
+67.1289417744  seconds has elapsed.  40000  events has been processed
+83.2741987705  seconds has elapsed.  50000  events has been processed
+99.8007059097  seconds has elapsed.  60000  events has been processed
+116.350462914  seconds has elapsed.  70000  events has been processed
+133.31019783  seconds has elapsed.  80000  events has been processed
+149.588415861  seconds has elapsed.  90000  events has been processed
+165.907804966  seconds has elapsed.  100000  events has been processed
+182.351381779  seconds has elapsed.  110000  events has been processed
+199.503800869  seconds has elapsed.  120000  events has been processed
+216.12368083  seconds has elapsed.  130000  events has been processed
+232.64879179  seconds has elapsed.  140000  events has been processed
+248.828108788  seconds has elapsed.  150000  events has been processed
+265.338049889  seconds has elapsed.  160000  events has been processed
+281.813260794  seconds has elapsed.  170000  events has been processed
+298.297993898  seconds has elapsed.  180000  events has been processed
+315.075365782  seconds has elapsed.  190000  events has been processed
+331.523416996  seconds has elapsed.  200000  events has been processed
+347.878520966  seconds has elapsed.  210000  events has been processed
+364.257665873  seconds has elapsed.  220000  events has been processed
+381.29497695  seconds has elapsed.  230000  events has been processed
+397.670486927  seconds has elapsed.  240000  events has been processed
+414.073107958  seconds has elapsed.  250000  events has been processed
+430.218376875  seconds has elapsed.  260000  events has been processed
+446.466342926  seconds has elapsed.  270000  events has been processed
+462.846961975  seconds has elapsed.  280000  events has been processed
+479.521280766  seconds has elapsed.  290000  events has been processed
+55555  evts failed the photon veto
+125185  evts failed the opposite charge requirement
+ntuplizing delphes file:  /uscms/home/tyang/nobackup/data/FCCee-Scalar-Boson-delphes-samples/eeZS_2.root
+-------------------------------------------------------------------
+0.185667991638  seconds has elapsed.  0  events has been processed
+17.6224570274  seconds has elapsed.  10000  events has been processed
+35.5351798534  seconds has elapsed.  20000  events has been processed
+53.2443709373  seconds has elapsed.  30000  events has been processed
+71.2205798626  seconds has elapsed.  40000  events has been processed
+89.1726098061  seconds has elapsed.  50000  events has been processed
+107.168323994  seconds has elapsed.  60000  events has been processed
+124.954272032  seconds has elapsed.  70000  events has been processed
+142.765506029  seconds has elapsed.  80000  events has been processed
+160.885296822  seconds has elapsed.  90000  events has been processed
+178.974233866  seconds has elapsed.  100000  events has been processed
+196.787856817  seconds has elapsed.  110000  events has been processed
+214.811101913  seconds has elapsed.  120000  events has been processed
+232.856153965  seconds has elapsed.  130000  events has been processed
+250.814100027  seconds has elapsed.  140000  events has been processed
+268.854264021  seconds has elapsed.  150000  events has been processed
+286.950453997  seconds has elapsed.  160000  events has been processed
+304.573341846  seconds has elapsed.  170000  events has been processed
+322.155968904  seconds has elapsed.  180000  events has been processed
+339.969873905  seconds has elapsed.  190000  events has been processed
+357.714423895  seconds has elapsed.  200000  events has been processed
+375.588083029  seconds has elapsed.  210000  events has been processed
+393.71617794  seconds has elapsed.  220000  events has been processed
+411.660590887  seconds has elapsed.  230000  events has been processed
+429.506963968  seconds has elapsed.  240000  events has been processed
+447.468876839  seconds has elapsed.  250000  events has been processed
+465.393320799  seconds has elapsed.  260000  events has been processed
+483.050657034  seconds has elapsed.  270000  events has been processed
+501.093140841  seconds has elapsed.  280000  events has been processed
+518.500133991  seconds has elapsed.  290000  events has been processed
+57958  evts failed the photon veto
+120857  evts failed the opposite charge requirement
+ntuplizing delphes file:  /uscms/home/tyang/nobackup/data/FCCee-Scalar-Boson-delphes-samples/eeZS_5.root
+-------------------------------------------------------------------
+0.1737408638  seconds has elapsed.  0  events has been processed
+18.3349428177  seconds has elapsed.  10000  events has been processed
+36.1900818348  seconds has elapsed.  20000  events has been processed
+54.4409339428  seconds has elapsed.  30000  events has been processed
+72.731153965  seconds has elapsed.  40000  events has been processed
+90.6949038506  seconds has elapsed.  50000  events has been processed
+108.720112801  seconds has elapsed.  60000  events has been processed
+127.078588963  seconds has elapsed.  70000  events has been processed
+145.364637852  seconds has elapsed.  80000  events has been processed
+163.141828775  seconds has elapsed.  90000  events has been processed
+180.689606905  seconds has elapsed.  100000  events has been processed
+198.539676905  seconds has elapsed.  110000  events has been processed
+216.825758934  seconds has elapsed.  120000  events has been processed
+234.990633011  seconds has elapsed.  130000  events has been processed
+252.80388093  seconds has elapsed.  140000  events has been processed
+270.648520947  seconds has elapsed.  150000  events has been processed
+288.956772804  seconds has elapsed.  160000  events has been processed
+306.868464947  seconds has elapsed.  170000  events has been processed
+324.673657894  seconds has elapsed.  180000  events has been processed
+342.735083818  seconds has elapsed.  190000  events has been processed
+360.237864971  seconds has elapsed.  200000  events has been processed
+377.923952818  seconds has elapsed.  210000  events has been processed
+395.772241831  seconds has elapsed.  220000  events has been processed
+413.924696922  seconds has elapsed.  230000  events has been processed
+432.009539843  seconds has elapsed.  240000  events has been processed
+450.135763884  seconds has elapsed.  250000  events has been processed
+467.863273859  seconds has elapsed.  260000  events has been processed
+485.81375289  seconds has elapsed.  270000  events has been processed
+503.59380579  seconds has elapsed.  280000  events has been processed
+521.33483386  seconds has elapsed.  290000  events has been processed
+55426  evts failed the photon veto
+125040  evts failed the opposite charge requirement
+ntuplizing delphes file:  /uscms/home/tyang/nobackup/data/FCCee-Scalar-Boson-delphes-samples/eeZS_15.root
+-------------------------------------------------------------------
+0.131699085236  seconds has elapsed.  0  events has been processed
+17.1419410706  seconds has elapsed.  10000  events has been processed
+34.8703410625  seconds has elapsed.  20000  events has been processed
+52.3379940987  seconds has elapsed.  30000  events has been processed
+69.8655688763  seconds has elapsed.  40000  events has been processed
+87.1298151016  seconds has elapsed.  50000  events has been processed
+104.337142944  seconds has elapsed.  60000  events has been processed
+121.823940992  seconds has elapsed.  70000  events has been processed
+139.10579896  seconds has elapsed.  80000  events has been processed
+156.554859877  seconds has elapsed.  90000  events has been processed
+173.598037958  seconds has elapsed.  100000  events has been processed
+190.993798018  seconds has elapsed.  110000  events has been processed
+208.575104952  seconds has elapsed.  120000  events has been processed
+226.103215933  seconds has elapsed.  130000  events has been processed
+243.450790882  seconds has elapsed.  140000  events has been processed
+260.942980051  seconds has elapsed.  150000  events has been processed
+278.748140097  seconds has elapsed.  160000  events has been processed
+296.171194077  seconds has elapsed.  170000  events has been processed
+313.515326977  seconds has elapsed.  180000  events has been processed
+331.039757013  seconds has elapsed.  190000  events has been processed
+348.092652082  seconds has elapsed.  200000  events has been processed
+365.713676929  seconds has elapsed.  210000  events has been processed
+383.093971968  seconds has elapsed.  220000  events has been processed
+400.125050068  seconds has elapsed.  230000  events has been processed
+417.686748981  seconds has elapsed.  240000  events has been processed
+435.393429041  seconds has elapsed.  250000  events has been processed
+452.978007078  seconds has elapsed.  260000  events has been processed
+470.317732096  seconds has elapsed.  270000  events has been processed
+487.496851921  seconds has elapsed.  280000  events has been processed
+504.613883972  seconds has elapsed.  290000  events has been processed
+58686  evts failed the photon veto
+133629  evts failed the opposite charge requirement
+ntuplizing delphes file:  /uscms/home/tyang/nobackup/data/FCCee-Scalar-Boson-delphes-samples/eeZS_25.root
+-------------------------------------------------------------------
+0.158540010452  seconds has elapsed.  0  events has been processed
+16.9230139256  seconds has elapsed.  10000  events has been processed
+33.1652340889  seconds has elapsed.  20000  events has been processed
+49.9024779797  seconds has elapsed.  30000  events has been processed
+66.2833840847  seconds has elapsed.  40000  events has been processed
+82.574944973  seconds has elapsed.  50000  events has been processed
+99.110270977  seconds has elapsed.  60000  events has been processed
+115.389353991  seconds has elapsed.  70000  events has been processed
+131.556436062  seconds has elapsed.  80000  events has been processed
+148.064521074  seconds has elapsed.  90000  events has been processed
+164.329046011  seconds has elapsed.  100000  events has been processed
+180.277446032  seconds has elapsed.  110000  events has been processed
+196.951114893  seconds has elapsed.  120000  events has been processed
+213.160713911  seconds has elapsed.  130000  events has been processed
+229.429800987  seconds has elapsed.  140000  events has been processed
+246.204765081  seconds has elapsed.  150000  events has been processed
+262.238341093  seconds has elapsed.  160000  events has been processed
+278.604386091  seconds has elapsed.  170000  events has been processed
+295.058470964  seconds has elapsed.  180000  events has been processed
+311.228581905  seconds has elapsed.  190000  events has been processed
+327.485502005  seconds has elapsed.  200000  events has been processed
+343.925894976  seconds has elapsed.  210000  events has been processed
+360.137484074  seconds has elapsed.  220000  events has been processed
+376.376917124  seconds has elapsed.  230000  events has been processed
+392.868757963  seconds has elapsed.  240000  events has been processed
+409.128870964  seconds has elapsed.  250000  events has been processed
+425.262892962  seconds has elapsed.  260000  events has been processed
+441.854641914  seconds has elapsed.  270000  events has been processed
+458.261408091  seconds has elapsed.  280000  events has been processed
+474.249946117  seconds has elapsed.  290000  events has been processed
+57436  evts failed the photon veto
+145395  evts failed the opposite charge requirement
+ntuplizing delphes file:  /uscms/home/tyang/nobackup/data/FCCee-Scalar-Boson-delphes-samples/ee2fermion_mutau.root
+-------------------------------------------------------------------
+0.153746843338  seconds has elapsed.  0  events has been processed
+17.5518438816  seconds has elapsed.  10000  events has been processed
+35.390201807  seconds has elapsed.  20000  events has been processed
+53.2864229679  seconds has elapsed.  30000  events has been processed
+70.2987148762  seconds has elapsed.  40000  events has been processed
+87.7920520306  seconds has elapsed.  50000  events has been processed
+105.220687866  seconds has elapsed.  60000  events has been processed
+121.992934942  seconds has elapsed.  70000  events has been processed
+139.403503895  seconds has elapsed.  80000  events has been processed
+156.806080818  seconds has elapsed.  90000  events has been processed
+173.36726284  seconds has elapsed.  100000  events has been processed
+191.009438038  seconds has elapsed.  110000  events has been processed
+208.478541851  seconds has elapsed.  120000  events has been processed
+225.511763811  seconds has elapsed.  130000  events has been processed
+243.269752026  seconds has elapsed.  140000  events has been processed
+260.828613043  seconds has elapsed.  150000  events has been processed
+277.737603903  seconds has elapsed.  160000  events has been processed
+295.216998816  seconds has elapsed.  170000  events has been processed
+312.75095892  seconds has elapsed.  180000  events has been processed
+329.841428041  seconds has elapsed.  190000  events has been processed
+347.182996988  seconds has elapsed.  200000  events has been processed
+364.124526978  seconds has elapsed.  210000  events has been processed
+380.796286821  seconds has elapsed.  220000  events has been processed
+397.710626841  seconds has elapsed.  230000  events has been processed
+414.546411991  seconds has elapsed.  240000  events has been processed
+431.389967918  seconds has elapsed.  250000  events has been processed
+448.785531998  seconds has elapsed.  260000  events has been processed
+465.739157915  seconds has elapsed.  270000  events has been processed
+482.443423986  seconds has elapsed.  280000  events has been processed
+499.559054852  seconds has elapsed.  290000  events has been processed
+516.7624259  seconds has elapsed.  300000  events has been processed
+533.69331789  seconds has elapsed.  310000  events has been processed
+551.520589828  seconds has elapsed.  320000  events has been processed
+569.196372032  seconds has elapsed.  330000  events has been processed
+586.297699928  seconds has elapsed.  340000  events has been processed
+604.016237974  seconds has elapsed.  350000  events has been processed
+621.553926945  seconds has elapsed.  360000  events has been processed
+638.533355951  seconds has elapsed.  370000  events has been processed
+656.320307016  seconds has elapsed.  380000  events has been processed
+673.90414381  seconds has elapsed.  390000  events has been processed
+690.884032965  seconds has elapsed.  400000  events has been processed
+708.075261831  seconds has elapsed.  410000  events has been processed
+724.980562925  seconds has elapsed.  420000  events has been processed
+741.309139013  seconds has elapsed.  430000  events has been processed
+758.434304953  seconds has elapsed.  440000  events has been processed
+775.814785957  seconds has elapsed.  450000  events has been processed
+792.75878191  seconds has elapsed.  460000  events has been processed
+810.499352932  seconds has elapsed.  470000  events has been processed
+828.028156042  seconds has elapsed.  480000  events has been processed
+845.114650965  seconds has elapsed.  490000  events has been processed
+862.679814816  seconds has elapsed.  500000  events has been processed
+880.754406929  seconds has elapsed.  510000  events has been processed
+898.190984964  seconds has elapsed.  520000  events has been processed
+915.050434828  seconds has elapsed.  530000  events has been processed
+932.364835024  seconds has elapsed.  540000  events has been processed
+949.638953924  seconds has elapsed.  550000  events has been processed
+966.475406885  seconds has elapsed.  560000  events has been processed
+983.67544198  seconds has elapsed.  570000  events has been processed
+1000.97459197  seconds has elapsed.  580000  events has been processed
+1017.65116382  seconds has elapsed.  590000  events has been processed
+1034.84232187  seconds has elapsed.  600000  events has been processed
+1052.58321786  seconds has elapsed.  610000  events has been processed
+1069.34360981  seconds has elapsed.  620000  events has been processed
+1086.87870789  seconds has elapsed.  630000  events has been processed
+1103.93605304  seconds has elapsed.  640000  events has been processed
+1120.54064989  seconds has elapsed.  650000  events has been processed
+1137.90965104  seconds has elapsed.  660000  events has been processed
+1155.4097929  seconds has elapsed.  670000  events has been processed
+1172.13538694  seconds has elapsed.  680000  events has been processed
+1189.48745489  seconds has elapsed.  690000  events has been processed
+1207.06878996  seconds has elapsed.  700000  events has been processed
+1224.08983088  seconds has elapsed.  710000  events has been processed
+1241.50948787  seconds has elapsed.  720000  events has been processed
+1259.254426  seconds has elapsed.  730000  events has been processed
+1276.62637997  seconds has elapsed.  740000  events has been processed
+1294.22237301  seconds has elapsed.  750000  events has been processed
+1311.91576004  seconds has elapsed.  760000  events has been processed
+1328.51331687  seconds has elapsed.  770000  events has been processed
+1346.19057989  seconds has elapsed.  780000  events has been processed
+1363.87577796  seconds has elapsed.  790000  events has been processed
+1380.77131987  seconds has elapsed.  800000  events has been processed
+1398.04812789  seconds has elapsed.  810000  events has been processed
+1415.82880902  seconds has elapsed.  820000  events has been processed
+1433.07775497  seconds has elapsed.  830000  events has been processed
+1450.76462698  seconds has elapsed.  840000  events has been processed
+1468.46198702  seconds has elapsed.  850000  events has been processed
+1485.72880888  seconds has elapsed.  860000  events has been processed
+1503.32192802  seconds has elapsed.  870000  events has been processed
+1524.44344497  seconds has elapsed.  880000  events has been processed
+1541.43974686  seconds has elapsed.  890000  events has been processed
+1558.54438686  seconds has elapsed.  900000  events has been processed
+1575.88159895  seconds has elapsed.  910000  events has been processed
+1592.50914598  seconds has elapsed.  920000  events has been processed
+1609.85799289  seconds has elapsed.  930000  events has been processed
+1626.98267794  seconds has elapsed.  940000  events has been processed
+1643.84768295  seconds has elapsed.  950000  events has been processed
+1661.25229383  seconds has elapsed.  960000  events has been processed
+1678.6074779  seconds has elapsed.  970000  events has been processed
+1695.29391098  seconds has elapsed.  980000  events has been processed
+1712.10094285  seconds has elapsed.  990000  events has been processed
+108618  evts failed the photon veto
+520000  evts failed the opposite charge requirement
+ntuplizing delphes file:  /uscms/home/tyang/nobackup/data/FCCee-Scalar-Boson-delphes-samples/ee4lepton_muon.root
+-------------------------------------------------------------------
+0.145040988922  seconds has elapsed.  0  events has been processed
+18.4731869698  seconds has elapsed.  10000  events has been processed
+36.7828660011  seconds has elapsed.  20000  events has been processed
+54.5898659229  seconds has elapsed.  30000  events has been processed
+72.8687648773  seconds has elapsed.  40000  events has been processed
+91.578701973  seconds has elapsed.  50000  events has been processed
+109.461472034  seconds has elapsed.  60000  events has been processed
+127.916147947  seconds has elapsed.  70000  events has been processed
+146.563195944  seconds has elapsed.  80000  events has been processed
+164.686239004  seconds has elapsed.  90000  events has been processed
+13099  evts failed the photon veto
+45471  evts failed the opposite charge requirement
