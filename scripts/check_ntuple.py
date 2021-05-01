@@ -818,8 +818,8 @@ hist_mu_4f_1.SetFillColor(ROOT.kYellow)
 hist_mu_4f_1.SetLineWidth(1)
 hist_mu_4f_1.SetLineStyle(1)
 
-hs_bkg_mu_1.SetMinimum(0.1)
-hs_sig_mu_1.SetMinimum(0.1)
+hs_bkg_mu_1.SetMinimum(1)
+hs_sig_mu_1.SetMinimum(1)
 
 
 hs_sig_mu_1.Add(hist_mu_0p5_1)
@@ -943,8 +943,8 @@ hist_mu_4f_2.SetFillColor(ROOT.kYellow)
 hist_mu_4f_2.SetLineWidth(1)
 hist_mu_4f_2.SetLineStyle(1)
 
-hs_bkg_mu_2.SetMinimum(0.1)
-hs_sig_mu_2.SetMinimum(0.1)
+hs_bkg_mu_2.SetMinimum(1)
+hs_sig_mu_2.SetMinimum(1)
 
 
 hs_sig_mu_2.Add(hist_mu_0p5_2)
@@ -1059,8 +1059,8 @@ hist_mu_4f_3.SetFillColor(ROOT.kYellow)
 hist_mu_4f_3.SetLineWidth(1)
 hist_mu_4f_3.SetLineStyle(1)
 
-hs_bkg_mu_3.SetMinimum(0.1)
-hs_sig_mu_3.SetMinimum(0.1)
+hs_bkg_mu_3.SetMinimum(1)
+hs_sig_mu_3.SetMinimum(1)
 
 
 hs_sig_mu_3.Add(hist_mu_0p5_3)
@@ -1175,8 +1175,8 @@ hist_mu_4f_4.SetFillColor(ROOT.kYellow)
 hist_mu_4f_4.SetLineWidth(1)
 hist_mu_4f_4.SetLineStyle(1)
 
-hs_bkg_mu_4.SetMinimum(0.1)
-hs_sig_mu_4.SetMinimum(0.1)
+hs_bkg_mu_4.SetMinimum(1)
+hs_sig_mu_4.SetMinimum(1)
 
 
 hs_sig_mu_4.Add(hist_mu_0p5_4)

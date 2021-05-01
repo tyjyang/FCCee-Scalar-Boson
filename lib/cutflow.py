@@ -4,6 +4,8 @@ from helper import *
 '''
 INPUT -------------------------------------------------------------------------
 |*(str) ntuple_file_path: the fuill path to the ntuple file of interest
+| OR
+| (str) delphes_filename: the name of the delphes sample, with suffix
 |*(float) lumi_in_inverse_pb: the luminosity in units of inverse picobarn
 |  
 ROUTINE -----------------------------------------------------------------------
@@ -16,8 +18,12 @@ OUTPUT ------------------------------------------------------------------------
 |* (float) the normalization factor
 +------------------------------------------------------------------------------ 
 ''' 
-def get_normalization_factor(ntuple_file_path, lumi_in_inverse_pb):
-	delphes_filename = get_delphes_filename(ntuple_file_path)
+def get_normalization_factor(filename, lumi_in_inverse_pb):
+	ntuple_delimiter = ':'
+	if len(filename.split(ntuple_delimiter)) > 1:
+		delphes_filename = get_delphes_filename(filename)
+	else:
+		delphes_filename = filename
 	nevts = float(delphes_gen_info[delphes_filename]['nevt'])
 	xsec = delphes_gen_info[delphes_filename]['xsec']
 	return xsec * lumi_in_inverse_pb / nevts
