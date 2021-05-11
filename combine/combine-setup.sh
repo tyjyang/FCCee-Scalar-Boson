@@ -14,7 +14,7 @@ else
 	cd $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit
 	git fetch origin
 	git checkout v8.1.0
-
+	cd -
 	cd $CMSSW_BASE/src
 
 	# load necessary components from CombineHarvester
@@ -22,6 +22,7 @@ else
 
 	# compile 
 	scramv1 b clean; scramv1 b -j 8
+	cd -
 fi
 
 # clone tutorial
@@ -30,5 +31,5 @@ if [ -d "$CMSSW_BASE/src/combinetutorial-2020" ]; then
 else
 	cd $CMSSW_BASE/src
 	git clone https://gitlab.cern.ch/adewit/combinetutorial-2020
-	cd combinetutorial-2020
+	cd - 
 fi

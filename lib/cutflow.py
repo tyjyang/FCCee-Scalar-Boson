@@ -28,23 +28,45 @@ def get_normalization_factor(filename, lumi_in_inverse_pb):
 	xsec = delphes_gen_info[delphes_filename]['xsec']
 	return xsec * lumi_in_inverse_pb / nevts
 
-def get_ntuple_trees(sig_filepaths, bkg_filepaths, channels):
+'''
+INPUT -------------------------------------------------------------------------
+|* (dict) filepaths: the list of full paths to rootfiles from which the 
+|                    function gets the ntuple trees
+|* list(str) channels: the final state particle channels from whose name the
+|                      function fetches the trees in the rootfiles 
+|  
+ROUTINE -----------------------------------------------------------------------
+|* store the short-handed filenames and the pointers to rootfiles into a 1D
+|  dictionary files
+|* Nest the trees, one per channel per file, into a 2D dictionary, with the 1st
+|  dim being the channel and the 2nd being the files
+| 
+OUTPUT ------------------------------------------------------------------------
+|* dict(dict(ROOT.TNtuple)) trees: the 2D dict containing root ntuple trees
++------------------------------------------------------------------------------ 
+''' 
+def get_ntuple_trees(filepaths, channels):
 	channels = string_to_list(channels)
-	sig_files = {}
-	bkg_files = {}
-	sig_trees = {}
-	bkg_trees = {}
+	files = {}
+	trees = {}
 	for chn in channels: 
-		sig_trees[chn] = {}
-		bkg_trees[chn] = {}
-	for key, f in sig_filepaths.items():
-		sig_files[key] = ROOT.TFile.Open(f)
-		
-	for key, f in bkg_filepaths.items():
-		bkg_files[key] = ROOT.TFile.Open(f)
+		trees[chn] = {}
+	for key, f in filepaths.items():
+		files[key] = ROOT.TFile.Open(f)
+		for chn in channels:
+			trees[chn][key] = getattr(files[key], chn)
 	return trees
+
+def get_ntuple_weights(filepaths, lumi):
+	w = {}
+	for key, f in filepaths.items():
+		w[key] = get_normalization_factor(f, lumi)
+	return w
+
+#def set_tree_weights(trees, 
 		
-# pointer to files + trees
+# implement channel recognition from filenames
+# setting tree weights
 # str to store cuts
 # get number of evts after each cut
 # plot the cutflow

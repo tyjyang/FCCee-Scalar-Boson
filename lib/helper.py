@@ -306,7 +306,7 @@ def string_to_list(string):
 	elif type(string) == list:
 		return string
 	else:
-		sys.exit(("string_to_list(): cannot convert an inpit that is"
+		sys.exit(("string_to_list(): cannot convert an input that is "
                   "neither a single string or a list of strings"))  
 
 '''
