@@ -101,8 +101,8 @@ muon_cuts['cos_theta_p_missing'] = electron_cuts['cos_theta_p_missing']
 
 hist_pixel_x = 600
 hist_pixel_y = 450
-num_hist_x = 2
-num_hist_y = 3
+num_hist_x = 3
+num_hist_y = 2
 '''
 c_electron = ROOT.TCanvas("electron_cutflow","cutflow plots for Z -> ee at 91.2 GeV",
                            hist_pixel_x * num_hist_x, hist_pixel_y * num_hist_y)
