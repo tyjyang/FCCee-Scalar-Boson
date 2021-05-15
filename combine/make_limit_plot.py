@@ -187,7 +187,7 @@ def makePlotUpperLimit():
     latex.SetTextAlign(13)
     latex.SetTextFont(42)
     latex.SetTextSize(0.045)
-    latex.DrawLatex(0.15, 0.985, "#bf{CMS} #scale[0.7]{#it{Preliminary}}")
+    latex.DrawLatex(0.15, 0.985, "#bf{FCC-ee} #scale[0.7]{#it{Performance}}")
     
     
     ROOT.gPad.SetTicks()
