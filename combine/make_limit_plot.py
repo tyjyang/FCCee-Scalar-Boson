@@ -202,8 +202,13 @@ def makePlotUpperLimit():
 
 if __name__ == "__main__":
 
-    masses = [0.5, 5, 25]
-    combine_files = ["higgsCombineTest.AsymptoticLimits.mH0.5.root", "higgsCombineTest.AsymptoticLimits.mH5.root", "higgsCombineTest.AsymptoticLimits.mH25.root"]
+    masses = [0.5, 2, 5, 10, 15, 25]
+    combine_files = ["higgsCombineTest.AsymptoticLimits.mH0.5.root", 
+                     "higgsCombineTest.AsymptoticLimits.mH2.root",
+                     "higgsCombineTest.AsymptoticLimits.mH5.root",
+                     "higgsCombineTest.AsymptoticLimits.mH10.root",
+                     "higgsCombineTest.AsymptoticLimits.mH15.root",
+                     "higgsCombineTest.AsymptoticLimits.mH25.root"]
 
     
     cfg_xtitle = "m_{S^{0}} (GeV)"
