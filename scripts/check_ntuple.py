@@ -34,7 +34,7 @@ sig = {}
 bkg = {}
 sig['0p5'] = ROOT.TFile.Open(ntuple_sig_filepath[0])
 sig['2'] = ROOT.TFile.Open(ntuple_sig_filepath[1])
-sig['5']   = ROOT.TFile.Open(ntuple_sig_filepath[2])
+sig['5'] = ROOT.TFile.Open(ntuple_sig_filepath[2])
 sig['10'] = ROOT.TFile.Open(ntuple_sig_filepath[3])
 sig['15'] = ROOT.TFile.Open(ntuple_sig_filepath[4])
 sig['25']  = ROOT.TFile.Open(ntuple_sig_filepath[5])
@@ -965,29 +965,29 @@ hist_mu_4f_2.SetLineStyle(1)
 
 hs_bkg_mu_2.SetMinimum(0.1)
 hs_sig_mu_2.SetMinimum(0.1)
-
+hs_bkg_mu_2.SetMaximum(50)
+hs_sig_mu_2.SetMaximum(50)
 
 hs_sig_mu_2.Add(hist_mu_0p5_2)
 hs_sig_mu_2.Add(hist_mu_5_2)
 hs_sig_mu_2.Add(hist_mu_25_2)
 hs_bkg_mu_2.Add(hist_mu_2f_2)
 hs_bkg_mu_2.Add(hist_mu_4f_2)
-
 ymin = []
 ymax = []
 xmin = []
 xmax = []
 ROOT.gPad.SetLogy()
-hs_sig_mu_2.Draw("hist")
-hs_sig_mu_2.GetHistogram().SetXTitle('|cos(#theta_{1})|')
-hs_sig_mu_2.GetHistogram().SetYTitle('Events/0.0667')
-hs_sig_mu_2.GetHistogram().SetTitleSize(0.05, "xy")
+hs_bkg_mu_2.Draw("hist")
+hs_bkg_mu_2.GetHistogram().SetXTitle('|cos(#theta_{1})|')
+hs_bkg_mu_2.GetHistogram().SetYTitle('Events/0.0667')
+hs_bkg_mu_2.GetHistogram().SetTitleSize(0.05, "xy")
 ROOT.gPad.Update()
 ymin.append(ROOT.gPad.GetUymin())
 ymax.append(ROOT.gPad.GetUymax())
 xmin.append(ROOT.gPad.GetUxmin())
 xmax.append(ROOT.gPad.GetUxmax())
-hs_bkg_mu_2.Draw("hist, nostack, same")
+hs_sig_mu_2.Draw("hist, same, nostack")
 ROOT.gPad.RedrawAxis()
 ROOT.gPad.Update()
 ymin.append(ROOT.gPad.GetUymin())
@@ -1082,7 +1082,8 @@ hist_mu_4f_3.SetLineStyle(1)
 
 hs_bkg_mu_3.SetMinimum(0.1)
 hs_sig_mu_3.SetMinimum(0.1)
-
+hs_bkg_mu_3.SetMaximum(60)
+hs_sig_mu_3.SetMaximum(60)
 
 hs_sig_mu_3.Add(hist_mu_0p5_3)
 hs_sig_mu_3.Add(hist_mu_5_3)
@@ -1198,7 +1199,8 @@ hist_mu_4f_4.SetLineStyle(1)
 
 hs_bkg_mu_4.SetMinimum(0.1)
 hs_sig_mu_4.SetMinimum(0.1)
-
+hs_bkg_mu_4.SetMaximum(40)
+hs_sig_mu_4.SetMaximum(40)
 
 hs_sig_mu_4.Add(hist_mu_0p5_4)
 hs_sig_mu_4.Add(hist_mu_5_4)
@@ -1211,16 +1213,16 @@ ymax = []
 xmin = []
 xmax = []
 ROOT.gPad.SetLogy()
-hs_sig_mu_4.Draw("hist")
-hs_sig_mu_4.GetHistogram().SetXTitle('|cos(#theta_{miss})|')
-hs_sig_mu_4.GetHistogram().SetYTitle('Events/0.667')
-hs_sig_mu_4.GetHistogram().SetTitleSize(0.05, "xy")
+hs_bkg_mu_4.Draw("hist")
+hs_bkg_mu_4.GetHistogram().SetXTitle('|cos(#theta_{miss})|')
+hs_bkg_mu_4.GetHistogram().SetYTitle('Events/0.667')
+hs_bkg_mu_4.GetHistogram().SetTitleSize(0.05, "xy")
 ROOT.gPad.Update()
 ymin.append(ROOT.gPad.GetUymin())
 ymax.append(ROOT.gPad.GetUymax())
 xmin.append(ROOT.gPad.GetUxmin())
 xmax.append(ROOT.gPad.GetUxmax())
-hs_bkg_mu_4.Draw("hist, nostack, same")
+hs_sig_mu_4.Draw("hist, nostack, same")
 ROOT.gPad.RedrawAxis()
 ROOT.gPad.Update()
 ymin.append(ROOT.gPad.GetUymin())
@@ -1316,7 +1318,8 @@ hist_mu_4f_5.SetLineStyle(1)
 
 hs_bkg_mu_5.SetMinimum(0)
 hs_sig_mu_5.SetMinimum(0)
-
+hs_bkg_mu_5.SetMaximum(120)
+hs_sig_mu_5.SetMaximum(120)
 
 hs_sig_mu_5.Add(hist_mu_0p5_5)
 hs_sig_mu_5.Add(hist_mu_5_5)
@@ -1329,16 +1332,16 @@ ymax = []
 xmin = []
 xmax = []
 #ROOT.gPad.SetLogy()
-hs_sig_mu_5.Draw("hist")
-hs_sig_mu_5.GetHistogram().SetXTitle('m_{mumu} [GeV]')
-hs_sig_mu_5.GetHistogram().SetYTitle('Events/10 GeV')
-hs_sig_mu_5.GetHistogram().SetTitleSize(0.05, "xy")
+hs_bkg_mu_5.Draw("hist")
+hs_bkg_mu_5.GetHistogram().SetXTitle('m_{mumu} [GeV]')
+hs_bkg_mu_5.GetHistogram().SetYTitle('Events/10 GeV')
+hs_bkg_mu_5.GetHistogram().SetTitleSize(0.05, "xy")
 ROOT.gPad.Update()
 ymin.append(ROOT.gPad.GetUymin())
 ymax.append(ROOT.gPad.GetUymax())
 xmin.append(ROOT.gPad.GetUxmin())
 xmax.append(ROOT.gPad.GetUxmax())
-hs_bkg_mu_5.Draw("hist, nostack, same")
+hs_sig_mu_5.Draw("hist, nostack, same")
 ROOT.gPad.Update()
 ymin.append(ROOT.gPad.GetUymin())
 ymax.append(ROOT.gPad.GetUymax())
@@ -1446,7 +1449,8 @@ hist_mu_4f_rec.SetLineStyle(1)
 
 hs_bkg_mu_rec.SetMinimum(0)
 hs_sig_mu_rec.SetMinimum(0)
-
+hs_bkg_mu_rec.SetMaximum(180)
+hs_sig_mu_rec.SetMaximum(180)
 
 hs_sig_mu_rec.Add(hist_mu_0p5_rec)
 hs_sig_mu_rec.Add(hist_mu_5_rec)
@@ -1459,16 +1463,16 @@ ymax = []
 xmin = []
 xmax = []
 #ROOT.gPad.SetLogy()
-hs_sig_mu_rec.Draw("hist")
-hs_sig_mu_rec.GetHistogram().SetXTitle('m_{rec} [GeV]')
-hs_sig_mu_rec.GetHistogram().SetYTitle('Events/5 GeV')
-hs_sig_mu_rec.GetHistogram().SetTitleSize(0.05, "xy")
+hs_bkg_mu_rec.Draw("hist")
+hs_bkg_mu_rec.GetHistogram().SetXTitle('m_{rec} [GeV]')
+hs_bkg_mu_rec.GetHistogram().SetYTitle('Events/5 GeV')
+hs_bkg_mu_rec.GetHistogram().SetTitleSize(0.05, "xy")
 ROOT.gPad.Update()
 ymin.append(ROOT.gPad.GetUymin())
 ymax.append(ROOT.gPad.GetUymax())
 xmin.append(ROOT.gPad.GetUxmin())
 xmax.append(ROOT.gPad.GetUxmax())
-hs_bkg_mu_rec.Draw("hist, nostack, same")
+hs_sig_mu_rec.Draw("hist, nostack, same")
 ROOT.gPad.Update()
 c_muon_rec.Print("../plots/ZTomumu_rec.png")
 file_mu_0p5_rec = ROOT.TFile("../combine/mu_0p5_mrec.root","RECREATE")
