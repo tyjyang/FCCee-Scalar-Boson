@@ -9,13 +9,15 @@ delphes_gen_info = { #xsec in units of pb
 'eeTollS_25_inc.root':{'s':91**2, 'nevt':300000, 'xsec':2.186},
 'eeTo2fermion.root':{'s':91**2, 'nevt':1000000, 'xsec':8530},
 'four_lepton.root':{'s':91**2, 'nevt':1000000, 'xsec':3.88},
-'eeZS_p5.root':{'s':91**2, 'nevt':300000, 'xsec':3.738},
-'eeZS_2.root':{'s':91**2, 'nevt':300000, 'xsec':2.751},
-'eeZS_5.root':{'s':91**2, 'nevt':300000, 'xsec':1.703},
+'eeZS_p5.root':{'s':91**2, 'nevt':300000, 'xsec':37.376},
+'eeZS_2.root':{'s':91**2, 'nevt':300000, 'xsec':27.510},
+'eeZS_5.root':{'s':91**2, 'nevt':300000, 'xsec':17.027},
+'eeZS_10.root':{'s':91**2, 'nevt':300000, 'xsec':7.856},
 'eeZS_15.root':{'s':91**2, 'nevt':300000, 'xsec':5.748},
 'eeZS_25.root':{'s':91**2, 'nevt':300000, 'xsec':2.291},
 'ee2fermion_mutau.root':{'s':91**2, 'nevt':1000000, 'xsec':3013.049},
-'ee4lepton_muon.root':{'s':91**2, 'nevt':100000, 'xsec':1.134}
+'ee4lepton_muon.root':{'s':91**2, 'nevt':100000, 'xsec':11.339},
+'ee4lepquark.root':{'s':91**2, 'nevt':100000, 'xsec':1.019}
 }
 
 '''

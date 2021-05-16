@@ -9,13 +9,22 @@ from cutflow import *
 ntuple_path = '../ntuples/'
 ntuple_sig_files = [('eeZS_p5:electron-muon:pt-eta-phi-cos_theta-'
                      'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
+                    ('eeZS_2:electron-muon:pt-eta-phi-cos_theta-'
+                     'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
                     ('eeZS_5:electron-muon:pt-eta-phi-cos_theta-'
                      'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
+                    ('eeZS_10:electron-muon:pt-eta-phi-cos_theta-'
+                     'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
+                    ('eeZS_15:electron-muon:pt-eta-phi-cos_theta-'
+                     'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
                     ('eeZS_25:electron-muon:pt-eta-phi-cos_theta-'
-                     'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root')]
+                     'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root')
+                   ]
 ntuple_bkg_files = [('ee2fermion_mutau:electron-muon:pt-eta-phi-cos_theta-'
                      'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
                     ('ee4lepton_muon:electron-muon:pt-eta-phi-cos_theta-'
+                     'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
+                    ('ee4lepquark:electron-muon:pt-eta-phi-cos_theta-'
                      'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root')]
 ntuple_sig_filepath = []
 ntuple_bkg_filepath = []
@@ -24,8 +33,11 @@ for f in ntuple_bkg_files: ntuple_bkg_filepath.append(ntuple_path + f)
 sig = {}
 bkg = {}
 sig['0p5'] = ROOT.TFile.Open(ntuple_sig_filepath[0])
-sig['5']   = ROOT.TFile.Open(ntuple_sig_filepath[1])
-sig['25']  = ROOT.TFile.Open(ntuple_sig_filepath[2])
+sig['2'] = ROOT.TFile.Open(ntuple_sig_filepath[1])
+sig['5']   = ROOT.TFile.Open(ntuple_sig_filepath[2])
+sig['10'] = ROOT.TFile.Open(ntuple_sig_filepath[3])
+sig['15'] = ROOT.TFile.Open(ntuple_sig_filepath[4])
+sig['25']  = ROOT.TFile.Open(ntuple_sig_filepath[5])
 bkg['2f']  = ROOT.TFile.Open(ntuple_bkg_filepath[0])
 bkg['4f']  = ROOT.TFile.Open(ntuple_bkg_filepath[1])
 # create rootfile to save the histograms
@@ -35,8 +47,11 @@ cutflow_file.cd()
 lumi = 115.4
 w = {}
 w['0p5'] = get_normalization_factor(ntuple_sig_files[0], lumi)
-w['5'] = get_normalization_factor(ntuple_sig_files[1], lumi)
-w['25'] = get_normalization_factor(ntuple_sig_files[2], lumi)
+w['2'] = get_normalization_factor(ntuple_sig_files[1], lumi)
+w['5'] = get_normalization_factor(ntuple_sig_files[2], lumi)
+w['10'] = get_normalization_factor(ntuple_sig_files[3], lumi)
+w['15'] = get_normalization_factor(ntuple_sig_files[4], lumi)
+w['25'] = get_normalization_factor(ntuple_sig_files[5], lumi)
 w['2f'] = get_normalization_factor(ntuple_bkg_files[0], lumi)
 w['4f'] = get_normalization_factor(ntuple_bkg_files[1], lumi)
 # load electron/muon trees from the ntuple files
@@ -738,11 +753,16 @@ c_electron.Print("../plots/ZToee.png")
 c_muon = ROOT.TCanvas("muon_cutflow","cutflow plots for Z -> mumu at 91.2 GeV",
                            hist_pixel_x * num_hist_x, hist_pixel_y * num_hist_y)
 c_muon.Divide(num_hist_x, num_hist_y)
-print  muons['0p5'].GetEntries()
 print ('normalized num of Z-> mumu evts from singal with m_s = 0.5 GeV: ',
        muons['0p5'].GetEntries()*w['0p5'])
+#print ('normalized num of Z-> mumu evts from singal with m_s = 5 GeV: ',
+#       muons['2'].GetEntries()*w['2'])
 print ('normalized num of Z-> mumu evts from singal with m_s = 5 GeV: ',
        muons['5'].GetEntries()*w['5'])
+#print ('normalized num of Z-> mumu evts from singal with m_s = 5 GeV: ',
+#       muons['10'].GetEntries()*w['10'])
+#print ('normalized num of Z-> mumu evts from singal with m_s = 5 GeV: ',
+#       muons['15'].GetEntries()*w['15'])
 print ('normalized num of Z-> mumu evts from singal with m_s = 25 GeV: ',
        muons['25'].GetEntries()*w['25'])
 print ('normalized num of Z-> mumu evts from 2-fermion background: ',
@@ -958,16 +978,16 @@ ymax = []
 xmin = []
 xmax = []
 ROOT.gPad.SetLogy()
-hs_bkg_mu_2.Draw("hist")
-hs_bkg_mu_2.GetHistogram().SetXTitle('|cos(#theta_{1})|')
-hs_bkg_mu_2.GetHistogram().SetYTitle('Events/0.0667')
-hs_bkg_mu_2.GetHistogram().SetTitleSize(0.05, "xy")
+hs_sig_mu_2.Draw("hist")
+hs_sig_mu_2.GetHistogram().SetXTitle('|cos(#theta_{1})|')
+hs_sig_mu_2.GetHistogram().SetYTitle('Events/0.0667')
+hs_sig_mu_2.GetHistogram().SetTitleSize(0.05, "xy")
 ROOT.gPad.Update()
 ymin.append(ROOT.gPad.GetUymin())
 ymax.append(ROOT.gPad.GetUymax())
 xmin.append(ROOT.gPad.GetUxmin())
 xmax.append(ROOT.gPad.GetUxmax())
-hs_sig_mu_2.Draw("hist, nostack, same")
+hs_bkg_mu_2.Draw("hist, nostack, same")
 ROOT.gPad.Update()
 ymin.append(ROOT.gPad.GetUymin())
 ymax.append(ROOT.gPad.GetUymax())
@@ -1190,16 +1210,16 @@ ymax = []
 xmin = []
 xmax = []
 ROOT.gPad.SetLogy()
-hs_bkg_mu_4.Draw("hist")
-hs_bkg_mu_4.GetHistogram().SetXTitle('|cos(#theta_{miss})|')
-hs_bkg_mu_4.GetHistogram().SetYTitle('Events/0.667')
-hs_bkg_mu_4.GetHistogram().SetTitleSize(0.05, "xy")
+hs_sig_mu_4.Draw("hist")
+hs_sig_mu_4.GetHistogram().SetXTitle('|cos(#theta_{miss})|')
+hs_sig_mu_4.GetHistogram().SetYTitle('Events/0.667')
+hs_sig_mu_4.GetHistogram().SetTitleSize(0.05, "xy")
 ROOT.gPad.Update()
 ymin.append(ROOT.gPad.GetUymin())
 ymax.append(ROOT.gPad.GetUymax())
 xmin.append(ROOT.gPad.GetUxmin())
 xmax.append(ROOT.gPad.GetUxmax())
-hs_sig_mu_4.Draw("hist, nostack, same")
+hs_bkg_mu_4.Draw("hist, nostack, same")
 ROOT.gPad.Update()
 ymin.append(ROOT.gPad.GetUymin())
 ymax.append(ROOT.gPad.GetUymax())
@@ -1307,16 +1327,16 @@ ymax = []
 xmin = []
 xmax = []
 #ROOT.gPad.SetLogy()
-hs_bkg_mu_5.Draw("hist")
-hs_bkg_mu_5.GetHistogram().SetXTitle('m_{mumu} [GeV]')
-hs_bkg_mu_5.GetHistogram().SetYTitle('Events/10 GeV')
-hs_bkg_mu_5.GetHistogram().SetTitleSize(0.05, "xy")
+hs_sig_mu_5.Draw("hist")
+hs_sig_mu_5.GetHistogram().SetXTitle('m_{mumu} [GeV]')
+hs_sig_mu_5.GetHistogram().SetYTitle('Events/10 GeV')
+hs_sig_mu_5.GetHistogram().SetTitleSize(0.05, "xy")
 ROOT.gPad.Update()
 ymin.append(ROOT.gPad.GetUymin())
 ymax.append(ROOT.gPad.GetUymax())
 xmin.append(ROOT.gPad.GetUxmin())
 xmax.append(ROOT.gPad.GetUxmax())
-hs_sig_mu_5.Draw("hist, nostack, same")
+hs_bkg_mu_5.Draw("hist, nostack, same")
 ROOT.gPad.Update()
 ymin.append(ROOT.gPad.GetUymin())
 ymax.append(ROOT.gPad.GetUymax())
@@ -1377,7 +1397,13 @@ mu_rec_nbins = 20
 mu_rec_descrp = "Z #rightarrow #mu^{+}#mu^{-} vs. m_{mumu} @ 91.2 GeV"
 hist_mu_0p5_rec = ROOT.TH1F("mu_0p5_m_rec",
 mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
+hist_mu_2_rec = ROOT.TH1F("mu_2_m_rec",
+mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
 hist_mu_5_rec = ROOT.TH1F("mu_5_m_rec",
+mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
+hist_mu_10_rec = ROOT.TH1F("mu_10_m_rec",
+mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
+hist_mu_15_rec = ROOT.TH1F("mu_15_m_rec",
 mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
 hist_mu_25_rec = ROOT.TH1F("mu_25_m_rec",
 mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
@@ -1386,7 +1412,10 @@ mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
 hist_mu_4f_rec = ROOT.TH1F("mu_4f_m_rec",
 mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
 muons['0p5'].Draw("m_rec>>mu_0p5_m_rec", mu_cut_5, "goff")
+muons['2'].Draw("m_rec>>mu_2_m_rec", mu_cut_5, "goff")
 muons['5'].Draw("m_rec>>mu_5_m_rec", mu_cut_5, "goff")
+muons['10'].Draw("m_rec>>mu_10_m_rec", mu_cut_5, "goff")
+muons['15'].Draw("m_rec>>mu_15_m_rec", mu_cut_5, "goff")
 muons['25'].Draw("m_rec>>mu_25_m_rec", mu_cut_5, "goff")
 muons['2f'].Draw("m_rec>>mu_2f_m_rec", mu_cut_5, "goff")
 muons['4f'].Draw("m_rec>>mu_4f_m_rec", mu_cut_5, "goff")
@@ -1441,17 +1470,29 @@ hs_sig_mu_rec.Draw("hist, nostack, same")
 ROOT.gPad.Update()
 c_muon_rec.Print("../plots/ZTomumu_rec.png")
 file_mu_0p5_rec = ROOT.TFile("../combine/mu_0p5_mrec.root","RECREATE")
+file_mu_2_rec = ROOT.TFile("../combine/mu_2_mrec.root","RECREATE")
 file_mu_5_rec = ROOT.TFile("../combine/mu_5_mrec.root","RECREATE")
+file_mu_10_rec = ROOT.TFile("../combine/mu_10_mrec.root","RECREATE")
+file_mu_15_rec = ROOT.TFile("../combine/mu_15_mrec.root","RECREATE")
 file_mu_25_rec = ROOT.TFile("../combine/mu_25_mrec.root","RECREATE")
 file_mu_2f_rec = ROOT.TFile("../combine/mu_2f_mrec.root","RECREATE")
 file_mu_4f_rec = ROOT.TFile("../combine/mu_4f_mrec.root","RECREATE")
 file_mu_tot_0p5_rec = ROOT.TFile("../combine/mu_tot_0p5_mrec.root","RECREATE")
+file_mu_tot_2_rec = ROOT.TFile("../combine/mu_tot_2_mrec.root","RECREATE")
 file_mu_tot_5_rec = ROOT.TFile("../combine/mu_tot_5_mrec.root","RECREATE")
+file_mu_tot_10_rec = ROOT.TFile("../combine/mu_tot_10_mrec.root","RECREATE")
+file_mu_tot_15_rec = ROOT.TFile("../combine/mu_tot_15_mrec.root","RECREATE")
 file_mu_tot_25_rec = ROOT.TFile("../combine/mu_tot_25_mrec.root","RECREATE")
 file_mu_0p5_rec.cd()
 hist_mu_0p5_rec.Write()
+file_mu_2_rec.cd()
+hist_mu_2_rec.Write()
 file_mu_5_rec.cd()
 hist_mu_5_rec.Write()
+file_mu_10_rec.cd()
+hist_mu_10_rec.Write()
+file_mu_15_rec.cd()
+hist_mu_15_rec.Write()
 file_mu_25_rec.cd()
 hist_mu_25_rec.Write()
 file_mu_2f_rec.cd()
@@ -1465,6 +1506,13 @@ hist_mu_tot_0p5_rec.Add(hist_mu_2f_rec)
 hist_mu_tot_0p5_rec.Add(hist_mu_4f_rec)
 file_mu_tot_0p5_rec.cd()
 hist_mu_tot_0p5_rec.Write()
+hist_mu_tot_2_rec = ROOT.TH1F('tot_2',
+                      mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
+hist_mu_tot_2_rec.Add(hist_mu_2_rec)
+hist_mu_tot_2_rec.Add(hist_mu_2f_rec)
+hist_mu_tot_2_rec.Add(hist_mu_4f_rec)
+file_mu_tot_2_rec.cd()
+hist_mu_tot_2_rec.Write()
 hist_mu_tot_5_rec = ROOT.TH1F('tot_5',
                       mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
 hist_mu_tot_5_rec.Add(hist_mu_5_rec)
@@ -1472,6 +1520,20 @@ hist_mu_tot_5_rec.Add(hist_mu_2f_rec)
 hist_mu_tot_5_rec.Add(hist_mu_4f_rec)
 file_mu_tot_5_rec.cd()
 hist_mu_tot_5_rec.Write()
+hist_mu_tot_10_rec = ROOT.TH1F('tot_10',
+                      mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
+hist_mu_tot_10_rec.Add(hist_mu_10_rec)
+hist_mu_tot_10_rec.Add(hist_mu_2f_rec)
+hist_mu_tot_10_rec.Add(hist_mu_4f_rec)
+file_mu_tot_10_rec.cd()
+hist_mu_tot_10_rec.Write()
+hist_mu_tot_15_rec = ROOT.TH1F('tot_15',
+                      mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
+hist_mu_tot_15_rec.Add(hist_mu_15_rec)
+hist_mu_tot_15_rec.Add(hist_mu_2f_rec)
+hist_mu_tot_15_rec.Add(hist_mu_4f_rec)
+file_mu_tot_15_rec.cd()
+hist_mu_tot_15_rec.Write()
 hist_mu_tot_25_rec = ROOT.TH1F('tot_25',
                       mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
 hist_mu_tot_25_rec.Add(hist_mu_25_rec)
