@@ -214,7 +214,7 @@ if __name__ == "__main__":
     cfg_xtitle = "m_{S^{0}} (GeV)"
     cfg_ytitle = " limit on k for (#sigma_{S^{0}Z^{0}} = k * #sigma_{H^{0}Z^{0}} (m_{H^{0}_{SM}} = m_{S^{0}}))"
     
-    cfg_ymin, cfg_ymax = 0.05, 10 
+    cfg_ymin, cfg_ymax = 0.01, 3 
     
     fout = "limitPlot.png"
 
