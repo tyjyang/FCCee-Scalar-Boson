@@ -40,6 +40,7 @@ sig['15'] = ROOT.TFile.Open(ntuple_sig_filepath[4])
 sig['25']  = ROOT.TFile.Open(ntuple_sig_filepath[5])
 bkg['2f']  = ROOT.TFile.Open(ntuple_bkg_filepath[0])
 bkg['4f']  = ROOT.TFile.Open(ntuple_bkg_filepath[1])
+bkg['4fqq']  = ROOT.TFile.Open(ntuple_bkg_filepath[2])
 # create rootfile to save the histograms
 cutflow_file = ROOT.TFile("cutflow.root","RECREATE")
 cutflow_file.cd()
@@ -54,6 +55,7 @@ w['15'] = get_normalization_factor(ntuple_sig_files[4], lumi)
 w['25'] = get_normalization_factor(ntuple_sig_files[5], lumi)
 w['2f'] = get_normalization_factor(ntuple_bkg_files[0], lumi)
 w['4f'] = get_normalization_factor(ntuple_bkg_files[1], lumi)
+w['4fqq'] = get_normalization_factor(ntuple_bkg_files[2], lumi)
 # load electron/muon trees from the ntuple files
 electrons = {}
 muons = {}
@@ -767,9 +769,10 @@ print ('normalized num of Z-> mumu evts from singal with m_s = 25 GeV: ',
        muons['25'].GetEntries()*w['25'])
 print ('normalized num of Z-> mumu evts from 2-fermion background: ',
        muons['2f'].GetEntries()*w['2f'])
-print ('normalized num of Z-> mumu evts from 4-fermion background: ',
+print ('normalized num of Z-> mumu evts from 4-fermion lep background: ',
        muons['4f'].GetEntries()*w['4f'])
-
+print ('normalized num of Z-> mumu evts from 4-fermion qq background: ',
+       muons['4fqq'].GetEntries()*w['4fqq'])
 ''' first cut for the mumu channel '''
 c_muon.cd(1)
 # get the entrylist after the cut
@@ -778,11 +781,13 @@ muons['5'].Draw(">>mu_5_cutlist1",muon_cuts['alpha'],"entrylist")
 muons['25'].Draw(">>mu_25_cutlist1",muon_cuts['alpha'],"entrylist")
 muons['2f'].Draw(">>mu_2f_cutlist1",muon_cuts['alpha'],"entrylist")
 muons['4f'].Draw(">>mu_4f_cutlist1",muon_cuts['alpha'],"entrylist")
+muons['4fqq'].Draw(">>mu_4fqq_cutlist1",muon_cuts['alpha'],"entrylist")
 mu_0p5_cutlist1 = ROOT.gDirectory.Get("mu_0p5_cutlist1")
 mu_5_cutlist1 = ROOT.gDirectory.Get("mu_5_cutlist1")
 mu_25_cutlist1 = ROOT.gDirectory.Get("mu_25_cutlist1")
 mu_2f_cutlist1 = ROOT.gDirectory.Get("mu_2f_cutlist1")
 mu_4f_cutlist1 = ROOT.gDirectory.Get("mu_4f_cutlist1")
+mu_4fqq_cutlist1 = ROOT.gDirectory.Get("mu_4fqq_cutlist1")
 print ('num of singal evts with m_s = 0.5 GeV passing alpha cut: ', 
        mu_0p5_cutlist1.GetN()*w['0p5'])
 print ('num of singal evts with m_s = 5 GeV passing alpha cut: ', 
@@ -793,6 +798,8 @@ print ('num of 2-fermion bkg evts passing alpha cut: ',
        mu_2f_cutlist1.GetN()*w['2f'])
 print ('num of 4-fermion bkg evts passing alpha cut: ', 
        mu_4f_cutlist1.GetN()*w['4f'])
+print ('num of 4-fermion bkg evts passing alpha cut: ', 
+       mu_4fqq_cutlist1.GetN()*w['4fqq'])
 # plot the events vs. var being cut, up to all cuts applied before
 hs_sig_mu_1 = ROOT.THStack("hs_sig_mu_1","")
 hs_bkg_mu_1 = ROOT.THStack("hs_bkg_mu_1","")
@@ -810,11 +817,14 @@ hist_mu_2f_1 = ROOT.TH1F("mu_2f_alpha",
 mu_1_descrp, mu_1_nbins, mu_1_xlow, mu_1_xhigh)
 hist_mu_4f_1 = ROOT.TH1F("mu_4f_alpha",
 mu_1_descrp, mu_1_nbins, mu_1_xlow, mu_1_xhigh)
+hist_mu_4fqq_1 = ROOT.TH1F("mu_4fqq_alpha",
+mu_1_descrp, mu_1_nbins, mu_1_xlow, mu_1_xhigh)
 muons['0p5'].Draw("alpha>>mu_0p5_alpha", "", "goff")
 muons['5'].Draw("alpha>>mu_5_alpha", "", "goff")
 muons['25'].Draw("alpha>>mu_25_alpha","","goff")
 muons['2f'].Draw("alpha>>mu_2f_alpha", "", "goff")
 muons['4f'].Draw("alpha>>mu_4f_alpha", "", "goff")
+muons['4fqq'].Draw("alpha>>mu_4fqq_alpha", "", "goff")
 #hist_mu_0p5_1.SetDirectory(0)
 #hist_mu_5_1.SetDirectory(0)
 #hist_mu_25_1.SetDirectory(0)
@@ -837,7 +847,14 @@ hist_mu_4f_1.SetLineColor(ROOT.kBlack)
 hist_mu_4f_1.SetFillColor(ROOT.kYellow)
 hist_mu_4f_1.SetLineWidth(1)
 hist_mu_4f_1.SetLineStyle(1)
-
+hist_mu_4f_1.SetLineColor(ROOT.kBlack)
+hist_mu_4f_1.SetFillColor(ROOT.kYellow)
+hist_mu_4f_1.SetLineWidth(1)
+hist_mu_4f_1.SetLineStyle(1)
+hist_mu_4fqq_1.SetLineColor(ROOT.kBlack)
+hist_mu_4fqq_1.SetFillColor(ROOT.kOrange)
+hist_mu_4fqq_1.SetLineWidth(1)
+hist_mu_4fqq_1.SetLineStyle(1)
 hs_bkg_mu_1.SetMinimum(0.1)
 hs_sig_mu_1.SetMinimum(0.1)
 
@@ -847,6 +864,7 @@ hs_sig_mu_1.Add(hist_mu_5_1)
 hs_sig_mu_1.Add(hist_mu_25_1)
 hs_bkg_mu_1.Add(hist_mu_2f_1)
 hs_bkg_mu_1.Add(hist_mu_4f_1)
+hs_bkg_mu_1.Add(hist_mu_4fqq_1)
 
 ymin = []
 ymax = []
@@ -869,11 +887,11 @@ ymax.append(ROOT.gPad.GetUymax())
 xmin.append(ROOT.gPad.GetUxmin())
 xmax.append(ROOT.gPad.GetUxmax())
 linmu_mu_1_low = ROOT.TLine(mu_alpha_cut_low, 10**min(ymin),
-                          mu_alpha_cut_low, 10**max(ymax))
+                            mu_alpha_cut_low, 10**max(ymax))
 linmu_mu_1_low.SetLineWidth(2)
 linmu_mu_1_low.Draw("same")
 linmu_mu_1_high = ROOT.TLine(mu_alpha_cut_high, 10**min(ymin),
-                           mu_alpha_cut_high, 10**max(ymax))
+                             mu_alpha_cut_high, 10**max(ymax))
 linmu_mu_1_high.SetLineWidth(2)
 linmu_mu_1_high.Draw("same")
 arrow_len = (max(xmax) - min(xmin)) * 0.1 
@@ -893,6 +911,7 @@ hist_mu_5_1.Write()
 hist_mu_25_1.Write()
 hist_mu_2f_1.Write()
 hist_mu_4f_1.Write()
+hist_mu_4fqq_1.Write()
 
 ''' second cut for the mumu channel '''
 c_muon.cd(2)
@@ -903,11 +922,13 @@ muons['5'].Draw(">>mu_5_cutlist2",mu_cut_2,"entrylist")
 muons['25'].Draw(">>mu_25_cutlist2",mu_cut_2,"entrylist")
 muons['2f'].Draw(">>mu_2f_cutlist2",mu_cut_2,"entrylist")
 muons['4f'].Draw(">>mu_4f_cutlist2",mu_cut_2,"entrylist")
+muons['4fqq'].Draw(">>mu_4fqq_cutlist2",mu_cut_2,"entrylist")
 mu_0p5_cutlist2 = ROOT.gDirectory.Get("mu_0p5_cutlist2")
 mu_5_cutlist2 = ROOT.gDirectory.Get("mu_5_cutlist2")
 mu_25_cutlist2 = ROOT.gDirectory.Get("mu_25_cutlist2")
 mu_2f_cutlist2 = ROOT.gDirectory.Get("mu_2f_cutlist2")
 mu_4f_cutlist2 = ROOT.gDirectory.Get("mu_4f_cutlist2")
+mu_4fqq_cutlist2 = ROOT.gDirectory.Get("mu_4fqq_cutlist2")
 print ('num of singal evts with m_s = 0.5 GeV passing angle cut: ', 
        mu_0p5_cutlist2.GetN()*w['0p5'])
 print ('num of singal evts with m_s = 5 GeV passing angle cut: ', 
@@ -918,6 +939,8 @@ print ('num of 2-fermion bkg evts passing angle cut: ',
        mu_2f_cutlist2.GetN()*w['2f'])
 print ('num of 4-fermion bkg evts passing angle cut: ', 
        mu_4f_cutlist2.GetN()*w['4f'])
+print ('num of 4-fermion bkg evts passing angle cut: ', 
+       mu_4fqq_cutlist2.GetN()*w['4fqq'])
 # plot the events vs. var being cut, up to all cuts applied before
 hs_sig_mu_2 = ROOT.THStack("hs_sig_mu_2","")
 hs_bkg_mu_2 = ROOT.THStack("hs_bkg_mu_2","")
@@ -935,11 +958,14 @@ hist_mu_2f_2 = ROOT.TH1F("mu_2f_angle",
 mu_2_descrp, mu_2_nbins, mu_2_xlow, mu_2_xhigh)
 hist_mu_4f_2 = ROOT.TH1F("mu_4f_angle",
 mu_2_descrp, mu_2_nbins, mu_2_xlow, mu_2_xhigh)
+hist_mu_4fqq_2 = ROOT.TH1F("mu_4fqq_angle",
+mu_2_descrp, mu_2_nbins, mu_2_xlow, mu_2_xhigh)
 muons['0p5'].Draw("abs(leading_cos_theta)>>mu_0p5_angle", muon_cuts['alpha'], "goff")
 muons['5'].Draw("abs(leading_cos_theta)>>mu_5_angle", muon_cuts['alpha'], "goff")
 muons['25'].Draw("abs(leading_cos_theta)>>mu_25_angle", muon_cuts['alpha'],"goff")
 muons['2f'].Draw("abs(leading_cos_theta)>>mu_2f_angle", muon_cuts['alpha'], "goff")
 muons['4f'].Draw("abs(leading_cos_theta)>>mu_4f_angle", muon_cuts['alpha'], "goff")
+muons['4fqq'].Draw("abs(leading_cos_theta)>>mu_4fqq_angle", muon_cuts['alpha'], "goff")
 #hist_mu_0p5_2.SetDirectory(0)
 #hist_mu_5_2.SetDirectory(0)
 #hist_mu_25_2.SetDirectory(0)
@@ -962,6 +988,10 @@ hist_mu_4f_2.SetLineColor(ROOT.kBlack)
 hist_mu_4f_2.SetFillColor(ROOT.kYellow)
 hist_mu_4f_2.SetLineWidth(1)
 hist_mu_4f_2.SetLineStyle(1)
+hist_mu_4fqq_2.SetLineColor(ROOT.kBlack)
+hist_mu_4fqq_2.SetFillColor(ROOT.kOrange)
+hist_mu_4fqq_2.SetLineWidth(1)
+hist_mu_4fqq_2.SetLineStyle(1)
 
 hs_bkg_mu_2.SetMinimum(0.1)
 hs_sig_mu_2.SetMinimum(0.1)
@@ -973,6 +1003,7 @@ hs_sig_mu_2.Add(hist_mu_5_2)
 hs_sig_mu_2.Add(hist_mu_25_2)
 hs_bkg_mu_2.Add(hist_mu_2f_2)
 hs_bkg_mu_2.Add(hist_mu_4f_2)
+hs_bkg_mu_2.Add(hist_mu_4fqq_2)
 ymin = []
 ymax = []
 xmin = []
@@ -1010,6 +1041,7 @@ hist_mu_5_2.Write()
 hist_mu_25_2.Write()
 hist_mu_2f_2.Write()
 hist_mu_4f_2.Write()
+hist_mu_4fqq_2.Write()
 
 ''' third cut for the mumu channel '''
 c_muon.cd(3)
@@ -1020,11 +1052,13 @@ muons['5'].Draw(">>mu_5_cutlist3",mu_cut_3,"entrylist")
 muons['25'].Draw(">>mu_25_cutlist3",mu_cut_3,"entrylist")
 muons['2f'].Draw(">>mu_2f_cutlist3",mu_cut_3,"entrylist")
 muons['4f'].Draw(">>mu_4f_cutlist3",mu_cut_3,"entrylist")
+muons['4fqq'].Draw(">>mu_4fqq_cutlist3",mu_cut_3,"entrylist")
 mu_0p5_cutlist3 = ROOT.gDirectory.Get("mu_0p5_cutlist3")
 mu_5_cutlist3 = ROOT.gDirectory.Get("mu_5_cutlist3")
 mu_25_cutlist3 = ROOT.gDirectory.Get("mu_25_cutlist3")
 mu_2f_cutlist3 = ROOT.gDirectory.Get("mu_2f_cutlist3")
 mu_4f_cutlist3 = ROOT.gDirectory.Get("mu_4f_cutlist3")
+mu_4fqq_cutlist3 = ROOT.gDirectory.Get("mu_4fqq_cutlist3")
 print ('num of singal evts with m_s = 0.5 GeV passing momentum cut: ', 
        mu_0p5_cutlist3.GetN()*w['0p5'])
 print ('num of singal evts with m_s = 5 GeV passing momentum cut: ', 
@@ -1035,6 +1069,8 @@ print ('num of 2-fermion bkg evts passing momentum cut: ',
        mu_2f_cutlist3.GetN()*w['2f'])
 print ('num of 4-fermion bkg evts passing momentum cut: ', 
        mu_4f_cutlist3.GetN()*w['4f'])
+print ('num of 4-fermion bkg evts passing momentum cut: ', 
+       mu_4fqq_cutlist3.GetN()*w['4fqq'])
 # plot the events vs. var being cut, up to all cuts applied before
 hs_sig_mu_3 = ROOT.THStack("hs_sig_mu_3","")
 hs_bkg_mu_3 = ROOT.THStack("hs_bkg_mu_3","")
@@ -1052,11 +1088,14 @@ hist_mu_2f_3 = ROOT.TH1F("mu_2f_momentum",
 mu_3_descrp, mu_3_nbins, mu_3_xlow, mu_3_xhigh)
 hist_mu_4f_3 = ROOT.TH1F("mu_4f_momentum",
 mu_3_descrp, mu_3_nbins, mu_3_xlow, mu_3_xhigh)
+hist_mu_4fqq_3 = ROOT.TH1F("mu_4fqq_momentum",
+mu_3_descrp, mu_3_nbins, mu_3_xlow, mu_3_xhigh)
 muons['0p5'].Draw("leading_p_mag>>mu_0p5_momentum", mu_cut_2, "goff")
 muons['5'].Draw("leading_p_mag>>mu_5_momentum", mu_cut_2, "goff")
 muons['25'].Draw("leading_p_mag>>mu_25_momentum", mu_cut_2, "goff")
 muons['2f'].Draw("leading_p_mag>>mu_2f_momentum", mu_cut_2, "goff")
 muons['4f'].Draw("leading_p_mag>>mu_4f_momentum", mu_cut_2, "goff")
+muons['4fqq'].Draw("leading_p_mag>>mu_4fqq_momentum", mu_cut_2, "goff")
 #hist_mu_0p5_3.SetDirectory(0)
 #hist_mu_5_3.SetDirectory(0)
 #hist_mu_25_3.SetDirectory(0)
@@ -1079,6 +1118,10 @@ hist_mu_4f_3.SetLineColor(ROOT.kBlack)
 hist_mu_4f_3.SetFillColor(ROOT.kYellow)
 hist_mu_4f_3.SetLineWidth(1)
 hist_mu_4f_3.SetLineStyle(1)
+hist_mu_4fqq_3.SetLineColor(ROOT.kBlack)
+hist_mu_4fqq_3.SetFillColor(ROOT.kOrange)
+hist_mu_4fqq_3.SetLineWidth(1)
+hist_mu_4fqq_3.SetLineStyle(1)
 
 hs_bkg_mu_3.SetMinimum(0.1)
 hs_sig_mu_3.SetMinimum(0.1)
@@ -1090,6 +1133,7 @@ hs_sig_mu_3.Add(hist_mu_5_3)
 hs_sig_mu_3.Add(hist_mu_25_3)
 hs_bkg_mu_3.Add(hist_mu_2f_3)
 hs_bkg_mu_3.Add(hist_mu_4f_3)
+hs_bkg_mu_3.Add(hist_mu_4fqq_3)
 
 ymin = []
 ymax = []
@@ -1127,6 +1171,7 @@ hist_mu_5_3.Write()
 hist_mu_25_3.Write()
 hist_mu_2f_3.Write()
 hist_mu_4f_3.Write()
+hist_mu_4fqq_3.Write()
 
 ''' fourth cut for the mumu channel '''
 c_muon.cd(4)
@@ -1137,11 +1182,13 @@ muons['5'].Draw(">>mu_5_cutlist4",mu_cut_4,"entrylist")
 muons['25'].Draw(">>mu_25_cutlist4",mu_cut_4,"entrylist")
 muons['2f'].Draw(">>mu_2f_cutlist4",mu_cut_4,"entrylist")
 muons['4f'].Draw(">>mu_4f_cutlist4",mu_cut_4,"entrylist")
+muons['4fqq'].Draw(">>mu_4fqq_cutlist4",mu_cut_4,"entrylist")
 mu_0p5_cutlist4 = ROOT.gDirectory.Get("mu_0p5_cutlist4")
 mu_5_cutlist4 = ROOT.gDirectory.Get("mu_5_cutlist4")
 mu_25_cutlist4 = ROOT.gDirectory.Get("mu_25_cutlist4")
 mu_2f_cutlist4 = ROOT.gDirectory.Get("mu_2f_cutlist4")
 mu_4f_cutlist4 = ROOT.gDirectory.Get("mu_4f_cutlist4")
+mu_4fqq_cutlist4 = ROOT.gDirectory.Get("mu_4fqq_cutlist4")
 print ('num of singal evts with m_s = 0.5 GeV passing cos_theta_p_missing cut: ', 
        mu_0p5_cutlist4.GetN()*w['0p5'])
 print ('num of singal evts with m_s = 5 GeV passing cos_theta_p_missing cut: ', 
@@ -1152,6 +1199,8 @@ print ('num of 2-fermion bkg evts passing cos_theta_p_missing cut: ',
        mu_2f_cutlist4.GetN()*w['2f'])
 print ('num of 4-fermion bkg evts passing cos_theta_p_missing cut: ', 
        mu_4f_cutlist4.GetN()*w['4f'])
+print ('num of 4-fermion bkg evts passing cos_theta_p_missing cut: ', 
+       mu_4fqq_cutlist4.GetN()*w['4fqq'])
 # plot the events vs. var being cut, up to all cuts applied before
 hs_sig_mu_4 = ROOT.THStack("hs_sig_mu_4","")
 hs_bkg_mu_4 = ROOT.THStack("hs_bkg_mu_4","")
@@ -1169,11 +1218,14 @@ hist_mu_2f_4 = ROOT.TH1F("mu_2f_cos_theta_p_missing",
 mu_4_descrp, mu_4_nbins, mu_4_xlow, mu_4_xhigh)
 hist_mu_4f_4 = ROOT.TH1F("mu_4f_cos_theta_p_missing",
 mu_4_descrp, mu_4_nbins, mu_4_xlow, mu_4_xhigh)
+hist_mu_4fqq_4 = ROOT.TH1F("mu_4fqq_cos_theta_p_missing",
+mu_4_descrp, mu_4_nbins, mu_4_xlow, mu_4_xhigh)
 muons['0p5'].Draw("abs(cos_theta_p_missing)>>mu_0p5_cos_theta_p_missing", mu_cut_3, "goff")
 muons['5'].Draw("abs(cos_theta_p_missing)>>mu_5_cos_theta_p_missing", mu_cut_3, "goff")
 muons['25'].Draw("abs(cos_theta_p_missing)>>mu_25_cos_theta_p_missing", mu_cut_3,"goff")
 muons['2f'].Draw("abs(cos_theta_p_missing)>>mu_2f_cos_theta_p_missing", mu_cut_3, "goff")
 muons['4f'].Draw("abs(cos_theta_p_missing)>>mu_4f_cos_theta_p_missing", mu_cut_3, "goff")
+muons['4fqq'].Draw("abs(cos_theta_p_missing)>>mu_4fqq_cos_theta_p_missing", mu_cut_3, "goff")
 #hist_mu_0p5_4.SetDirectory(0)
 #hist_mu_5_4.SetDirectory(0)
 #hist_mu_25_4.SetDirectory(0)
@@ -1196,6 +1248,10 @@ hist_mu_4f_4.SetLineColor(ROOT.kBlack)
 hist_mu_4f_4.SetFillColor(ROOT.kYellow)
 hist_mu_4f_4.SetLineWidth(1)
 hist_mu_4f_4.SetLineStyle(1)
+hist_mu_4fqq_4.SetLineColor(ROOT.kBlack)
+hist_mu_4fqq_4.SetFillColor(ROOT.kOrange)
+hist_mu_4fqq_4.SetLineWidth(1)
+hist_mu_4fqq_4.SetLineStyle(1)
 
 hs_bkg_mu_4.SetMinimum(0.1)
 hs_sig_mu_4.SetMinimum(0.1)
@@ -1207,6 +1263,7 @@ hs_sig_mu_4.Add(hist_mu_5_4)
 hs_sig_mu_4.Add(hist_mu_25_4)
 hs_bkg_mu_4.Add(hist_mu_2f_4)
 hs_bkg_mu_4.Add(hist_mu_4f_4)
+hs_bkg_mu_4.Add(hist_mu_4fqq_4)
 
 ymin = []
 ymax = []
@@ -1246,6 +1303,7 @@ hist_mu_5_4.Write()
 hist_mu_25_4.Write()
 hist_mu_2f_4.Write()
 hist_mu_4f_4.Write()
+hist_mu_4fqq_4.Write()
 
 ''' fifth cut for the mumu channel '''
 c_muon.cd(5)
@@ -1256,11 +1314,13 @@ muons['5'].Draw(">>mu_5_cutlist5",mu_cut_5,"entrylist")
 muons['25'].Draw(">>mu_25_cutlist5",mu_cut_5,"entrylist")
 muons['2f'].Draw(">>mu_2f_cutlist5",mu_cut_5,"entrylist")
 muons['4f'].Draw(">>mu_4f_cutlist5",mu_cut_5,"entrylist")
+muons['4fqq'].Draw(">>mu_4fqq_cutlist5",mu_cut_5,"entrylist")
 mu_0p5_cutlist5 = ROOT.gDirectory.Get("mu_0p5_cutlist5")
 mu_5_cutlist5 = ROOT.gDirectory.Get("mu_5_cutlist5")
 mu_25_cutlist5 = ROOT.gDirectory.Get("mu_25_cutlist5")
 mu_2f_cutlist5 = ROOT.gDirectory.Get("mu_2f_cutlist5")
 mu_4f_cutlist5 = ROOT.gDirectory.Get("mu_4f_cutlist5")
+mu_4fqq_cutlist5 = ROOT.gDirectory.Get("mu_4fqq_cutlist5")
 print ('num of singal evts with m_s = 0.5 GeV passing m_inv cut: ', 
        mu_0p5_cutlist5.GetN()*w['0p5'])
 print ('num of singal evts with m_s = 5 GeV passing m_inv cut: ', 
@@ -1271,6 +1331,8 @@ print ('num of 2-fermion bkg evts passing m_inv cut: ',
        mu_2f_cutlist5.GetN()*w['2f'])
 print ('num of 4-fermion bkg evts passing m_inv cut: ', 
        mu_4f_cutlist5.GetN()*w['4f'])
+print ('num of 4-fermion bkg evts passing m_inv cut: ', 
+       mu_4fqq_cutlist5.GetN()*w['4fqq'])
 # plot the events vs. var being cut, up to all cuts applied before
 hs_sig_mu_5 = ROOT.THStack("hs_sig_mu_5","")
 hs_bkg_mu_5 = ROOT.THStack("hs_bkg_mu_5","")
@@ -1288,11 +1350,14 @@ hist_mu_2f_5 = ROOT.TH1F("mu_2f_m_inv",
 mu_5_descrp, mu_5_nbins, mu_5_xlow, mu_5_xhigh)
 hist_mu_4f_5 = ROOT.TH1F("mu_4f_m_inv",
 mu_5_descrp, mu_5_nbins, mu_5_xlow, mu_5_xhigh)
+hist_mu_4fqq_5 = ROOT.TH1F("mu_4fqq_m_inv",
+mu_5_descrp, mu_5_nbins, mu_5_xlow, mu_5_xhigh)
 muons['0p5'].Draw("m_inv>>mu_0p5_m_inv", mu_cut_4, "goff")
 muons['5'].Draw("m_inv>>mu_5_m_inv", mu_cut_4, "goff")
 muons['25'].Draw("m_inv>>mu_25_m_inv", mu_cut_4, "goff")
 muons['2f'].Draw("m_inv>>mu_2f_m_inv", mu_cut_4, "goff")
 muons['4f'].Draw("m_inv>>mu_4f_m_inv", mu_cut_4, "goff")
+muons['4fqq'].Draw("m_inv>>mu_4fqq_m_inv", mu_cut_4, "goff")
 #hist_mu_0p5_5.SetDirectory(0)
 #hist_mu_5_5.SetDirectory(0)
 #hist_mu_25_5.SetDirectory(0)
@@ -1315,6 +1380,10 @@ hist_mu_4f_5.SetLineColor(ROOT.kBlack)
 hist_mu_4f_5.SetFillColor(ROOT.kYellow)
 hist_mu_4f_5.SetLineWidth(1)
 hist_mu_4f_5.SetLineStyle(1)
+hist_mu_4fqq_5.SetLineColor(ROOT.kBlack)
+hist_mu_4fqq_5.SetFillColor(ROOT.kOrange)
+hist_mu_4fqq_5.SetLineWidth(1)
+hist_mu_4fqq_5.SetLineStyle(1)
 
 hs_bkg_mu_5.SetMinimum(0)
 hs_sig_mu_5.SetMinimum(0)
@@ -1326,6 +1395,7 @@ hs_sig_mu_5.Add(hist_mu_5_5)
 hs_sig_mu_5.Add(hist_mu_25_5)
 hs_bkg_mu_5.Add(hist_mu_2f_5)
 hs_bkg_mu_5.Add(hist_mu_4f_5)
+hs_bkg_mu_5.Add(hist_mu_4fqq_5)
 
 ymin = []
 ymax = []
@@ -1373,13 +1443,15 @@ hist_mu_5_5.Write()
 hist_mu_25_5.Write()
 hist_mu_2f_5.Write()
 hist_mu_4f_5.Write()
+hist_mu_4fqq_5.Write()
 
 legend = ROOT.TLegend(0.1,0.6,0.6,0.85)
 legend.AddEntry(hist_mu_0p5_1, "m_{s} = 0.5 GeV", "l")
 legend.AddEntry(hist_mu_5_1, "m_{s} = 5 GeV", "l")
 legend.AddEntry(hist_mu_25_1, "m_{s} = 25 GeV", "l")
 legend.AddEntry(hist_mu_2f_1, "2 fermion", "f")
-legend.AddEntry(hist_mu_4f_1, "4 fermion", "f")
+legend.AddEntry(hist_mu_4f_1, "4 fermion - 2#mu 2l", "f")
+legend.AddEntry(hist_mu_4fqq_1, "4 fermion - 2#mu 2q", "f")
 mu_title = ROOT.TLatex(0.1,0.9,"Z #rightarrow #mu^{+}#mu^{-} @ #sqrt{s} = 91.2 GeV")
 mu_title.SetTextSize(0.05)
 c_muon.cd(6)
@@ -1416,6 +1488,8 @@ hist_mu_2f_rec = ROOT.TH1F("mu_2f_m_rec",
 mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
 hist_mu_4f_rec = ROOT.TH1F("mu_4f_m_rec",
 mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
+hist_mu_4fqq_rec = ROOT.TH1F("mu_4fqq_m_rec",
+mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
 muons['0p5'].Draw("m_rec>>mu_0p5_m_rec", mu_cut_5, "goff")
 muons['2'].Draw("m_rec>>mu_2_m_rec", mu_cut_5, "goff")
 muons['5'].Draw("m_rec>>mu_5_m_rec", mu_cut_5, "goff")
@@ -1424,6 +1498,7 @@ muons['15'].Draw("m_rec>>mu_15_m_rec", mu_cut_5, "goff")
 muons['25'].Draw("m_rec>>mu_25_m_rec", mu_cut_5, "goff")
 muons['2f'].Draw("m_rec>>mu_2f_m_rec", mu_cut_5, "goff")
 muons['4f'].Draw("m_rec>>mu_4f_m_rec", mu_cut_5, "goff")
+muons['4fqq'].Draw("m_rec>>mu_4fqq_m_rec", mu_cut_5, "goff")
 #hist_mu_0p5_5.SetDirectory(0)
 #hist_mu_5_5.SetDirectory(0)
 #hist_mu_25_5.SetDirectory(0)
@@ -1446,6 +1521,10 @@ hist_mu_4f_rec.SetLineColor(ROOT.kBlack)
 hist_mu_4f_rec.SetFillColor(ROOT.kYellow)
 hist_mu_4f_rec.SetLineWidth(1)
 hist_mu_4f_rec.SetLineStyle(1)
+hist_mu_4fqq_rec.SetLineColor(ROOT.kBlack)
+hist_mu_4fqq_rec.SetFillColor(ROOT.kOrange)
+hist_mu_4fqq_rec.SetLineWidth(1)
+hist_mu_4fqq_rec.SetLineStyle(1)
 
 hs_bkg_mu_rec.SetMinimum(0)
 hs_sig_mu_rec.SetMinimum(0)
@@ -1457,6 +1536,7 @@ hs_sig_mu_rec.Add(hist_mu_5_rec)
 hs_sig_mu_rec.Add(hist_mu_25_rec)
 hs_bkg_mu_rec.Add(hist_mu_2f_rec)
 hs_bkg_mu_rec.Add(hist_mu_4f_rec)
+hs_bkg_mu_rec.Add(hist_mu_4fqq_rec)
 
 ymin = []
 ymax = []
@@ -1483,6 +1563,7 @@ file_mu_15_rec = ROOT.TFile("../combine/mu_15_mrec.root","RECREATE")
 file_mu_25_rec = ROOT.TFile("../combine/mu_25_mrec.root","RECREATE")
 file_mu_2f_rec = ROOT.TFile("../combine/mu_2f_mrec.root","RECREATE")
 file_mu_4f_rec = ROOT.TFile("../combine/mu_4f_mrec.root","RECREATE")
+file_mu_4fqq_rec = ROOT.TFile("../combine/mu_4fqq_mrec.root","RECREATE")
 file_mu_tot_0p5_rec = ROOT.TFile("../combine/mu_tot_0p5_mrec.root","RECREATE")
 file_mu_tot_2_rec = ROOT.TFile("../combine/mu_tot_2_mrec.root","RECREATE")
 file_mu_tot_5_rec = ROOT.TFile("../combine/mu_tot_5_mrec.root","RECREATE")
@@ -1505,11 +1586,14 @@ file_mu_2f_rec.cd()
 hist_mu_2f_rec.Write()
 file_mu_4f_rec.cd()
 hist_mu_4f_rec.Write()
+file_mu_4fqq_rec.cd()
+hist_mu_4fqq_rec.Write()
 hist_mu_tot_0p5_rec = ROOT.TH1F('tot_0p5',
                       mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
 hist_mu_tot_0p5_rec.Add(hist_mu_0p5_rec)
 hist_mu_tot_0p5_rec.Add(hist_mu_2f_rec)
 hist_mu_tot_0p5_rec.Add(hist_mu_4f_rec)
+hist_mu_tot_0p5_rec.Add(hist_mu_4fqq_rec)
 file_mu_tot_0p5_rec.cd()
 hist_mu_tot_0p5_rec.Write()
 hist_mu_tot_2_rec = ROOT.TH1F('tot_2',
@@ -1517,6 +1601,7 @@ hist_mu_tot_2_rec = ROOT.TH1F('tot_2',
 hist_mu_tot_2_rec.Add(hist_mu_2_rec)
 hist_mu_tot_2_rec.Add(hist_mu_2f_rec)
 hist_mu_tot_2_rec.Add(hist_mu_4f_rec)
+hist_mu_tot_2_rec.Add(hist_mu_4fqq_rec)
 file_mu_tot_2_rec.cd()
 hist_mu_tot_2_rec.Write()
 hist_mu_tot_5_rec = ROOT.TH1F('tot_5',
@@ -1524,6 +1609,7 @@ hist_mu_tot_5_rec = ROOT.TH1F('tot_5',
 hist_mu_tot_5_rec.Add(hist_mu_5_rec)
 hist_mu_tot_5_rec.Add(hist_mu_2f_rec)
 hist_mu_tot_5_rec.Add(hist_mu_4f_rec)
+hist_mu_tot_5_rec.Add(hist_mu_4fqq_rec)
 file_mu_tot_5_rec.cd()
 hist_mu_tot_5_rec.Write()
 hist_mu_tot_10_rec = ROOT.TH1F('tot_10',
@@ -1531,6 +1617,7 @@ hist_mu_tot_10_rec = ROOT.TH1F('tot_10',
 hist_mu_tot_10_rec.Add(hist_mu_10_rec)
 hist_mu_tot_10_rec.Add(hist_mu_2f_rec)
 hist_mu_tot_10_rec.Add(hist_mu_4f_rec)
+hist_mu_tot_10_rec.Add(hist_mu_4fqq_rec)
 file_mu_tot_10_rec.cd()
 hist_mu_tot_10_rec.Write()
 hist_mu_tot_15_rec = ROOT.TH1F('tot_15',
@@ -1538,6 +1625,7 @@ hist_mu_tot_15_rec = ROOT.TH1F('tot_15',
 hist_mu_tot_15_rec.Add(hist_mu_15_rec)
 hist_mu_tot_15_rec.Add(hist_mu_2f_rec)
 hist_mu_tot_15_rec.Add(hist_mu_4f_rec)
+hist_mu_tot_15_rec.Add(hist_mu_4fqq_rec)
 file_mu_tot_15_rec.cd()
 hist_mu_tot_15_rec.Write()
 hist_mu_tot_25_rec = ROOT.TH1F('tot_25',
@@ -1545,5 +1633,6 @@ hist_mu_tot_25_rec = ROOT.TH1F('tot_25',
 hist_mu_tot_25_rec.Add(hist_mu_25_rec)
 hist_mu_tot_25_rec.Add(hist_mu_2f_rec)
 hist_mu_tot_25_rec.Add(hist_mu_4f_rec)
+hist_mu_tot_25_rec.Add(hist_mu_4fqq_rec)
 file_mu_tot_25_rec.cd()
 hist_mu_tot_25_rec.Write()
