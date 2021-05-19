@@ -114,6 +114,7 @@ def makePlotUpperLimit():
     canvas.SetBottomMargin(0.11)
 
 
+
     # make dummy histogram to set the axis etc.
     dummy = ROOT.TH1D("h", "h", 1, min(masses), max(masses))
 
@@ -191,7 +192,9 @@ def makePlotUpperLimit():
     
     
     ROOT.gPad.SetTicks()
+    canvas.SetGrid()
     ROOT.gPad.RedrawAxis()
+    ROOT.gPad.RedrawAxis("G")
     canvas.SaveAs(fout)        
     canvas.SaveAs(fout.replace(".png", ".pdf"))  
     
