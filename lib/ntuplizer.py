@@ -46,6 +46,24 @@ def load_delphes_file(delphes_file_path, particles):
 
 '''
 INPUT -------------------------------------------------------------------------
+|* 
+|  
+ROUTINE -----------------------------------------------------------------------
+|* 
+| 
+OUTPUT ------------------------------------------------------------------------
+|* 
++------------------------------------------------------------------------------ 
+'''
+def get_num_evts(delphes_filepath):
+	test_particle = "Electron"
+	evt_chain = load_delphes_file(delphes_filepath, test_particle)
+	nevt = 0
+	for evt in evt_chain: nevt += 1
+	return nevt
+
+'''
+INPUT -------------------------------------------------------------------------
 |* (TObject) event: the delphes event to look at
 |* (str) particle: the particle of interest 
 |  
