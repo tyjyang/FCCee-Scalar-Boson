@@ -12,15 +12,15 @@ from helper import *
 delphes_path = '/uscms/home/tyang/nobackup/data/FCCee-Scalar-Boson-delphes-samples/'
 #delphes_file_list = ['eeTollS_0p5_inc.root', 'eeTollS_5_inc.root', 'eeTollS_25_inc.root',
 #                     'ee2fermion_mutau.root', 'four_lepton.root']
-delphes_file_list = ['eeZS_p5.root', 
-                     #'eeZS_2.root',
-                     #'eeZS_5.root', 
-                     #'eeZS_10.root',
-                     #'eeZS_15.root',
-                     #'eeZS_25.root',  
-                     #'ee2fermion_mutau.root',
-                     #'ee4lepton_muon.root',
-                     #'ee4lepquark.root'
+delphes_file_list = [#'eeZS_p5.root', 
+                     'eeZS_2.root',
+                     'eeZS_5.root', 
+                     'eeZS_10.root',
+                     'eeZS_15.root',
+                     'eeZS_25.root',  
+                     'ee2fermion_mutau.root',
+                     'ee4lepton_muon.root',
+                     'ee4lepquark.root'
                     ]
 ntuple_path = '../ntuples_gen_photon'
 particles =  ['electron', 'muon', 'photon']
