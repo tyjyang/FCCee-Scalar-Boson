@@ -1,3 +1,11 @@
+##############################
+# Author: T. J. Yang        #
+#---------------------------#
+# tyjyang@mit.edu           #
+#---------------------------#
+# May 24, 2021              #
+##############################
+
 import sys,os
 import ROOT
 import numpy as np
@@ -33,7 +41,7 @@ OUTPUT ------------------------------------------------------------------------
 +------------------------------------------------------------------------------
 '''
 def calculate_theta(eta):
-	return 2 * np.arctan(np.exp(-1 * eta))
+	return float(2 * np.arctan(np.exp(-1 * eta)))
 
 '''
 INPUT -------------------------------------------------------------------------
@@ -51,7 +59,7 @@ OUTPUT ------------------------------------------------------------------------
 +------------------------------------------------------------------------------
 '''
 def calculate_acoplanarity(phi_1, phi_2):
-	return np.absolute(np.pi - np.absolute(phi_1 - phi_2))
+	return float(np.absolute(np.pi - np.absolute(phi_1 - phi_2)))
 
 ''' 
 INPUT -------------------------------------------------------------------------
@@ -69,7 +77,7 @@ OUTPUT ------------------------------------------------------------------------
 def calculate_acolinearity(eta_1, eta_2):
 	theta_1 = calculate_theta(eta_1)
 	theta_2 = calculate_theta(eta_2)
-	return np.pi - np.absolute(theta_1 - theta_2)
+	return float(np.pi - np.absolute(theta_1 - theta_2))
 
 
 '''
@@ -92,7 +100,7 @@ def calculate_mod_acoplanarity(eta_1, eta_2, phi_1, phi_2):
 	theta_2 = calculate_theta(eta_2)
 	w = 0.5 * (np.sin(theta_1) + np.sin(theta_2))
 	phi_a = calculate_acoplanarity(phi_1, phi_2)
-	return w * phi_a
+	return float(w * phi_a)
 
 '''
 INPUT -------------------------------------------------------------------------
@@ -107,7 +115,7 @@ OUTPUT ------------------------------------------------------------------------
 ''' 
 def calculate_cos_theta(eta):
 	theta = calculate_theta(eta)
-	return np.cos(theta)
+	return float(np.cos(theta))
 
 '''
 INPUT -------------------------------------------------------------------------
@@ -145,7 +153,7 @@ OUTPUT ------------------------------------------------------------------------
 def calculate_inv_m(pt_1, pt_2, eta_1, eta_2, phi_1, phi_2, m_1, m_2):
 	p4_1 = to_TLorentzVector(pt_1, eta_1, phi_1, m_1)
 	p4_2 = to_TLorentzVector(pt_2, eta_2, phi_2, m_2)
-	return (p4_1 + p4_2).M()
+	return float((p4_1 + p4_2).M())
 
 '''
 INPUT -------------------------------------------------------------------------
@@ -170,8 +178,8 @@ def calculate_recoil_m(s, pt_1, pt_2, eta_1, eta_2, phi_1, phi_2, m_1, m_2):
 	E_ll = p4_sum.E()
 	m_ll = p4_sum.M()
 	m_rec_sq = s + m_ll ** 2 - 2 * np.sqrt(s) * E_ll
-	if m_rec_sq < 0: return -np.sqrt(-m_rec_sq)
-	else: return np.sqrt(m_rec_sq)
+	if m_rec_sq < 0: return float(-np.sqrt(-m_rec_sq))
+	else: return float(np.sqrt(m_rec_sq))
 
 '''
 INPUT -------------------------------------------------------------------------
@@ -186,7 +194,7 @@ OUTPUT ------------------------------------------------------------------------
 +------------------------------------------------------------------------------ 
 '''
 def calculate_momentum(pt, eta):
-	return pt * np.cosh(eta) 
+	return float(pt * np.cosh(eta)) 
 
 '''
 INPUT -------------------------------------------------------------------------
@@ -202,7 +210,7 @@ OUTPUT ------------------------------------------------------------------------
 def calculate_sum_momentum(pt_1, pt_2, eta_1, eta_2):
 	p_mag_1 = calculate_momentum(pt_1, eta_1)
 	p_mag_2 = calculate_momentum(pt_2, eta_2)
-	return p_mag_1 + p_mag_2
+	return float(p_mag_1 + p_mag_2)
 
 '''
 INPUT -------------------------------------------------------------------------
@@ -216,7 +224,7 @@ OUTPUT ------------------------------------------------------------------------
 +------------------------------------------------------------------------------ 
 ''' 
 def calculate_charge_prod(charge_1, charge_2):
-	return charge_1 * charge_2
+	return float(charge_1 * charge_2)
 
 '''
 INPUT -------------------------------------------------------------------------
@@ -238,7 +246,7 @@ def calculate_alpha_sep(eta_1, eta_2, phi_1, phi_2):
 	theta_2 = calculate_theta(eta_2)
 	d_theta = np.absolute(theta_1 - theta_2)
 	d_phi = np.absolute(phi_1 - phi_2)
-	return np.arccos(np.cos(d_phi) * np.sin(d_theta))
+	return float(np.arccos(np.cos(d_phi) * np.sin(d_theta)))
 
 '''
 INPUT -------------------------------------------------------------------------
@@ -253,7 +261,7 @@ OUTPUT ------------------------------------------------------------------------
 +------------------------------------------------------------------------------ 
 ''' 
 def calculate_cos_theta_p_missing(eta_p_missing):
-	return np.cos(calculate_theta(eta_p_missing))
+	return float(np.cos(calculate_theta(eta_p_missing)))
 
 calc_var_func_call = {"theta":calculate_theta,
                       "theta_a":calculate_acolinearity,
@@ -631,7 +639,7 @@ INPUT -------------------------------------------------------------------------
 |* (TObject) event: the delphes event to look at
 |* (OrderedDict) ptcl_cand: of the format 'particle_type':[indices]. 
 |                           elements of the indices list have to be int
-|* (str) or list(str) var: the variable(s) of interest. 
+|* (str) or list(str) var: the variable(s) to be calculated
 |                          must be COMMA-SEPARATED when passed in as str
 |
 ROUTINE -----------------------------------------------------------------------
@@ -717,30 +725,38 @@ def concatenate_var_val_arrays(*arrays):
 
 '''
 INPUT -------------------------------------------------------------------------
-|* (np.ndarray) arrays: 2D numpy arrays each with 1D arrays containing values 
-|                       for one variable each.
+|* (bool) sort_each_var: the option to sort the multi_valued vars in the arrays
+|                        passed in. If TRUE, sort in descending order; otherwise,
+|                        keep them in then original order when they'are passed in
+|* (np.ndarray) arrays: 2D numpy arrays, each made of 1D arrays containing values 
+|                       for one variable.
 |  
 ROUTINE -----------------------------------------------------------------------
 |* take all the 1D arrays, each corresponding to values of one var for all ptcl,,
 |  from the 2D array passed in
-|* sort each 1D array of floats in descending order
+|* sort each 1D array of floats in descending order 
+|  OR
+|  flatten the arrays by the order of elements passed in; i.e. by particle
+|  idx in the delphes tree
 |* put all elements of these 1D arrays together into one 1D array
 | 
 OUTPUT ------------------------------------------------------------------------
 |* (np.ndarray) flat_arr: the 1D numpy array of flattened values for vars
 +------------------------------------------------------------------------------ 
 ''' 
-def flatten_var_val_arrays(*arrays):
-	arrays = concatenate_var_val_arrays(*arrays)
+def flatten_var_val_arrays(sort_each_var, *arrays):
 	flat_arr = []
 	for array in arrays:
-		if all(isinstance(n, float) for n in array):
-			array = sorted(array, key = float)
-			array.reverse()
-		for i in array:
-			flat_arr.append(i)
-	flat_arr = np.array(flat_arr)
-	return flat_arr
+		for arr_1d in array:
+			# check all array elements are floats and sort each array
+			if sort_each_var:
+				if all(isinstance(n, float) for n in arr_1d):
+					arr_1d = sorted(arr_1d, key = float, reverse = True)
+				else:
+					sys.exit('no known way to sort an array with non-float elements')
+			for i in arr_1d:
+				flat_arr.append(i)
+	return np.array(flat_arr)
 
 '''
 INPUT -------------------------------------------------------------------------

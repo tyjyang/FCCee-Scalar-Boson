@@ -1,4 +1,11 @@
-# import ROOT in batch mode
+##############################
+# Author: T. J. Yang        #
+#---------------------------#
+# tyjyang@mit.edu           #
+#---------------------------#
+# May 24, 2021              #
+##############################
+
 import sys,os
 oldargv = sys.argv[:]
 import ROOT
@@ -46,13 +53,14 @@ def load_delphes_file(delphes_file_path, particles):
 
 '''
 INPUT -------------------------------------------------------------------------
-|* 
+|* (str) delphes_filepath: the full path to the delphes file of interest 
 |  
 ROUTINE -----------------------------------------------------------------------
-|* 
+|* load the delphes file into an event chain, with a test particle for loading
+|* count the number of events in the event chain.
 | 
 OUTPUT ------------------------------------------------------------------------
-|* 
+|* (int) number of evts
 +------------------------------------------------------------------------------ 
 '''
 def get_num_evts(delphes_filepath):
@@ -65,7 +73,7 @@ def get_num_evts(delphes_filepath):
 '''
 INPUT -------------------------------------------------------------------------
 |* (TObject) event: the delphes event to look at
-|* (str) particle: the particle of interest 
+|* (str) particle: the particle name in lowercase 
 |  
 ROUTINE -----------------------------------------------------------------------
 |* look through the particle candidates in the event and record the number of
@@ -185,7 +193,7 @@ ROUTINE -----------------------------------------------------------------------
 | 
 OUTPUT ------------------------------------------------------------------------
 |* 0: if cand_selected in empty
-|* (dict) cand_selected: {ptcl:[[i1,j1],[i2,j2]]}
+|* (OrderedDict) cand_selected: {ptcl:[[i1,j1],[i2,j2]]}
 +------------------------------------------------------------------------------ 
 ''' 
 def select_ptcl_var_opposite(delphes_file, event, particles, var, var_in_delphes,
@@ -244,7 +252,7 @@ ROUTINE -----------------------------------------------------------------------
 | 
 OUTPUT ------------------------------------------------------------------------
 |* 0: if candidate passed in == 0
-|* (dict) cand_max: {ptcl:[i,j]}
+|* (OrderedDict) cand_max: {ptcl:[i,j]}
 +------------------------------------------------------------------------------ 
 ''' 
 def select_ptcl_var_highest(delphes_file, event, particles, var, var_in_delphes,
@@ -385,23 +393,32 @@ INPUT -------------------------------------------------------------------------
 |* (dict) particle_variable: the dictionary specifying which 
 |         variables are to be extracted from each particle.
 |         e.g. particle_variable = {"electron":["pt", "eta", "phi"]}
+|* (bool) flatten_vars: option to create col names to put all vars into one row
+|* (bool) sort_each_var: option to sort the multi-valued vars when flattening
+|                       If TRUE, write the col names as leading_var, trailing_var
+|                       If FALSE, write the col names as var_1, var_2
+|* (int) num_ptcl_per_evt: to determine how many values the vars can take when
+|                          assigning them col names
 |  
 ROUTINE -----------------------------------------------------------------------
 |* create an enpty dict of TNtuple trees
 |* create a TNtuple tree for each particle with their corresponding variables
 |  to be written, put it into the dict with the particle name as key
-|* for each tree, the columns are ordered in sorted delphes ptcl+ evt var in 
-|  lowercase + sorted calc ptcl+evt var in lowercase
-|* there is an option to flatten event to one line. In this case, variables
-|  with more than one value are written to multiple columns within one row.
-|  The column names are "leading_var" and "trailing_var"
+|* for each tree, the columns are ordered in sorted delphes ptcl + evt var in 
+|  lowercase + sorted calc ptcl + evt var in lowercase
+|* there is an option to flatten event to one line. In this case, it calculates
+|  how many values a variable can take on, by dividing #ptcls passed in by
+|  #ptcls needed to get one value.
+|* variables with more than one value are written to multiple columns within one row.
+|  The column names are "leading_var" and "trailing_var" if sort_each_var is
+|  toggled on. Otherwise, they are "var_1" and "var_2"
 | 
 OUTPUT ------------------------------------------------------------------------
 |* {(str) "particle":(TNtuple) ntuple_Tree} the dict containing all trees
 +------------------------------------------------------------------------------ 
 ''' 
 def create_ntuple_trees(particle_variable, flatten_vars = False,
-                        num_ptcl_per_evt = 2):
+                        sort_each_var = False, num_ptcl_per_evt = 2):
 	ntuple_tree = {}
 	particles = particle_variable.keys()
 	for particle in sorted(particles):
@@ -425,10 +442,13 @@ def create_ntuple_trees(particle_variable, flatten_vars = False,
 					num_ptcl_for_var = get_num_ptcl_to_calc_var(var)
 				num_val = num_ptcl_per_evt / num_ptcl_for_var
 				if num_val == 2:
-					sorted_vars[i_var] = ['leading_'+var, 'trailing_'+var]
+					if sort_each_var:
+						sorted_vars[i_var] = ['leading_'+var, 'trailing_'+var]
+					else:
+						sorted_vars[i_var] = [var + '_1', var + '_2']
 			for i_var, var in enumerate(sorted_vars): 
 				sorted_vars[i_var] = string_to_list(sorted_vars[i_var])
-			sorted_vars = flatten_var_val_arrays(sorted_vars)
+			sorted_vars = flatten_var_val_arrays(False, sorted_vars)
 		column_separator = ":"
 		variables_combined = column_separator.join(sorted_vars)
 		ntuple_tree[particle] = ROOT.TNtuple(particle, "Flat ntuple tree for " 
@@ -443,7 +463,10 @@ INPUT -------------------------------------------------------------------------
 |* (dict) tree_chain: keys are ptcl name in str, values are TTree for the ptcl
 |* (TObject) event: the delphes event to look at
 |* (dict) ptcl_cand: keys are ptcl name in str, values are list(int) cand idx
-|* list(str) var: the vars to be written to the ntuple tree. same for all ptcl
+|* list(str) variables: the vars to be written to the ntuple tree. 
+|                       must be same for all ptcl
+|* (bool) flatten_vars: option to write all variables from one evt in one row
+|* (bool) sort_each_var: option to sort multi-value variables in descending order
 |
 ROUTINE -----------------------------------------------------------------------
 |* separate variables into ptcl_var_delphes, evt_var_delphes, ptcl_var_calc,
@@ -457,14 +480,15 @@ ROUTINE -----------------------------------------------------------------------
 |  array so each particle info takes one row, and the columns are vars
 |* write the rectangular array to the ntuple tree row by row
 |* if flatten_vars == True, we flatten the var vals into one row. For each var,
-|  we sort the vals so they are in leading-trailing order
+|  we sort the vals so they are in leading-trailing order if sort_each_var == TRUE
+|  else, we put them in the order they come in
 |
 OUTPUT ------------------------------------------------------------------------
 |* NONE
 +------------------------------------------------------------------------------
 '''
 def write_to_ntuple_tree(delphes_file, tree_chain, event, ptcl_cand, variables,
-                         flatten_vars = False):
+                         flatten_vars = False, sort_each_var = False):
 	particles = ptcl_cand.keys()
 	if len(particles) > 1: sys.exit("only one ptcl species can be wrtn per evt")
 	else: ptcl = list_to_string(particles)
@@ -482,7 +506,7 @@ def write_to_ntuple_tree(delphes_file, tree_chain, event, ptcl_cand, variables,
 	arr_all_var = concatenate_var_val_arrays(arr_delphes_ptcl, arr_delphes_evt,
 	                                         arr_calc_ptcl, arr_calc_evt)
 	if flatten_vars:
-		var_data = flatten_var_val_arrays(arr_all_var)
+		var_data = flatten_var_val_arrays(sort_each_var, arr_all_var)
 		tree_chain[ptcl].Fill(*var_data)
 	else:
 		var_data = rectangularize_jagged_array_T(arr_all_var)
