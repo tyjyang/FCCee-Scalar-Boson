@@ -11,7 +11,7 @@ import ROOT
 import numpy as np
 from collections import OrderedDict
 
-delphes_gen_info = { #xsec in units of pb
+DELPHES_GEN_INFO = { #xsec in units of pb
 #'eeTollS_0p5_inc.root':{'s':91**2, 'nevt':300000, 'xsec':3.348},
 #'eeTollS_5_inc.root':{'s':91**2, 'nevt':300000, 'xsec':1.586},
 #'eeTollS_25_inc.root':{'s':91**2, 'nevt':300000, 'xsec':2.186},
@@ -263,7 +263,7 @@ OUTPUT ------------------------------------------------------------------------
 def calculate_cos_theta_p_missing(eta_p_missing):
 	return float(np.cos(calculate_theta(eta_p_missing)))
 
-calc_var_func_call = {"theta":calculate_theta,
+CALC_VAR_FUNC_CALL = {"theta":calculate_theta,
                       "theta_a":calculate_acolinearity,
                       "phi_a":calculate_acoplanarity,
                       "alpha":calculate_mod_acoplanarity,
@@ -276,7 +276,7 @@ calc_var_func_call = {"theta":calculate_theta,
                       "alpha_sep":calculate_alpha_sep,
                       "cos_theta_p_missing":calculate_cos_theta_p_missing}
 
-calc_var_func_args = {"theta":"eta:1",
+CALC_VAR_FUNC_ARGS = {"theta":"eta:1",
                       "theta_a":"eta:2",
                       "phi_a":"phi:2",
                       "alpha":"eta,phi:2",
@@ -284,18 +284,18 @@ calc_var_func_args = {"theta":"eta:1",
                       "m_inv":"pt,eta,phi,m:2",
                       "m_rec":"s:1-pt,eta,phi,m:2",
                       "p_mag":"pt,eta:1",
-                      "sum_p_mag":"pt,eta:2",
+                      "sum_p_mag":"pt,eta:2", 
                       "charge_prod":"charge:2",
                       "alpha_sep":"eta,phi:2",
                       "cos_theta_p_missing":"eta_p_missing:1"}
 
-particle_mass = {"electron": 0.000511,
+PARTICLE_MASS = {"electron": 0.000511,
                  "muon": 0.1057}
 
-ptcl_var_delphes_list = ['pt', 'eta', 'phi', 'energy', 'charge']
-evt_var_delphes_list = ['p_mag_missing','eta_p_missing']
+PTCL_VAR_DELPHES_LIST = ['pt', 'eta', 'phi', 'energy', 'charge'] 
+EVT_VAR_DELPHES_LIST = ['p_mag_missing','eta_p_missing']
 # the location of the event variable in forms of "treename:tree_var"
-evt_var_delphes_location = {'eta_p_missing':'MissingET,eta',
+EVT_VAR_DELPHES_LOCATION = {'eta_p_missing':'MissingET,eta',
                             'p_mag_missing':'MissingET,met'} 
 
 '''
@@ -484,7 +484,7 @@ def get_delphes_evt_var(event, var):
 	var = string_to_list(var)
 	var_val = np.empty([len(var),1])
 	for i, v in enumerate(var):
-		tree, tree_var = evt_var_delphes_location[v].split(',')
+		tree, tree_var = EVT_VAR_DELPHES_LOCATION[v].split(',')
 		tree_var = list_to_string(vars_to_delphes_form(tree_var))
 		var_val[i][0] = [getattr(data, tree_var) for data in getattr(event, tree)][0]
 	return var_val
@@ -494,7 +494,7 @@ INPUT -------------------------------------------------------------------------
 |* (str) var_calc: the variable to be calculated from delphes vars
 |  
 ROUTINE -----------------------------------------------------------------------
-|* fetch the value of the passed-in var_calc key in the dict calc_var_func_args
+|* fetch the value of the passed-in var_calc key in the dict CALC_VAR_FUNC_ARGS
 |* separate the str of variables into var1,var2:num_ptcl entires, by -
 |* convert each entry to a tuple of the format (["var1","var2"],num_ptcl)
 |* return the list of tuples
@@ -505,7 +505,7 @@ OUTPUT ------------------------------------------------------------------------
 ''' 
 def get_args_calc_var(var_calc):
 	var_calc = list_to_string(var_calc)
-	args_in_str = calc_var_func_args[var_calc]
+	args_in_str = CALC_VAR_FUNC_ARGS[var_calc]
 	args_in_list = args_in_str.split("-")
 	args = []
 	for entry in args_in_list:
@@ -547,8 +547,8 @@ ROUTINE -----------------------------------------------------------------------
 |* Look at the N particles in the candidate list, and fetch their vars.
 |  put all values of one variable before going to next one.
 |  for input vars that takes n < N particles, look at the first n entries
-|* if var == "m", look at the particle_mass dict to fetch particle mass
-|  if var == "s", look at delphes_gen_info for center of mass energy^2
+|* if var == "m", look at the PARTICLE_MASS dict to fetch particle mass
+|  if var == "s", look at DELPHES_GEN_INFO for center of mass energy^2
 |
 OUTPUT ------------------------------------------------------------------------
 |* list(float) args: the list of args in their numerical value 
@@ -562,7 +562,7 @@ def get_args_val(delphes_file, event, ptcl_cand, var_calc):
 		num_ptcl = arg_tuple[1]
 		for var in input_vars:
 			num_ptcl_checked = 0
-			if var in ptcl_var_delphes_list:
+			if var in PTCL_VAR_DELPHES_LIST:
 				for ptcl in ptcl_cand.keys():
 					if num_ptcl_checked == num_ptcl: break
 					for i_cand, cand in enumerate(getattr(event, ptcl.capitalize())):
@@ -571,16 +571,16 @@ def get_args_val(delphes_file, event, ptcl_cand, var_calc):
 							args_val.append(*val)
 							num_ptcl_checked += 1
 							if num_ptcl_checked == num_ptcl: break
-			elif var in evt_var_delphes_list:
+			elif var in EVT_VAR_DELPHES_LIST:
 				val = get_delphes_evt_var(event, var)
 				args_val.append(*val)
 			elif var == 's':
-				args_val.append(delphes_gen_info[delphes_file][var])
+				args_val.append(DELPHES_GEN_INFO[delphes_file][var])
 			elif var == 'm':
 				for ptcl in ptcl_cand.keys():
 					if num_ptcl_checked == num_ptcl: break
 					for cand in ptcl_cand[ptcl]:
-						args_val.append(particle_mass[ptcl])
+						args_val.append(PARTICLE_MASS[ptcl])
 						num_ptcl_checked += 1
 						if num_ptcl_checked == num_ptcl: break
 	return args_val
@@ -651,7 +651,7 @@ ROUTINE -----------------------------------------------------------------------
 |* for each variable to be calculated, pass in the particle type, candidate in-
 |  dices, and the variable name to get_args_val() to get the values of the args
 |  needed to return the variable to be calculated. 
-|* call the calculation function from the dictionary calc_var_func_call, which
+|* call the calculation function from the dictionary CALC_VAR_FUNC_CALL, which
 |  links name of calculated variable to the corresponding function.
 |* put values of one var into a list, and values of all vars into a list of lists
 |
@@ -667,7 +667,7 @@ def calc_ptcl_var_by_idx(delphes_file, event, ptcl_cand, var):
 		ptcl_cand_list = dvd_ptcl_cand_into_size_n(ptcl_cand, v)
 		for ptcl_cand_size_n in ptcl_cand_list:
 			args_val = get_args_val(delphes_file, event, ptcl_cand_size_n, v)
-			var_val[i].append(calc_var_func_call[v](*args_val))
+			var_val[i].append(CALC_VAR_FUNC_CALL[v](*args_val))
 	return np.array(var_val)
 
 '''
@@ -682,7 +682,7 @@ ROUTINE -----------------------------------------------------------------------
 |  - call get_args_val(), which calls get_delphes_evt_var(), which looks at
 |    the delphes_evt_var_location dict for particle tree and tree var to fetch
 |    the value of the variables to calculate the evt variable
-|  - Use the calc_var_func_call dict to look up for function to calculate the 
+|  - Use the CALC_VAR_FUNC_CALL dict to look up for function to calculate the 
 |    evt variable
 |  - write the calculation result to a row of a 2D numpy array, with col size
 |    == 1 since evt vars only have one value
@@ -698,7 +698,7 @@ def calc_evt_var(delphes_file, evt, var):
 	var_val = np.empty([len(var),1])
 	for i, v in enumerate(var):
 		args_val = get_args_val(delphes_file, evt, {"placeholder":0}, v)
-		var_val[i][0] = calc_var_func_call[v](*args_val)
+		var_val[i][0] = CALC_VAR_FUNC_CALL[v](*args_val)
 	return var_val
 
 '''

@@ -54,21 +54,21 @@ def load_delphes_file(delphes_file_path, particles):
 '''
 INPUT -------------------------------------------------------------------------
 |* (str) delphes_filepath: the full path to the delphes file of interest 
+|* (str) treename: the name of the tree to get nevt from
 |  
 ROUTINE -----------------------------------------------------------------------
-|* load the delphes file into an event chain, with a test particle for loading
-|* count the number of events in the event chain.
+|* get the pointer to the TFile object of the delphes file
+|* use the Get() function provided by pyroot to get the tree
+|* use GetEntries() on the TTree to get nevts 
 | 
 OUTPUT ------------------------------------------------------------------------
 |* (int) number of evts
 +------------------------------------------------------------------------------ 
 '''
-def get_num_evts(delphes_filepath):
-	test_particle = "Electron"
-	evt_chain = load_delphes_file(delphes_filepath, test_particle)
-	nevt = 0
-	for evt in evt_chain: nevt += 1
-	return nevt
+def get_num_evts(delphes_filepath, treename):
+	f = ROOT.TFile.Open(delphes_filepath)
+	tree = f.Get(treename)
+	return tree.GetEntries()
 
 '''
 INPUT -------------------------------------------------------------------------
@@ -335,7 +335,7 @@ INPUT -------------------------------------------------------------------------
 ROUTINE -----------------------------------------------------------------------
 |* seperate the variables into delphes and calculated vars
 |* for delphes vars, separate into ptcl and evt vars, based on list of vars from
-|  ptcl_var_delphes_list and evt_var_delphes_list
+|  PTCL_VAR_DELPHES_LIST and EVT_VAR_DELPHES_LIST
 |* for calculated vars, check the input vars needed to calculate them
 |  if input vars are delphes evt vars, then put calculated var to evt_var_calc
 |  otherwise, put it into ptcl_var_calc
@@ -348,9 +348,9 @@ def sep_vars_into_delph_calc_ptcl_evt(variables):
 	variables_to_sep = [v for v in string_to_list(variables)] #pass by value
 	ptcl_var_delphes, evt_var_delphes, ptcl_var_calc, evt_var_calc = [[],[],[],[]]
 	for var in variables_to_sep:
-		if var in ptcl_var_delphes_list:
+		if var in PTCL_VAR_DELPHES_LIST:
 			ptcl_var_delphes.append(var)
-		elif var in evt_var_delphes_list:
+		elif var in EVT_VAR_DELPHES_LIST:
 			evt_var_delphes.append(var)
 		
 	for var in ptcl_var_delphes: variables_to_sep.remove(var)
@@ -363,7 +363,7 @@ def sep_vars_into_delph_calc_ptcl_evt(variables):
 			for input_var in arg_tuple[0]:
 				input_var_list.append(input_var)
 		for input_var in input_var_list:
-			if input_var in evt_var_delphes_list:
+			if input_var in EVT_VAR_DELPHES_LIST:
 				evt_var_calc.append(var)
 	
 	for var in evt_var_calc: variables_to_sep.remove(var)

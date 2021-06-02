@@ -11,14 +11,12 @@ from helper import *
 
 '''
 INPUT -------------------------------------------------------------------------
-|*(str) ntuple_file_path: the fuill path to the ntuple file of interest
-| OR
-| (str) delphes_filename: the name of the delphes sample, with suffix
-|*(float) lumi_in_inverse_pb: the luminosity in units of inverse picobarn
+|* (str) delphes_filepath: the fullpath to the delphes sample 
+|* (float) lumi_in_inverse_pb: the luminosity in units of inverse picobarn
 |  
 ROUTINE -----------------------------------------------------------------------
 |* get the name of the delphes file used to produce the ntuple
-|* look up for the cross section (in pb) + number of evts in the delphes_gen_info
+|* look up for the cross section (in pb) + number of evts in the DELPHES_GEN_INFO
 |  dictionary
 |* calculate the factor to normalize evts to the input luminosity
 | 
@@ -26,14 +24,14 @@ OUTPUT ------------------------------------------------------------------------
 |* (float) the normalization factor
 +------------------------------------------------------------------------------ 
 ''' 
-def get_normalization_factor(filename, lumi_in_inverse_pb):
+def get_normalization_factor(delphes_filepath, lumi_in_inverse_pb):
 	ntuple_delimiter = ':'
 	if len(filename.split(ntuple_delimiter)) > 1:
 		delphes_filename = get_delphes_filename(filename)
 	else:
 		delphes_filename = filename
-	nevts = float(delphes_gen_info[delphes_filename]['nevt'])
-	xsec = delphes_gen_info[delphes_filename]['xsec']
+	nevts = get_num_evts(
+	xsec = DELPHES_GEN_INFO[delphes_filename]['xsec']
 	return xsec * lumi_in_inverse_pb / nevts
 
 '''
