@@ -30,16 +30,16 @@ def load_delphes_lib():
 '''
 INPUT -------------------------------------------------------------------------   
 |* (str) path_delphes_file: the path to the delphes file to be loaded
-|* list(str) particles: the list of particle trees to be loaded
+|* list(str) particles: the list of particle branchs to be loaded
 |
 ROUTINE -----------------------------------------------------------------------
 |* load events in the delphes file into a TChain
-|* set the address of aech tree to a pointer of the tree name
+|* set the address of aech branch to a pointer of the branch name
 |
 OUTPUT ------------------------------------------------------------------------
 |* (ROOT.TChain) chain: the TChain containing events inside the delphes file
-|                       with trees by particle type readily accessible by 
-|                       for evt in chain: particle_tree = evt.Particle
+|                       with branchs by particle type readily accessible by 
+|                       for evt in chain: particle_branch = evt.Particle
 +------------------------------------------------------------------------------
 '''
 def load_delphes_file(delphes_file_path, particles):
@@ -171,7 +171,7 @@ def particle_var_veto(event, particles, var, var_in_delphes, threshold):
 '''
 INPUT -------------------------------------------------------------------------
 |* (TObject) event: the delphes event to look at
-|* (str) or list(str) particles: the list of particle trees to look at
+|* (str) or list(str) particles: the list of particle branchs to look at
 |                                must be COMMA-SEPARATED when passing in
 |                                multiple ptcls in a single str
 |* (str) var: the var of interest. Only one var, the final one used for select-
@@ -229,7 +229,7 @@ def select_ptcl_var_opposite(delphes_file, event, particles, var, var_in_delphes
 '''
 INPUT -------------------------------------------------------------------------
 |* (TObject) event: the delphes event to look at
-|* (str) or list(str) particles: the list of particle trees to look at
+|* (str) or list(str) particles: the list of particle branchs to look at
 |                                must be COMMA-SEPARATED when passing in
 |                                multiple ptcls in a single str
 |* (str) var: the var of interest. Only one var, the final one used for select-
@@ -245,7 +245,7 @@ ROUTINE -----------------------------------------------------------------------
 |* make sure the ptcls are in list(str) and var is in (str)
 |* for each ptcl, create all cand subsets if "all" candidates are passed in
 |* check if var is in delphes, calc the var if not
-|* set var_max to be the var_val of the 1st cand group in the 1st ptcl tree,
+|* set var_max to be the var_val of the 1st cand group in the 1st ptcl branch,
 |  update var_max if var_val from subsequent cnad group is larger
 |* store the ptcl and cand idx info in (dict) cand_max.
 |  update the dict if var_max is updated
@@ -414,7 +414,7 @@ ROUTINE -----------------------------------------------------------------------
 |  toggled on. Otherwise, they are "var_1" and "var_2"
 | 
 OUTPUT ------------------------------------------------------------------------
-|* {(str) "particle":(TNtuple) ntuple_Tree} the dict containing all trees
+|* {(str) "particle":(TNtuple) ntuple_tree} the dict containing all trees
 +------------------------------------------------------------------------------ 
 ''' 
 def create_ntuple_trees(particle_variable, flatten_vars = False,
@@ -460,7 +460,8 @@ INPUT -------------------------------------------------------------------------
 |* (str) delphes_file: the name of the delphes file. Passed in for 
 |                      calc_ptcl_var_by_idx() to fetch gen-level info relevant
 |                      to calculation of vars (e.g. sqrt(s))
-|* (dict) tree_chain: keys are ptcl name in str, values are TTree for the ptcl
+|* (dict) tree_chain: the empty TNtuple trees to write data to
+|                     keys are ptcl name in str, values are TTree for the ptcl
 |* (TObject) event: the delphes event to look at
 |* (dict) ptcl_cand: keys are ptcl name in str, values are list(int) cand idx
 |* list(str) variables: the vars to be written to the ntuple tree. 
