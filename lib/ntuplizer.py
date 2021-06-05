@@ -53,43 +53,6 @@ def load_delphes_file(delphes_file_path, particles):
 
 '''
 INPUT -------------------------------------------------------------------------
-|* (str) delphes_filepath: the full path to the delphes file of interest 
-|* (str) treename: the name of the tree to get nevt from
-|  
-ROUTINE -----------------------------------------------------------------------
-|* get the pointer to the TFile object of the delphes file
-|* use the Get() function provided by pyroot to get the tree
-|* use GetEntries() on the TTree to get nevts 
-| 
-OUTPUT ------------------------------------------------------------------------
-|* (int) number of evts
-+------------------------------------------------------------------------------ 
-'''
-def get_num_evts(delphes_filepath, treename):
-	f = ROOT.TFile.Open(delphes_filepath)
-	tree = f.Get(treename)
-	return tree.GetEntries()
-
-'''
-INPUT -------------------------------------------------------------------------
-|* (TObject) event: the delphes event to look at
-|* (str) particle: the particle name in lowercase 
-|  
-ROUTINE -----------------------------------------------------------------------
-|* look through the particle candidates in the event and record the number of
-|  that particle in the event
-| 
-OUTPUT ------------------------------------------------------------------------
-|* (int) num_ptcl: the number of the input type of particle in the event
-+------------------------------------------------------------------------------ 
-''' 
-def get_num_ptcl(event, particle):
-	num_ptcl = 0
-	for x in getattr(event, particle.capitalize()): num_ptcl += 1
-	return num_ptcl
-
-'''
-INPUT -------------------------------------------------------------------------
 |* (TObject) event: the delphes event object to look at
 |* (str) particle: the particle(s) to be used for the veto
 |* (str) var: the one variable of that particle(s) to be used for the veto

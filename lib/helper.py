@@ -17,15 +17,15 @@ DELPHES_GEN_INFO = { #xsec in units of pb
 #'eeTollS_25_inc.root':{'s':91**2, 'nevt':300000, 'xsec':2.186},
 #'eeTo2fermion.root':{'s':91**2, 'nevt':1000000, 'xsec':8530},
 #'four_lepton.root':{'s':91**2, 'nevt':1000000, 'xsec':3.88},
-'eeZS_p5.root':{'s':91**2, 'nevt':300000, 'xsec':37.376},
-'eeZS_2.root':{'s':91**2, 'nevt':300000, 'xsec':27.510},
-'eeZS_5.root':{'s':91**2, 'nevt':300000, 'xsec':17.027},
-'eeZS_10.root':{'s':91**2, 'nevt':250000, 'xsec':7.856},
-'eeZS_15.root':{'s':91**2, 'nevt':300000, 'xsec':5.748},
-'eeZS_25.root':{'s':91**2, 'nevt':300000, 'xsec':2.291},
-'ee2fermion_mutau.root':{'s':91**2, 'nevt':1000000, 'xsec':3013.049},
-'ee4lepton_muon.root':{'s':91**2, 'nevt':100000, 'xsec':11.339},
-'ee4lepquark.root':{'s':91**2, 'nevt':880000, 'xsec':1.019}
+'eeZS_p5.root':{'s':91**2, 'xsec':37.376},
+'eeZS_2.root':{'s':91**2, 'xsec':27.510},
+'eeZS_5.root':{'s':91**2, 'xsec':17.027},
+'eeZS_10.root':{'s':91**2, 'xsec':7.856},
+'eeZS_15.root':{'s':91**2, 'xsec':5.748},
+'eeZS_25.root':{'s':91**2, 'xsec':2.291},
+'ee2fermion_mutau.root':{'s':91**2, 'xsec':3013.049},
+'ee4lepton_muon.root':{'s':91**2, 'xsec':11.339},
+'ee4lepquark.root':{'s':91**2, 'xsec':1.019}
 }
 
 '''
@@ -436,6 +436,44 @@ def get_delphes_filename(ntuple_file_path):
 	ntuple = ntuple_file_path.split("/")[-1]
 	ntuple = ntuple.split(":")[0]
 	return ntuple + '.root'
+
+'''
+INPUT -------------------------------------------------------------------------
+|* (str) delphes_filepath: the full path to the delphes file of interest 
+|* (str) treename: the name of the tree to get nevt from
+|  
+ROUTINE -----------------------------------------------------------------------
+|* get the pointer to the TFile object of the delphes file
+|* use the Get() function provided by pyroot to get the tree
+|* use GetEntries() on the TTree to get nevts 
+| 
+OUTPUT ------------------------------------------------------------------------
+|* (int) number of evts
++------------------------------------------------------------------------------ 
+'''
+def get_num_evts(delphes_filepath, treename):
+	f = ROOT.TFile.Open(delphes_filepath)
+	tree = f.Get(treename)
+	return tree.GetEntries()
+
+'''
+INPUT -------------------------------------------------------------------------
+|* (TObject) event: the delphes event to look at
+|* (str) particle: the particle name in lowercase 
+|  
+ROUTINE -----------------------------------------------------------------------
+|* look through the particle candidates in the event and record the number of
+|  that particle in the event
+| 
+OUTPUT ------------------------------------------------------------------------
+|* (int) num_ptcl: the number of the input type of particle in the event
++------------------------------------------------------------------------------ 
+''' 
+def get_num_ptcl(event, particle):
+	num_ptcl = 0
+	for x in getattr(event, particle.capitalize()): num_ptcl += 1
+	return num_ptcl
+
 
 '''
 INPUT -------------------------------------------------------------------------
