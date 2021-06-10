@@ -17,15 +17,18 @@ DELPHES_GEN_INFO = { #xsec in units of pb
 #'eeTollS_25_inc.root':{'s':91**2, 'nevt':300000, 'xsec':2.186},
 #'eeTo2fermion.root':{'s':91**2, 'nevt':1000000, 'xsec':8530},
 #'four_lepton.root':{'s':91**2, 'nevt':1000000, 'xsec':3.88},
-'eeZS_p5.root':{'s':91**2, 'xsec':37.376},
-'eeZS_2.root':{'s':91**2, 'xsec':27.510},
-'eeZS_5.root':{'s':91**2, 'xsec':17.027},
-'eeZS_10.root':{'s':91**2, 'xsec':7.856},
-'eeZS_15.root':{'s':91**2, 'xsec':5.748},
-'eeZS_25.root':{'s':91**2, 'xsec':2.291},
-'ee2fermion_mutau.root':{'s':91**2, 'xsec':3013.049},
-'ee4lepton_muon.root':{'s':91**2, 'xsec':11.339},
-'ee4lepquark.root':{'s':91**2, 'xsec':1.019}
+'eeZS_p5.root':{'s':91**2, 'xsec':37.42},
+'eeZS_2.root':{'s':91**2, 'xsec':27.53},
+'eeZS_5.root':{'s':91**2, 'xsec':17.01},
+'eeZS_10.root':{'s':91**2, 'xsec':7.851},
+'eeZS_15.root':{'s':91**2, 'xsec':5.751},
+'eeZS_25.root':{'s':91**2, 'xsec':2.2896},
+'ee2fermion_mutau.root':{'s':91**2, 'xsec':3011.7},
+'ee2fermion_electron.root':{'s':91**2, 'xsec':4096.5},
+'ee4lepton_mutau.root':{"s":91**2, 'xsec':3.0735},
+'ee4lepton_electron.root':{'s':91**2, 'xsec':2.4868},
+'ee4lepquark_mutau.root':{'s':91**2, 'xsec':1.0131},
+'ee4eequark_electron.root':{'s':91**2, 'xsec':2.1187}
 }
 
 '''
@@ -454,7 +457,9 @@ OUTPUT ------------------------------------------------------------------------
 def get_num_evts(delphes_filepath, treename):
 	f = ROOT.TFile.Open(delphes_filepath)
 	tree = f.Get(treename)
-	return tree.GetEntries()
+	nevts = tree.GetEntries()
+	f.Close()
+	return nevts
 
 '''
 INPUT -------------------------------------------------------------------------

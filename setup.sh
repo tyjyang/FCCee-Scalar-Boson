@@ -5,10 +5,12 @@ export DELPHES_FOLDER=Delphes-3.4.2
 export REPO_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 cd $REPO_DIR
 
+export OCAML_BIN=$REPO_DIR/../ocaml-4.12.0/bin
+export PATH=$OCAML_BIN:$PATH
 # setup environment for delphes
+#source /cvmfs/sft.cern.ch/lcg/views/LCG_99/x86_64-centos7-gcc10-opt/setup.sh
 source /cvmfs/sft.cern.ch/lcg/views/LCG_88/x86_64-slc6-gcc49-opt/setup.sh
 source /cvmfs/sft.cern.ch/lcg/app/releases/ROOT/6.06.00/x86_64-centos7-gcc49-opt/root/bin/thisroot.sh
-#source /cvmfs/sft.cern.ch/lcg/views/LCG_92/x86_64-slc6-gcc62-opt/setup.sh
 
 # install delphes
 if [ -d "$DELPHES_FOLDER" ]; then
@@ -33,6 +35,7 @@ fi
 cd $CMSSW_VER/src && cmsenv && cd -
 
 # overwrite CMSSW enviroment
+#source /cvmfs/sft.cern.ch/lcg/views/LCG_99/x86_64-centos7-gcc10-opt/setup.sh
 source /cvmfs/sft.cern.ch/lcg/views/LCG_88/x86_64-slc6-gcc49-opt/setup.sh
 source /cvmfs/sft.cern.ch/lcg/app/releases/ROOT/6.06.00/x86_64-centos7-gcc49-opt/root/bin/thisroot.sh
 

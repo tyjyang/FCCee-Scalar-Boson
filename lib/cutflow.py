@@ -25,13 +25,13 @@ OUTPUT ------------------------------------------------------------------------
 def get_normalization_factor(delphes_filepath, lumi_in_inverse_pb):
 	nevts = hlp.get_num_evts(delphes_filepath, "Delphes")
 	delphes_filename = delphes_filepath.split("/")[-1]
-	xsec = DELPHES_GEN_INFO[delphes_filename]['xsec']
+	xsec = hlp.DELPHES_GEN_INFO[delphes_filename]['xsec']
 	return xsec * lumi_in_inverse_pb / nevts
 
 '''
 INPUT -------------------------------------------------------------------------
-|* (dict) filepaths: the list of full paths to rootfiles from which the 
-|                    function gets the ntuple trees
+|* (dict) filepaths: the dict of full paths to the ntuple files from which the 
+|                    function gets the TNtuple trees, keys are short-handed filenames
 |* list(str) channels: the final state particle channels from whose name the
 |                      function fetches the trees in the rootfiles 
 |  
@@ -51,10 +51,14 @@ def get_ntuple_tree(filepaths, channels):
 	trees = {}
 	for chn in channels: 
 		trees[chn] = {}
+		print chn
 	for key, f in filepaths.items():
 		files[key] = ROOT.TFile.Open(f)
+		print files[key]
 		for chn in channels:
-			trees[chn][key] = getattr(files[key], chn)
+			trees[chn][key] = files[key].Get(chn)
+			print trees[chn][key]
+	print trees
 	return trees
 
 '''
@@ -72,7 +76,7 @@ OUTPUT ------------------------------------------------------------------------
 |* (dict) w: short filenames in keys, weights in values
 +------------------------------------------------------------------------------ 
 ''' 
-def get_ntuple_weight(filepaths, lumi):
+def get_tree_weight(filepaths, lumi):
 	w = {}
 	for key, f in filepaths.items():
 		w[key] = get_normalization_factor(f, lumi)
