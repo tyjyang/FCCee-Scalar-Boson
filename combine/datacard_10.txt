@@ -1,0 +1,21 @@
+imax    * number of bins
+jmax    * number of processes minus 1
+kmax    * number of nuisance parameters
+--------------------------------------------------------------------------------
+shapes  2f          signal_region   mu_2f_mrec.root         mu_2f_m_rec
+shapes  4f          signal_region   mu_4f_mrec.root         mu_4f_m_rec
+shapes  4fqq          signal_region   mu_4fqq_mrec.root         mu_4fqq_m_rec
+shapes  Sll         signal_region   mu_10_mrec.root         mu_10_m_rec
+shapes  data_obs    signal_region   mu_tot_10_mrec.root     tot_10
+--------------------------------------------------------------------------------
+bin          signal_region
+observation  -1
+--------------------------------------------------------------------------------
+bin                        signal_region   signal_region   signal_region  signal_region  
+process                    Sll             2f              4f             4fqq
+process                    0               1               2              3
+rate                       -1              -1              -1             -1
+--------------------------------------------------------------------------------
+lumi              lnN     1.154            1.154           1.154         1.154 
+#xsec_Sll          lnN     2.186           -               -           
+#xsec_Zleplep      lnN     -               1.50            -        
