@@ -28,7 +28,19 @@ DELPHES_GEN_INFO = { #xsec in units of pb
 'ee4lepton_mutau.root':{"s":91**2, 'xsec':3.0735},
 'ee4lepton_electron.root':{'s':91**2, 'xsec':2.4868},
 'ee4lepquark_mutau.root':{'s':91**2, 'xsec':1.0131},
-'ee4eequark_electron.root':{'s':91**2, 'xsec':2.1187}
+'ee4eequark_electron.root':{'s':91**2, 'xsec':2.1187},
+'eeZS_p5_photon500.root':{'s':91**2, 'xsec':37.42},
+'eeZS_2_photon500.root':{'s':91**2, 'xsec':27.53},
+'eeZS_5_photon500.root':{'s':91**2, 'xsec':17.01},
+'eeZS_10_photon500.root':{'s':91**2, 'xsec':7.851},
+'eeZS_15_photon500.root':{'s':91**2, 'xsec':5.751},
+'eeZS_25_photon500.root':{'s':91**2, 'xsec':2.2896},
+'ee2fermion_mutau_photon500.root':{'s':91**2, 'xsec':3011.7},
+'ee2fermion_electron_photon500.root':{'s':91**2, 'xsec':4096.5},
+'ee4lepton_mutau_photon500.root':{"s":91**2, 'xsec':3.0735},
+'ee4lepton_electron_photon500.root':{'s':91**2, 'xsec':2.4868},
+'ee4lepquark_mutau_photon500.root':{'s':91**2, 'xsec':1.0131},
+'ee4eequark_electron_photon500.root':{'s':91**2, 'xsec':2.1187}
 }
 
 '''

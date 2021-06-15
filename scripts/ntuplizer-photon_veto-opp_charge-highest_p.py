@@ -12,20 +12,20 @@ from helper import *
 delphes_path = '/scratch5/arapyan/fcc_ee/scalar_delphes_idea/'
 #delphes_file_list = ['eeTollS_0p5_inc.root', 'eeTollS_5_inc.root', 'eeTollS_25_inc.root',
 #                     'ee2fermion_mutau.root', 'four_lepton.root']
-delphes_file_list = [#'eeZS_p5.root', 
-                     #'eeZS_2.root',
-                     #'eeZS_5.root', 
-                     #'eeZS_10.root',
-                     #'eeZS_15.root',
-                     #'eeZS_25.root',  
-                     #'ee2fermion_mutau.root',
-                     'ee2fermion_electron.root',
-                     'ee4lepton_electron.root',
-                     'ee4lepton_mutau.root',
-                     'ee4eequark_electron.root',
-                     'ee4lepquark_mutau.root'
+delphes_file_list = ['eeZS_p5_photon500.root', 
+                     'eeZS_2_photon500.root',
+                     'eeZS_5_photon500.root', 
+                     'eeZS_10_photon500.root',
+                     'eeZS_15_photon500.root',
+                     'eeZS_25_photon500.root',  
+                     'ee2fermion_mutau_photon500.root',
+                     'ee2fermion_electron_photon500.root',
+                     'ee4lepton_electron_photon500.root',
+                     'ee4lepton_mutau_photon500.root',
+                     'ee4eequark_electron_photon500.root',
+                     'ee4lepquark_mutau_photon500.root'
                     ]
-ntuple_path = '../ntuples_IDEA_2GeV/'
+ntuple_path = '../ntuples_IDEA_500MeV/'
 particles =  ['electron', 'muon', 'photon']
 var_to_wrt = ['pt', 'eta', 'phi', 'cos_theta', 'alpha',
               'p_mag', 'm_inv', 'm_rec','p_mag_missing', 'cos_theta_p_missing']  

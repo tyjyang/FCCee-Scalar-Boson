@@ -7,31 +7,31 @@ import cutflow as ctf
 from collections import OrderedDict
 
 # variables
-ntuple_path = '../ntuples_IDEA_2GeV/'
+ntuple_path = '../ntuples_IDEA_500MeV/'
 delphes_path = '/scratch5/arapyan/fcc_ee/scalar_delphes_idea/'
 channels = ['electron', 'muon']
 lumi = 115.4
-output_suffix = 'IDEA_2GeV'
+output_suffix = 'IDEA_500MeV'
 sig_ntuple_filenames = {
-'0p5':('eeZS_p5:electron-muon:pt-eta-phi-cos_theta-alpha-'
+'0p5':('eeZS_p5_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
        'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-'2'  :('eeZS_2:electron-muon:pt-eta-phi-cos_theta-alpha-'
+'2'  :('eeZS_2_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
        'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-'5'  :('eeZS_5:electron-muon:pt-eta-phi-cos_theta-alpha-'
+'5'  :('eeZS_5_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
        'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-'10' :('eeZS_10:electron-muon:pt-eta-phi-cos_theta-alpha-'
+'10' :('eeZS_10_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
        'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-'15' :('eeZS_15:electron-muon:pt-eta-phi-cos_theta-alpha-'
+'15' :('eeZS_15_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
        'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-'25' :('eeZS_25:electron-muon:pt-eta-phi-cos_theta-alpha-'
+'25' :('eeZS_25_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
        'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root')
 }      
 bkg_ntuple_filenames = {
-'2f'       :('ee2fermion_mutau:electron-muon:pt-eta-phi-cos_theta-'
+'2f'       :('ee2fermion_mutau_photon500:electron-muon:pt-eta-phi-cos_theta-'
              'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-'4f' :('ee4lepton_mutau:electron-muon:pt-eta-phi-cos_theta-'
+'4f' :('ee4lepton_mutau_photon500:electron-muon:pt-eta-phi-cos_theta-'
              'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-'4fqq' :('ee4lepquark_mutau:electron-muon:pt-eta-phi-cos_theta-'
+'4fqq' :('ee4lepquark_mutau_photon500:electron-muon:pt-eta-phi-cos_theta-'
              'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root')
 }
 
