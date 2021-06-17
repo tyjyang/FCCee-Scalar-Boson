@@ -12,6 +12,28 @@ delphes_path = '/scratch5/arapyan/fcc_ee/scalar_delphes_idea/'
 channels = ['electron', 'muon']
 lumi = 115.4
 output_suffix = 'IDEA_500MeV'
+#bkg_ntuple_filenames = {
+#'0p5':('eeZS_p5:electron-muon:pt-eta-phi-cos_theta-alpha-'
+#       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
+#'2'  :('eeZS_2:electron-muon:pt-eta-phi-cos_theta-alpha-'
+#       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
+#'5'  :('eeZS_5:electron-muon:pt-eta-phi-cos_theta-alpha-'
+#       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
+#'10' :('eeZS_10:electron-muon:pt-eta-phi-cos_theta-alpha-'
+#       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
+#'15' :('eeZS_15:electron-muon:pt-eta-phi-cos_theta-alpha-'
+#       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
+#'25' :('eeZS_25:electron-muon:pt-eta-phi-cos_theta-alpha-'
+#       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root')
+#}      
+#bkg_ntuple_filenames = {
+#'2f'       :('ee2fermion_mutau:electron-muon:pt-eta-phi-cos_theta-'
+#             'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
+#'4f' :('ee4lepton_mutau:electron-muon:pt-eta-phi-cos_theta-'
+#             'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
+#'4fqq' :('ee4lepquark_mutau:electron-muon:pt-eta-phi-cos_theta-'
+#             'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root')
+#}
 sig_ntuple_filenames = {
 '0p5':('eeZS_p5_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
        'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
@@ -34,7 +56,6 @@ bkg_ntuple_filenames = {
 '4fqq' :('ee4lepquark_mutau_photon500:electron-muon:pt-eta-phi-cos_theta-'
              'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root')
 }
-
 # get the full paths to the ntuple files 
 sig_ntuple_filepaths = {}
 bkg_ntuple_filepaths = {}
@@ -1487,9 +1508,9 @@ c_muon_rec = ROOT.TCanvas()
 c_muon_rec.cd()
 hs_sig_mu_rec = ROOT.THStack("hs_sig_mu_rec","")
 hs_bkg_mu_rec = ROOT.THStack("hs_bkg_mu_rec","")
-mu_rec_xlow = -5
-mu_rec_xhigh = 40
-mu_rec_nbins = 18
+mu_rec_xlow = -40
+mu_rec_xhigh = 60
+mu_rec_nbins = 20 
 mu_rec_descrp = "Z #rightarrow #mu^{+}#mu^{-} vs. m_{mumu} @ 91.2 GeV"
 hist_mu_0p5_rec = ROOT.TH1F("mu_0p5_m_rec",
 mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
