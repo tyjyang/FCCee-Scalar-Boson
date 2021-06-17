@@ -1508,9 +1508,9 @@ c_muon_rec = ROOT.TCanvas()
 c_muon_rec.cd()
 hs_sig_mu_rec = ROOT.THStack("hs_sig_mu_rec","")
 hs_bkg_mu_rec = ROOT.THStack("hs_bkg_mu_rec","")
-mu_rec_xlow = -40
-mu_rec_xhigh = 60
-mu_rec_nbins = 20 
+mu_rec_xlow = -5
+mu_rec_xhigh = 40
+mu_rec_nbins = 18 
 mu_rec_descrp = "Z #rightarrow #mu^{+}#mu^{-} vs. m_{mumu} @ 91.2 GeV"
 hist_mu_0p5_rec = ROOT.TH1F("mu_0p5_m_rec",
 mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
