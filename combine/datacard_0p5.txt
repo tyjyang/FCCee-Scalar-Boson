@@ -19,3 +19,4 @@ rate                       -1              -1              -1              -1
 lumi              lnN     1.154            1.154           1.154         1.154 
 #xsec_Sll          lnN     2.186           -               -             -
 #xsec_Zleplep      lnN     -               1.50            -             -
+signal_region autoMCStats 0

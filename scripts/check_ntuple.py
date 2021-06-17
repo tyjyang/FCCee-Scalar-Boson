@@ -1487,9 +1487,9 @@ c_muon_rec = ROOT.TCanvas()
 c_muon_rec.cd()
 hs_sig_mu_rec = ROOT.THStack("hs_sig_mu_rec","")
 hs_bkg_mu_rec = ROOT.THStack("hs_bkg_mu_rec","")
-mu_rec_xlow = -40
-mu_rec_xhigh = 60
-mu_rec_nbins = 20
+mu_rec_xlow = -5
+mu_rec_xhigh = 40
+mu_rec_nbins = 18
 mu_rec_descrp = "Z #rightarrow #mu^{+}#mu^{-} vs. m_{mumu} @ 91.2 GeV"
 hist_mu_0p5_rec = ROOT.TH1F("mu_0p5_m_rec",
 mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
@@ -1509,6 +1509,15 @@ hist_mu_4f_rec = ROOT.TH1F("mu_4f_m_rec",
 mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
 hist_mu_4fqq_rec = ROOT.TH1F("mu_4fqq_m_rec",
 mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
+hist_mu_0p5_rec.SetDefaultSumw2() 
+hist_mu_2_rec.SetDefaultSumw2()
+hist_mu_5_rec.SetDefaultSumw2()
+hist_mu_10_rec.SetDefaultSumw2()
+hist_mu_15_rec.SetDefaultSumw2()
+hist_mu_25_rec.SetDefaultSumw2()
+hist_mu_2f_rec.SetDefaultSumw2()
+hist_mu_4f_rec.SetDefaultSumw2()
+hist_mu_4fqq_rec.SetDefaultSumw2()
 muons['0p5'].Draw("m_rec>>mu_0p5_m_rec", mu_cut_5, "goff")
 muons['2'].Draw("m_rec>>mu_2_m_rec", mu_cut_5, "goff")
 muons['5'].Draw("m_rec>>mu_5_m_rec", mu_cut_5, "goff")
@@ -1547,8 +1556,8 @@ hist_mu_4fqq_rec.SetLineStyle(1)
 
 hs_bkg_mu_rec.SetMinimum(0)
 hs_sig_mu_rec.SetMinimum(0)
-hs_bkg_mu_rec.SetMaximum(180)
-hs_sig_mu_rec.SetMaximum(180)
+hs_bkg_mu_rec.SetMaximum(50)
+hs_sig_mu_rec.SetMaximum(50)
 
 hs_sig_mu_rec.Add(hist_mu_0p5_rec)
 hs_sig_mu_rec.Add(hist_mu_5_rec)
