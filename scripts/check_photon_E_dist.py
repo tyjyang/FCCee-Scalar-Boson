@@ -9,14 +9,14 @@ from helper import *
 #-----------------
 # Global Variables
 #-----------------
-delphes_path = '/uscms/home/tyang/nobackup/data/FCCee-Scalar-Boson-delphes-samples/'
+delphes_path = '/'
 delphes_file_list = [#'eeTollS_0p5_inc.root', 
                      #'eeTollS_5_inc.root', 
                      #'eeTollS_25_inc.root',
                      #'ee2fermion_mutau.root',
                      #'four_lepton.root',
-                     'eeZS_p5.root',
-                     'ee4lepton_muon'
+                     'eeZS_p5_photon500.root',
+                     #'ee4lepton_muon'
                     ]
 #delphes_file_list = ['eeTollS_0p5_inc.root']
 ntuple_path = '../ntuples'
@@ -27,10 +27,10 @@ load_delphes_lib()
 
 delphes_file_path = delphes_path + delphes_file_list[0]
 evt_chain = load_delphes_file(delphes_file_path, particles)
-photon_E_reco = ROOT.TH1I("photon_E_reco","Energy of RECO Photon",20,0,20)
+photon_E_reco = ROOT.TH1I("photon_E_reco","Energy of RECO Photon",40,0,20)
 photon_E_reco.GetYaxis().SetTitle("Number of Photon / 1 GeV")
 photon_E_reco.GetXaxis().SetTitle("Photon Energy [GeV]")
-photon_E_gen = ROOT.TH1I("photon_E_gen","Energy of GEN Photon",20,0,20)
+photon_E_gen = ROOT.TH1I("photon_E_gen","Energy of GEN Photon",40,0,20)
 photon_E_gen.GetYaxis().SetTitle("Number of Photon / 1 GeV")
 photon_E_gen.GetXaxis().SetTitle("Photon Energy [GeV]")
 
@@ -49,4 +49,4 @@ c1.cd(1)
 photon_E_reco.Draw()
 c1.cd(2)
 photon_E_gen.Draw()
-c1.SaveAs("../plots/E_photon_out_sig.pdf")
+c1.SaveAs("../plots/E_photon_sig_0p5_IDEA_500MeV.pdf")

@@ -7,55 +7,55 @@ import cutflow as ctf
 from collections import OrderedDict
 
 # variables
-ntuple_path = '../ntuples_IDEA_500MeV/'
+ntuple_path = '../ntuples_IDEA_2GeV/'
 delphes_path = '/scratch5/arapyan/fcc_ee/scalar_delphes_idea/'
 channels = ['electron', 'muon']
 lumi = 115.4
-output_suffix = 'IDEA_500MeV'
-#bkg_ntuple_filenames = {
-#'0p5':('eeZS_p5:electron-muon:pt-eta-phi-cos_theta-alpha-'
-#       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-#'2'  :('eeZS_2:electron-muon:pt-eta-phi-cos_theta-alpha-'
-#       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-#'5'  :('eeZS_5:electron-muon:pt-eta-phi-cos_theta-alpha-'
-#       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-#'10' :('eeZS_10:electron-muon:pt-eta-phi-cos_theta-alpha-'
-#       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-#'15' :('eeZS_15:electron-muon:pt-eta-phi-cos_theta-alpha-'
-#       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-#'25' :('eeZS_25:electron-muon:pt-eta-phi-cos_theta-alpha-'
-#       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root')
-#}      
-#bkg_ntuple_filenames = {
-#'2f'       :('ee2fermion_mutau:electron-muon:pt-eta-phi-cos_theta-'
-#             'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-#'4f' :('ee4lepton_mutau:electron-muon:pt-eta-phi-cos_theta-'
-#             'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-#'4fqq' :('ee4lepquark_mutau:electron-muon:pt-eta-phi-cos_theta-'
-#             'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root')
-#}
+output_suffix = 'IDEA_2GeV'
 sig_ntuple_filenames = {
-'0p5':('eeZS_p5_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
+'0p5':('eeZS_p5:electron-muon:pt-eta-phi-cos_theta-alpha-'
        'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-'2'  :('eeZS_2_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
+'2'  :('eeZS_2:electron-muon:pt-eta-phi-cos_theta-alpha-'
        'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-'5'  :('eeZS_5_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
+'5'  :('eeZS_5:electron-muon:pt-eta-phi-cos_theta-alpha-'
        'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-'10' :('eeZS_10_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
+'10' :('eeZS_10:electron-muon:pt-eta-phi-cos_theta-alpha-'
        'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-'15' :('eeZS_15_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
+'15' :('eeZS_15:electron-muon:pt-eta-phi-cos_theta-alpha-'
        'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-'25' :('eeZS_25_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
+'25' :('eeZS_25:electron-muon:pt-eta-phi-cos_theta-alpha-'
        'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root')
 }      
 bkg_ntuple_filenames = {
-'2f'       :('ee2fermion_mutau_photon500:electron-muon:pt-eta-phi-cos_theta-'
+'2f'       :('ee2fermion_mutau:electron-muon:pt-eta-phi-cos_theta-'
              'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-'4f' :('ee4lepton_mutau_photon500:electron-muon:pt-eta-phi-cos_theta-'
+'4f' :('ee4lepton_mutau:electron-muon:pt-eta-phi-cos_theta-'
              'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-'4fqq' :('ee4lepquark_mutau_photon500:electron-muon:pt-eta-phi-cos_theta-'
+'4fqq' :('ee4lepquark_mutau:electron-muon:pt-eta-phi-cos_theta-'
              'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root')
 }
+#sig_ntuple_filenames = {
+#'0p5':('eeZS_p5_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
+#       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
+#'2'  :('eeZS_2_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
+#       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
+#'5'  :('eeZS_5_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
+#       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
+#'10' :('eeZS_10_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
+#       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
+#'15' :('eeZS_15_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
+#       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
+#'25' :('eeZS_25_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
+#       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root')
+#}      
+#bkg_ntuple_filenames = {
+#'2f'       :('ee2fermion_mutau_photon500:electron-muon:pt-eta-phi-cos_theta-'
+#             'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
+#'4f' :('ee4lepton_mutau_photon500:electron-muon:pt-eta-phi-cos_theta-'
+#             'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
+#'4fqq' :('ee4lepquark_mutau_photon500:electron-muon:pt-eta-phi-cos_theta-'
+#             'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root')
+#}
 # get the full paths to the ntuple files 
 sig_ntuple_filepaths = {}
 bkg_ntuple_filepaths = {}
@@ -1350,21 +1350,33 @@ c_muon.cd(5)
 mu_cut_5 = mu_cut_4+'&&'+muon_cuts['m_inv']
 # get the entrylist after the cut
 muons['0p5'].Draw(">>mu_0p5_cutlist5",mu_cut_5,"entrylist")
+muons['2'].Draw(">>mu_2_cutlist5",mu_cut_5,"entrylist")
 muons['5'].Draw(">>mu_5_cutlist5",mu_cut_5,"entrylist")
+muons['10'].Draw(">>mu_10_cutlist5",mu_cut_5,"entrylist")
+muons['15'].Draw(">>mu_15_cutlist5",mu_cut_5,"entrylist")
 muons['25'].Draw(">>mu_25_cutlist5",mu_cut_5,"entrylist")
 muons['2f'].Draw(">>mu_2f_cutlist5",mu_cut_5,"entrylist")
 muons['4f'].Draw(">>mu_4f_cutlist5",mu_cut_5,"entrylist")
 muons['4fqq'].Draw(">>mu_4fqq_cutlist5",mu_cut_5,"entrylist")
 mu_0p5_cutlist5 = ROOT.gDirectory.Get("mu_0p5_cutlist5")
+mu_2_cutlist5 = ROOT.gDirectory.Get("mu_2_cutlist5")
 mu_5_cutlist5 = ROOT.gDirectory.Get("mu_5_cutlist5")
+mu_10_cutlist5 = ROOT.gDirectory.Get("mu_10_cutlist5")
+mu_15_cutlist5 = ROOT.gDirectory.Get("mu_15_cutlist5")
 mu_25_cutlist5 = ROOT.gDirectory.Get("mu_25_cutlist5")
 mu_2f_cutlist5 = ROOT.gDirectory.Get("mu_2f_cutlist5")
 mu_4f_cutlist5 = ROOT.gDirectory.Get("mu_4f_cutlist5")
 mu_4fqq_cutlist5 = ROOT.gDirectory.Get("mu_4fqq_cutlist5")
 print ('num of singal evts with m_s = 0.5 GeV passing m_inv cut: ', 
        mu_0p5_cutlist5.GetN()*w['0p5'])
+print ('num of singal evts with m_s = 2 GeV passing m_inv cut: ', 
+       mu_2_cutlist5.GetN()*w['2'])
 print ('num of singal evts with m_s = 5 GeV passing m_inv cut: ', 
        mu_5_cutlist5.GetN()*w['5'])
+print ('num of singal evts with m_s = 10 GeV passing m_inv cut: ', 
+       mu_10_cutlist5.GetN()*w['10'])
+print ('num of singal evts with m_s = 15 GeV passing m_inv cut: ', 
+       mu_15_cutlist5.GetN()*w['15'])
 print ('num of singal evts with m_s = 25 GeV passing m_inv cut: ', 
        mu_25_cutlist5.GetN()*w['25'])
 print ('num of 2-fermion bkg evts passing m_inv cut: ', 
