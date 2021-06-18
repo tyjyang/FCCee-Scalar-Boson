@@ -9,7 +9,7 @@ from helper import *
 #-----------------
 # Global Variables
 #-----------------
-delphes_path = '/'
+delphes_path = '/scratch5/arapyan/fcc_ee/scalar_delphes_idea/'
 delphes_file_list = [#'eeTollS_0p5_inc.root', 
                      #'eeTollS_5_inc.root', 
                      #'eeTollS_25_inc.root',
