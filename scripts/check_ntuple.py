@@ -7,55 +7,55 @@ import cutflow as ctf
 from collections import OrderedDict
 
 # variables
-ntuple_path = '../ntuples_IDEA_2GeV/'
+ntuple_path = '../ntuples-no-photon-veto/'
 delphes_path = '/scratch5/arapyan/fcc_ee/scalar_delphes_idea/'
 channels = ['electron', 'muon']
 lumi = 115.4
-output_suffix = 'IDEA_2GeV'
-sig_ntuple_filenames = {
-'0p5':('eeZS_p5:electron-muon:pt-eta-phi-cos_theta-alpha-'
-       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-'2'  :('eeZS_2:electron-muon:pt-eta-phi-cos_theta-alpha-'
-       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-'5'  :('eeZS_5:electron-muon:pt-eta-phi-cos_theta-alpha-'
-       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-'10' :('eeZS_10:electron-muon:pt-eta-phi-cos_theta-alpha-'
-       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-'15' :('eeZS_15:electron-muon:pt-eta-phi-cos_theta-alpha-'
-       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-'25' :('eeZS_25:electron-muon:pt-eta-phi-cos_theta-alpha-'
-       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root')
-}      
-bkg_ntuple_filenames = {
-'2f'       :('ee2fermion_mutau:electron-muon:pt-eta-phi-cos_theta-'
-             'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-'4f' :('ee4lepton_mutau:electron-muon:pt-eta-phi-cos_theta-'
-             'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-'4fqq' :('ee4lepquark_mutau:electron-muon:pt-eta-phi-cos_theta-'
-             'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root')
-}
+output_suffix = 'IDEA_500MeV_no_photon_veto'
 #sig_ntuple_filenames = {
-#'0p5':('eeZS_p5_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
+#'0p5':('eeZS_p5:electron-muon:pt-eta-phi-cos_theta-alpha-'
 #       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-#'2'  :('eeZS_2_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
+#'2'  :('eeZS_2:electron-muon:pt-eta-phi-cos_theta-alpha-'
 #       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-#'5'  :('eeZS_5_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
+#'5'  :('eeZS_5:electron-muon:pt-eta-phi-cos_theta-alpha-'
 #       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-#'10' :('eeZS_10_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
+#'10' :('eeZS_10:electron-muon:pt-eta-phi-cos_theta-alpha-'
 #       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-#'15' :('eeZS_15_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
+#'15' :('eeZS_15:electron-muon:pt-eta-phi-cos_theta-alpha-'
 #       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-#'25' :('eeZS_25_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
+#'25' :('eeZS_25:electron-muon:pt-eta-phi-cos_theta-alpha-'
 #       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root')
 #}      
 #bkg_ntuple_filenames = {
-#'2f'       :('ee2fermion_mutau_photon500:electron-muon:pt-eta-phi-cos_theta-'
+#'2f'       :('ee2fermion_mutau:electron-muon:pt-eta-phi-cos_theta-'
 #             'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-#'4f' :('ee4lepton_mutau_photon500:electron-muon:pt-eta-phi-cos_theta-'
+#'4f' :('ee4lepton_mutau:electron-muon:pt-eta-phi-cos_theta-'
 #             'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
-#'4fqq' :('ee4lepquark_mutau_photon500:electron-muon:pt-eta-phi-cos_theta-'
+#'4fqq' :('ee4lepquark_mutau:electron-muon:pt-eta-phi-cos_theta-'
 #             'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root')
 #}
+sig_ntuple_filenames = {
+'0p5':('eeZS_p5_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
+       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
+'2'  :('eeZS_2_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
+       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
+'5'  :('eeZS_5_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
+       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
+'10' :('eeZS_10_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
+       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
+'15' :('eeZS_15_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
+       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
+'25' :('eeZS_25_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
+       'p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root')
+}      
+bkg_ntuple_filenames = {
+'2f'       :('ee2fermion_mutau_photon500:electron-muon:pt-eta-phi-cos_theta-'
+             'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
+'4f' :('ee4lepton_mutau_photon500:electron-muon:pt-eta-phi-cos_theta-'
+             'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root'),
+'4fqq' :('ee4lepquark_mutau_photon500:electron-muon:pt-eta-phi-cos_theta-'
+             'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root')
+}
 # get the full paths to the ntuple files 
 sig_ntuple_filepaths = {}
 bkg_ntuple_filepaths = {}
@@ -64,7 +64,8 @@ for i, f in sig_ntuple_filenames.items():
 for i, f in bkg_ntuple_filenames.items(): 
 	bkg_ntuple_filepaths[i] = ntuple_path + f 
 
-# get pointers to the ntuple trees and set weights
+# get pointers to the ntuple trees and set weights by getting the number of
+# events from the delphes file
 ntuple_files = {}
 electrons = OrderedDict()
 muons = OrderedDict()
@@ -76,8 +77,6 @@ for key, f in sig_ntuple_filepaths.items():
 	delphes_file = hlp.get_delphes_filename(f)
 	delphes_filepath = delphes_path + delphes_file
 	w[key] = ctf.get_normalization_factor(delphes_filepath, lumi)
-	print electrons[key]
-	print type(w[key])
 	electrons[key].SetWeight(w[key])
 	muons[key].SetWeight(w[key])
 for key, f in bkg_ntuple_filepaths.items():
@@ -87,23 +86,10 @@ for key, f in bkg_ntuple_filepaths.items():
 	delphes_file = hlp.get_delphes_filename(f)
 	delphes_filepath = delphes_path + delphes_file
 	w[key] = ctf.get_normalization_factor(delphes_filepath, lumi)
-	print electrons[key]
-	print type(w[key])
 	electrons[key].SetWeight(w[key])
 	muons[key].SetWeight(w[key])
-
-##	print electrons[key]
-#for key, f in bkg_ntuple_filepaths.items():
-#	ntuple_file = ROOT.TFile.Open(f)
-#	electrons[key] = ntuple_file.Get('electron')
-#	muons[key] = ntuple_file.Get('muon')
-#	delphes_file = hlp.get_delphes_filename(bkg_ntuple_files[key])
-#	delphes_filepath = delphes_path + delphes_file
-#	w[key] = ctf.get_normalization_factor(delphes_filepath, lumi)
-#	electrons[key].SetWeight[w[key]]
-#	muons[key].SetWeight[w[key]]
-##	print electrons[key]
-
+for key in muons:
+	print muons[key]
 # create rootfile to save the histograms
 cutflow_file = ROOT.TFile("cutflow.root","RECREATE")
 cutflow_file.cd()
@@ -115,8 +101,8 @@ cut_names = ['anlge','momentum','alpha','m_inv','cos_theat_p_missing']
 e_angle_cut_low = -0.9
 e_angle_cut_high = 0.9
 electron_cuts['angle'] = (
-"(cos_theta_1 < 0.9 && cos_theta_1 > -0.9) &&"
-"(cos_theta_2 < 0.9 && cos_theta_2 > -0.9)")
+"TMath::abs(cos_theta_1) < 0.9 &&"
+"TMath::abs(cos_theta_2) < 0.9")
 #electron_cuts['angle'] = (
 #"(leading_eta < 1.47 && leading_eta > -1.47) &&"
 #"(trailing_eta < 1.47 && trailing_eta > -1.47)")
