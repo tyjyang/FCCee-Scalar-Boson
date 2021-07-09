@@ -43,3 +43,4 @@ source /cvmfs/sft.cern.ch/lcg/app/releases/ROOT/6.06.00/x86_64-centos7-gcc49-opt
 export DELPHES_PATH=$REPO_DIR/Delphes-3.4.2
 export LD_LIBRARY_PATH="$DELPHES_PATH:$LD_LIBRARY_PATH"
 export PYTHONPATH="$PYTHONPATH:$REPO_DIR/lib"
+#export PATH=/usr/bin:$PATH #prioritize use of local software tools to save execution time
