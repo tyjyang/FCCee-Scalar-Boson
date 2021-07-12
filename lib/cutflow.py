@@ -134,6 +134,7 @@ def make_cutflow_table(sig_trees, sig_w, bkg_trees, bkg_w,
 			gen_nevts = get_e_mu_nevts_from_gen(delphes_filepath)
 			for chn, nevts in gen_nevts.items():
 				sig_gen_nevts[chn][key] = float(nevts)
+				print key, '::', chn, ' has ', nevts, ' events'
 
 	# make table and store into markdown strings
 	table_string = {}
@@ -160,21 +161,30 @@ def make_cutflow_table(sig_trees, sig_w, bkg_trees, bkg_w,
 			if current_cut != "": current_cut += "&&"
 			current_cut += cut
 			for key, tree in sig_trees[chn].items():
-				tree.Draw(">>evts_pass_cut", current_cut, "entrylist")
-				evts_pass_cut = ROOT.gDirectory.Get("evts_pass_cut")
-				ctf_table_row += decimal_places_str.format(
-				                 evts_pass_cut.GetN() * sig_w[key]) + "|" 
-				sig_last_row_yields[key] = float(evts_pass_cut.GetN())
+				if tree.GetEntries() != 0:
+					tree.Draw(">>evts_pass_cut", current_cut, "entrylist")
+					evts_pass_cut = ROOT.gDirectory.Get("evts_pass_cut")
+					nevts_pass_cut = evts_pass_cut.GetN() 
+				else: #if tree is empty, avoid using evts_pass_cut from prev tree
+					nevts_pass_cut = 0
+				norm_nevts_pass_cut = nevts_pass_cut * sig_w[key]
+				sig_last_row_yields[key] = nevts_pass_cut
+				ctf_table_row += decimal_places_str.format(norm_nevts_pass_cut) + "|"
 			for key, tree in bkg_trees[chn].items():
-				tree.Draw(">>evts_pass_cut", current_cut, "entrylist")
-				evts_pass_cut = ROOT.gDirectory.Get("evts_pass_cut")
-				ctf_table_row += decimal_places_str.format(
-				                 evts_pass_cut.GetN() * bkg_w[key]) + "|"
+				if tree.GetEntries() != 0:
+					tree.Draw(">>evts_pass_cut", current_cut, "entrylist")
+					evts_pass_cut = ROOT.gDirectory.Get("evts_pass_cut")
+					nevts_pass_cut = evts_pass_cut.GetN() 
+				else: #if tree is empty, avoid using evts_pass_cut from prev tree
+					nevts_pass_cut = 0
+				norm_nevts_pass_cut = nevts_pass_cut * bkg_w[key]
+				ctf_table_row += decimal_places_str.format(norm_nevts_pass_cut) + "|"
 			ctf_table_rows.append(ctf_table_row)
 		ctf_table_eff = "|Efficiency|"
-		for key, nevts in sig_gen_nevts[chn].items():
-			ctf_table_eff += decimal_places_str.format(
-			                 sig_last_row_yields[key] / nevts * 100) + "%|"
+		if sig_eff:
+			for key, nevts in sig_gen_nevts[chn].items():
+				ctf_table_eff += decimal_places_str.format(
+				                 sig_last_row_yields[key] / nevts * 100) + "%|"
 		table_string[chn] += ctf_table_header + '\n'
 		table_string[chn] += ctf_table_separator + '\n'
 		table_string[chn] += ctf_table_preselection + '\n'
