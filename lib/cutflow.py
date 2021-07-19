@@ -192,6 +192,53 @@ def make_cutflow_table(sig_trees, sig_w, bkg_trees, bkg_w,
 		if sig_eff:
 			table_string[chn] += ctf_table_eff
 	return table_string
+
+'''
+INPUT -------------------------------------------------------------------------
+|* list(TTree): the list of trees to merge, min len is 2
+|* list(double): the list of tree weights, one for each tree
+|  
+ROUTINE -----------------------------------------------------------------------
+|* loop through the trees to be merged and their respective weights
+|* calculate the weight for the merged tree so number of weighed events matches
+|  before and after the merge
+| 
+OUTPUT ------------------------------------------------------------------------
+|* (double) weight for the merged tree
++------------------------------------------------------------------------------ 
+''' 
+def calculate_merged_tree_weights(trees, weights):
+	if len(trees) < 2 or len(trees) != len(weights):
+		sys.exit("too few trees to merge OR incorrect number of weights")
+	else:
+		pass
+	sum_of_entries = 0
+	sum_of_weighed_entries = 0
+	for i, tree in enumerate(trees):
+		sum_of_entries += tree.GetEntries()
+		sum_of_weighed_entries += weights[i] * tree.GetEntries()
+	return sum_of_weighed_entries / sum_of_entries
+
+'''
+INPUT -------------------------------------------------------------------------
+|* list(TTree): the list of trees to merge, min len is 2
+|* list(double): the list of tree weights, one for each tree
+|  
+ROUTINE -----------------------------------------------------------------------
+|* merge trees w/ different weights into a new tree, with proper weight calculated
+| 
+OUTPUT ------------------------------------------------------------------------
+|* (TTree) mtree: the merged tree with correct weight
++------------------------------------------------------------------------------ 
+''' 
+def merge_trees_w_weights(trees, weights):
+	tlist = ROOT.TList()
+	merged_weights = calculate_merged_tree_weights(trees, weights)
+	for tree in trees:
+		tlist.Add(tree)
+	mtree = ROOT.TTree.MergeTrees(tlist)
+	mtree.SetWeight(merged_weights)
+	return mtree
 #def set_tree_weights(trees, 
 		
 # implement channel recognition from filenames
