@@ -4,8 +4,9 @@ import time
 import ntuplizer as ntp 
 import helper as hlp 
 import cutflow as ctf 
+import autobinning as atb
 from collections import OrderedDict
-
+from array import array
 ##################
 # I/O variables #
 ##################
@@ -15,13 +16,15 @@ delphes_path = '/scratch5/arapyan/fcc_ee/scalar_delphes_idea/'
 plot_path = '../plots/'
 table_path = '../tables/'
 hist_path = '../hists/'
+combine_path = '../combine/'
 #output_suffix = 'IDEA_500MeV_no_photon_veto'
 output_suffix = 'IDEA_500MeV'
 ctf_hist_file = ROOT.TFile(hist_path + "cutflow_hists_" + output_suffix + ".root",
                           "RECREATE") # root file to store all cutflow hists
-
+bin_option = "manual"
+#bin_option = "auto"
 channels = ['electron', 'muon']
-lumi = 115.4
+lumi = 150 * 10 ** 6
 
 sig_ntuple_filenames = OrderedDict([
 ('0p5',('eeZS_p5_photon500:electron-muon:pt-eta-phi-cos_theta-alpha-'
@@ -103,7 +106,7 @@ ctf_plot_param['alpha'] = {
 'xmin':0, 
 'xmax':3.1,
 'nbins':31,
-'ymin':0.1,
+'ymin':1000,
 'ymax':200000,
 'xvar':'alpha',
 'xunit':'rad',
@@ -114,7 +117,7 @@ ctf_plot_param['angle'] = {
 'xmin':0, 
 'xmax':1,
 'nbins':15,
-'ymin':0.1,
+'ymin':1000,
 'ymax':100,
 'xvar':'abs(cos_theta_1)',
 'xunit':'',
@@ -125,7 +128,7 @@ ctf_plot_param['momentum'] = {
 'xmin':0, 
 'xmax':45,
 'nbins':45,
-'ymin':0.1,
+'ymin':1000,
 'ymax':100,
 'xvar':'max(p_mag_1, p_mag_2)',
 'xunit':'GeV',
@@ -136,7 +139,7 @@ ctf_plot_param['missing_angle'] = {
 'xmin':0, 
 'xmax':1,
 'nbins':15, 
-'ymin':0.1, 
+'ymin':1000, 
 'ymax':100,
 'xvar':'abs(cos_theta_p_missing)',
 'xunit':'',
@@ -153,6 +156,17 @@ ctf_plot_param['m_inv'] = {
 'xunit':'GeV',
 'xtitle':'m_{ll}',
 'scale':'linear'
+}
+ctf_plot_param['mrec'] = {
+'xmin':-5, 
+'xmax':40,
+'nbins':45, 
+'ymin':1000, 
+'ymax':100,
+'xvar':'m_rec',
+'xunit':'GeV',
+'xtitle':'m_{rec}',
+'scale':'logy'
 }
 
 for cutname, params in ctf_plot_param.items():
@@ -219,7 +233,9 @@ canvas_titles['muon']     = "#mu^{+}#mu^{-} events @ #sqrt{s} = 91.2 GeV"
 canvas_title_x = 0.1
 canvas_title_y = 0.9
 canvas_title_textsize = 0.05
-
+pad_title_x = 0.4
+pad_title_y = 0.95
+pad_title_textsize = 0.05
 ## legends
 legend_x_bl = 0.1 # x-coordinate of the bottom left point of the legend box
 legend_y_bl = 0.6
@@ -315,9 +331,9 @@ for chn, table in md_table_string.items():
 # merge trees from same bkg channel #
 ######################################
 bkg_merge_scheme = OrderedDict([
-("2f",["2f-mutau","2f-e"]),
+("4f-2l2q",['4f-2mutau2q', '4f-2e2q']),
 ("4f-4l",['4f-2mutau2l', '4f-2e2l']),
-("4f-2l2q",['4f-2mutau2q', '4f-2e2q'])
+("2f",["2f-mutau","2f-e"])
 ])
 for fs_chn in channels:
 	for merged_treename, treenames_to_merge in bkg_merge_scheme.items():
@@ -356,8 +372,6 @@ for fs_chn in channels:
 	canvases[fs_chn].Divide(num_hist_x, num_hist_y)
 	sig_hists[fs_chn] = OrderedDict()
 	bkg_hists[fs_chn] = OrderedDict()
-	sig_mrec_hists[fs_chn] = OrderedDict()
-	bkg_mrec_hists[fs_chn] = OrderedDict()
 	sig_stacks[fs_chn] = OrderedDict()
 	bkg_stacks[fs_chn] = OrderedDict()
 	lb_line[fs_chn] = OrderedDict()
@@ -372,62 +386,59 @@ for fs_chn in channels:
 		sig_hists[fs_chn][cutname] = OrderedDict() 
 		sig_stack_ymax = 0
 		for pd_chn, tree in sig_trees[fs_chn].items():
-			if pd_chn in sig_linecolors.keys():
-				hist_title = 'hist_' + fs_chn + '_' + pd_chn + '_' + cutname
-				hist_dscrp = hist_title
-				# declare hist, one per cut per prod chn per fs chn
-				sig_hists[fs_chn][cutname][pd_chn] = ROOT.TH1F(
-					hist_title, hist_dscrp, 
-					ctf_plot_param[cutname]['nbins'],
-					ctf_plot_param[cutname]['xmin'],
-					ctf_plot_param[cutname]['xmax'])
-				# fill the cutted trees to the hists
-				tree.Draw(ctf_plot_param[cutname]['xvar'] + ">>" + hist_title, 
-				cumulative_cutstr, "goff")
-				# store sum of squared weights to calculate stat uncertainty
-				sig_hists[fs_chn][cutname][pd_chn].Sumw2()
-				# set plotting style for the hists
-				sig_hists[fs_chn][cutname][pd_chn].SetLineColor(
-				                                   sig_linecolors[pd_chn])
-				sig_hists[fs_chn][cutname][pd_chn].SetLineWidth(sig_linewidth)
-				sig_hists[fs_chn][cutname][pd_chn].SetLineStyle(sig_linestyle)
-				sig_hists[fs_chn][cutname][pd_chn].Write()
-				sig_hist_ymax = sig_hists[fs_chn][cutname][pd_chn].GetBinContent(
-				                sig_hists[fs_chn][cutname][pd_chn].GetMaximumBin())
-				if sig_hist_ymax > sig_stack_ymax: sig_stack_ymax = sig_hist_ymax
+			hist_title = 'hist_' + fs_chn + '_' + pd_chn + '_' + cutname
+			hist_dscrp = hist_title
+			# declare hist, one per cut per prod chn per fs chn
+			sig_hists[fs_chn][cutname][pd_chn] = ROOT.TH1D(
+				hist_title, hist_dscrp, 
+				ctf_plot_param[cutname]['nbins'],
+				ctf_plot_param[cutname]['xmin'],
+				ctf_plot_param[cutname]['xmax'])
+			# fill the cutted trees to the hists
+			tree.Draw(ctf_plot_param[cutname]['xvar'] + ">>" + hist_title, 
+			cumulative_cutstr, "goff")
+			# store sum of squared weights to calculate stat uncertainty
+			sig_hists[fs_chn][cutname][pd_chn].Sumw2()
+			sig_hists[fs_chn][cutname][pd_chn].Write()
 		sig_stacks[fs_chn][cutname] = ROOT.THStack(
 		                              'hs_sig_' + fs_chn + '_' + cutname, "")
 		for pd_chn, hist in sig_hists[fs_chn][cutname].items(): 
-			sig_stacks[fs_chn][cutname].Add(hist)
-		
+			if pd_chn in sig_linecolors.keys():
+				sig_stacks[fs_chn][cutname].Add(hist)
+				# set plotting style for the hists
+				hist.SetLineColor(sig_linecolors[pd_chn])
+				hist.SetLineWidth(sig_linewidth)
+				hist.SetLineStyle(sig_linestyle)
+				sig_hist_ymax = hist.GetBinContent(hist.GetMaximumBin())
+				if sig_hist_ymax > sig_stack_ymax: sig_stack_ymax = sig_hist_ymax
+
 		bkg_hists[fs_chn][cutname] = OrderedDict()
 		bkg_stack_ymax = 0
 		for pd_chn, tree in bkg_trees[fs_chn].items():
-			if pd_chn in bkg_fillcolors.keys():
-				hist_title = 'hist_' + fs_chn + '_' + pd_chn + '_' + cutname
-				hist_dscrp = hist_title
-				# declare hist, one per cut per prod chn per fs chn
-				bkg_hists[fs_chn][cutname][pd_chn] = ROOT.TH1F(
-					hist_title, hist_dscrp, 
-					ctf_plot_param[cutname]['nbins'],
-					ctf_plot_param[cutname]['xmin'],
-					ctf_plot_param[cutname]['xmax'])
-				# fill the cutted trees to the hists
-				tree.Draw(ctf_plot_param[cutname]['xvar'] + ">>" + hist_title, 
-				cumulative_cutstr, "goff")
-				# store sum of squared weights to calculate stat uncertainty
-				sig_hists[fs_chn][cutname][pd_chn].Sumw2()
-				# set plotting style for the hists
-				bkg_hists[fs_chn][cutname][pd_chn].SetLineColor(bkg_linecolor)
-				bkg_hists[fs_chn][cutname][pd_chn].SetFillColor(
-				                                   bkg_fillcolors[pd_chn])
-				bkg_hists[fs_chn][cutname][pd_chn].SetLineWidth(bkg_linewidth)
-				bkg_hists[fs_chn][cutname][pd_chn].SetLineStyle(bkg_linestyle)
-				bkg_hists[fs_chn][cutname][pd_chn].Write()
+			hist_title = 'hist_' + fs_chn + '_' + pd_chn + '_' + cutname
+			hist_dscrp = hist_title
+			# declare hist, one per cut per prod chn per fs chn
+			bkg_hists[fs_chn][cutname][pd_chn] = ROOT.TH1D(
+				hist_title, hist_dscrp, 
+				ctf_plot_param[cutname]['nbins'],
+				ctf_plot_param[cutname]['xmin'],
+				ctf_plot_param[cutname]['xmax'])
+			# fill the cutted trees to the hists
+			tree.Draw(ctf_plot_param[cutname]['xvar'] + ">>" + hist_title, 
+			cumulative_cutstr, "goff")
+			# store sum of squared weights to calculate stat uncertainty
+			bkg_hists[fs_chn][cutname][pd_chn].Sumw2()
+			bkg_hists[fs_chn][cutname][pd_chn].Write()
 		bkg_stacks[fs_chn][cutname] = ROOT.THStack(
 		                             'hs_bkg_' + fs_chn + '_' + cutname, "")
 		for pd_chn, hist in bkg_hists[fs_chn][cutname].items(): 
-			bkg_stacks[fs_chn][cutname].Add(hist)
+			if pd_chn in bkg_fillcolors.keys():
+				bkg_stacks[fs_chn][cutname].Add(hist)
+				# set plotting style for the hists
+				hist.SetLineColor(bkg_linecolor)
+				hist.SetFillColor(bkg_fillcolors[pd_chn])
+				hist.SetLineWidth(bkg_linewidth)
+				hist.SetLineStyle(bkg_linestyle)
 		# calculate the ymax of stacked bkgs
 		for i_bin in np.arange(1, ctf_plot_param[cutname]['nbins'] + 1):
 			sum_bin_content = 0
@@ -457,17 +468,12 @@ for fs_chn in channels:
 		sig_stacks[fs_chn][cutname].SetMaximum(ctf_plot_param[cutname]['ymax'])
 		sig_stacks[fs_chn][cutname].Draw(sig_stack_options)
 		ROOT.gPad.Update()
+		# draw the cut lines and arrows
 		if ctf_plot_param[cutname]['scale'] == 'logy':
 			ctf_plot_param[cutname]['ymax'] = 10 ** ROOT.gPad.GetUymax()
 			ctf_plot_param[cutname]['ymin'] = 10 ** ROOT.gPad.GetUymin()
-		# draw the cut lines and arrows
-		#if ctf_plot_param[cutname]['scale'] == 'linear':
 		line_ymax = ctf_plot_param[cutname]['ymax']
 		line_ymin = ctf_plot_param[cutname]['ymin']
-		#elif ctf_plot_param[cutname]['scale'] == 'logy': 
-		#	print fs_chn, cutname, pd_chn
-		#	line_ymax = 10 ** ctf_plot_param[cutname]['ymax']
-		#	line_ymin = 10 ** ctf_plot_param[cutname]['ymin']
 		lb, ub = cut_bounds[fs_chn][cutname][0], cut_bounds[fs_chn][cutname][1]
 		x_range = (ctf_plot_param[cutname]['xmax'] -
 		           ctf_plot_param[cutname]['xmin'])
@@ -517,39 +523,208 @@ for fs_chn in channels:
 	canvas_title.Draw()
 	canvases[fs_chn].Print(plot_path + fs_chn + '_cutflow_plot_' + output_suffix
 	                       + ".png")
-	#TODO m recoil plots
+
+###############
+# mrec plots #
+###############
+sig_mrec_hists = OrderedDict()
+bkg_mrec_hists = OrderedDict()
+bkg_mrec_tot = OrderedDict()
+canvas_mrec = OrderedDict()
+for fs_chn in channels:
+	sig_mrec_hists[fs_chn] = OrderedDict()
+	bkg_mrec_hists[fs_chn] = OrderedDict()
+	 
 	for pd_chn, tree in sig_trees[fs_chn].items():
 		hist_title = 'hist_' + fs_chn + '_' + pd_chn + '_mrec'
 		hist_dscrp = hist_title
 		# declare hist, one per cut per prod chn per fs chn
-		sig_hists[fs_chn][cutname][pd_chn] = ROOT.TH1F(
+		sig_mrec_hists[fs_chn][pd_chn] = ROOT.TH1D(
 			hist_title, hist_dscrp, 
-			ctf_plot_param[cutname]['nbins'],
-			ctf_plot_param[cutname]['xmin'],
-			ctf_plot_param[cutname]['xmax'])
+			ctf_plot_param['mrec']['nbins'],
+			ctf_plot_param['mrec']['xmin'],
+			ctf_plot_param['mrec']['xmax'])
 		# fill the cutted trees to the hists
-		tree.Draw(ctf_plot_param[cutname]['xvar'] + ">>" + hist_title, 
+		tree.Draw(ctf_plot_param['mrec']['xvar'] + ">>" + hist_title, 
 		cumulative_cutstr, "goff")
 		# store sum of squared weights to calculate stat uncertainty
-		sig_hists[fs_chn][cutname][pd_chn].Sumw2()
-		# set plotting style for the hists
-		sig_hists[fs_chn][cutname][pd_chn].SetLineColor(
-		                                   sig_linecolors[pd_chn])
-		sig_hists[fs_chn][cutname][pd_chn].SetLineWidth(sig_linewidth)
-		sig_hists[fs_chn][cutname][pd_chn].SetLineStyle(sig_linestyle)
-		sig_hists[fs_chn][cutname][pd_chn].Write()
+		sig_mrec_hists[fs_chn][pd_chn].Sumw2()
+		#sig_mrec_hists[fs_chn][pd_chn].Write()
+
+	bkg_mrec_tot[fs_chn] = ROOT.TH1D(
+		'hist_' + fs_chn + '_total_bkg_mrec',
+		'hist_' + fs_chn + '_total_bkg_mrec',
+		ctf_plot_param['mrec']['nbins'],
+		ctf_plot_param['mrec']['xmin'],
+		ctf_plot_param['mrec']['xmax']
+	)
+	
 	for pd_chn, tree in bkg_trees[fs_chn].items():
-	m_rec = Order
+		hist_title = 'hist_' + fs_chn + '_' + pd_chn + '_mrec'
+		hist_dscrp = hist_title
+		# declare hist, one per cut per prod chn per fs chn
+		bkg_mrec_hists[fs_chn][pd_chn] = ROOT.TH1D(
+			hist_title, hist_dscrp, 
+			ctf_plot_param['mrec']['nbins'],
+			ctf_plot_param['mrec']['xmin'],
+			ctf_plot_param['mrec']['xmax'])
+		# fill the cutted trees to the hists
+		tree.Draw(ctf_plot_param['mrec']['xvar'] + ">>" + hist_title, 
+		cumulative_cutstr, "goff")
+		# store sum of squared weights to calculate stat uncertainty
+		bkg_mrec_hists[fs_chn][pd_chn].Sumw2()
+		#bkg_mrec_hists[fs_chn][pd_chn].Write()
+		bkg_mrec_tot[fs_chn].Add(bkg_mrec_hists[fs_chn][pd_chn])
+
+
+# rebin the sig + total bkg histograms
+binning = OrderedDict()
+
+for fs_chn in channels:
+	binning[fs_chn] = OrderedDict()
+	for pd_chn, hist in sig_mrec_hists[fs_chn].items():
+		if bin_option == "auto":
+			b = atb.AutoRebin(
+				bkg_mrec_tot[fs_chn].Clone("b_bkg_copy"), 
+				hist.Clone("h_sig_copy"), 
+				0.2, 
+				0.2
+			)
+			b.rebin() 
+			binning[fs_chn][pd_chn] = array('d',b.getBinArray()) #enforcing type 
+		elif bin_option == "manual":
+			x_cur = ctf_plot_param['mrec']['xmin']
+			binning[fs_chn][pd_chn] = array('d')
+			while x_cur <= ctf_plot_param['mrec']['xmax']:
+				binning[fs_chn][pd_chn].append(x_cur)
+				x_cur += ctf_plot_param['mrec']['binsize']
+			binning[fs_chn][pd_chn] = array('d',binning[fs_chn][pd_chn])
+
+bkg_mrec_hists_rebin = OrderedDict()
+sig_mrec_hists_rebin = OrderedDict()
+bkg_mrec_stack_rebin = OrderedDict()
+tot_mrec_hists = OrderedDict()
+mrec_files = OrderedDict()
+for fs_chn in channels:
+	mrec_files[fs_chn] = OrderedDict()
+	sig_mrec_hists_rebin[fs_chn] = OrderedDict()
+	bkg_mrec_hists_rebin[fs_chn] = OrderedDict()
+	bkg_mrec_stack_rebin[fs_chn] = OrderedDict()
+	tot_mrec_hists[fs_chn] = OrderedDict()
+	canvas_mrec[fs_chn] = ROOT.TCanvas(
+		fs_chn + "_mrec", "m_rec plot for the " + fs_chn + " channel",
+		hist_pixel_x * num_hist_x, hist_pixel_y * num_hist_y
+	)
+	canvas_mrec[fs_chn].Divide(num_hist_x, num_hist_y)
+	pad_titles = OrderedDict()
+	i_pad = 1
+	for sig_pd_chn, sig_hist in sig_mrec_hists[fs_chn].items():
+		mrec_files[fs_chn][sig_pd_chn] = ROOT.TFile(
+			combine_path + 'mrec_' + fs_chn + '_' + sig_pd_chn + '_' +
+			output_suffix + '_' + bin_option + '.root',
+			'RECREATE'
+		)
+		mrec_files[fs_chn][sig_pd_chn].cd()
+		tot_mrec_hists[fs_chn][sig_pd_chn] = ROOT.TH1D(
+			'tot_mrec_' + fs_chn + '_' + sig_pd_chn,
+			'tot_mrec_' + fs_chn + '_' + sig_pd_chn,
+			len(binning[fs_chn][sig_pd_chn]) - 1,
+			binning[fs_chn][sig_pd_chn]
+		)
+		canvas_mrec[fs_chn].cd(i_pad)
+		sig_mrec_hists_rebin[fs_chn][sig_pd_chn] = atb.Rebin(
+			sig_hist, binning[fs_chn][sig_pd_chn]
+		)
+		tot_mrec_hists[fs_chn][sig_pd_chn].Add(
+			sig_mrec_hists_rebin[fs_chn][sig_pd_chn]
+		)
+		# set plotting style for the hists
+		sig_mrec_hists_rebin[fs_chn][sig_pd_chn].SetLineColor(ROOT.kRed)
+		sig_mrec_hists_rebin[fs_chn][sig_pd_chn].SetLineWidth(sig_linewidth)
+		sig_mrec_hists_rebin[fs_chn][sig_pd_chn].SetLineStyle(sig_linestyle)
+		sig_rebin_ymax = sig_mrec_hists_rebin[fs_chn][sig_pd_chn].GetBinContent(
+			sig_mrec_hists_rebin[fs_chn][sig_pd_chn].GetMaximumBin()
+		)
+		sig_mrec_hists_rebin[fs_chn][sig_pd_chn].Sumw2()
+		sig_mrec_hists_rebin[fs_chn][sig_pd_chn].Write()
+		bkg_mrec_stack_rebin[fs_chn][sig_pd_chn] = ROOT.THStack(
+			'hs_bkg_' + fs_chn + '_mrec_rebin', ""
+		)
+		bkg_mrec_hists_rebin[fs_chn][sig_pd_chn] = OrderedDict()
+		for bkg_pd_chn, bkg_hist in bkg_mrec_hists[fs_chn].items():
+			bkg_mrec_hists_rebin[fs_chn][sig_pd_chn][bkg_pd_chn] = atb.Rebin(
+				bkg_hist, binning[fs_chn][sig_pd_chn]
+			)
+			tot_mrec_hists[fs_chn][sig_pd_chn].Add(
+				bkg_mrec_hists_rebin[fs_chn][sig_pd_chn][bkg_pd_chn]
+			)
+			bkg_mrec_hists_rebin[fs_chn][sig_pd_chn][bkg_pd_chn].SetLineColor(
+				bkg_linecolor)
+			bkg_mrec_hists_rebin[fs_chn][sig_pd_chn][bkg_pd_chn].SetFillColor(
+				bkg_fillcolors[bkg_pd_chn])
+			bkg_mrec_hists_rebin[fs_chn][sig_pd_chn][bkg_pd_chn].SetLineWidth(
+				bkg_linewidth)
+			bkg_mrec_hists_rebin[fs_chn][sig_pd_chn][bkg_pd_chn].SetLineStyle(
+				bkg_linestyle)
+			bkg_mrec_stack_rebin[fs_chn][sig_pd_chn].Add(
+				bkg_mrec_hists_rebin[fs_chn][sig_pd_chn][bkg_pd_chn]
+			) 
+			bkg_mrec_hists_rebin[fs_chn][sig_pd_chn][bkg_pd_chn].Sumw2()
+			bkg_mrec_hists_rebin[fs_chn][sig_pd_chn][bkg_pd_chn].Write()
+
+		tot_mrec_hists[fs_chn][sig_pd_chn].Write()
+		# calculate the ymax of stacked bkgs
+		bkg_mrec_stack_rebin_ymax = 0
+		for i_bin in np.arange(1, len(binning[fs_chn][sig_pd_chn]) + 1):
+			sum_bin_content = 0
+			for bkg_pd_chn, hist in bkg_mrec_hists_rebin[fs_chn][sig_pd_chn].items():
+				sum_bin_content += hist.GetBinContent(i_bin)
+			if sum_bin_content > bkg_mrec_stack_rebin_ymax:
+				bkg_mrec_stack_rebin_ymax = sum_bin_content
+		graph_max = max(sig_rebin_ymax,bkg_mrec_stack_rebin_ymax)
+		# automatic adjustment of ymax for the pad
+		if (ctf_plot_param['mrec']['ymax'] *
+		    pad_ymax_ub[ctf_plot_param['mrec']['scale']] < graph_ymax or
+		    ctf_plot_param['mrec']['ymax'] * 
+		    pad_ymax_lb[ctf_plot_param['mrec']['scale']] > graph_ymax):
+			ctf_plot_param['mrec']['ymax'] = graph_ymax * pad_ymax_ratio[
+			                                  ctf_plot_param['mrec']['scale']]
+		if ctf_plot_param['mrec']['scale'] == 'logy': ROOT.gPad.SetLogy()
+		bkg_mrec_stack_rebin[fs_chn][sig_pd_chn].SetMinimum(
+			ctf_plot_param['mrec']['ymin'])
+		bkg_mrec_stack_rebin[fs_chn][sig_pd_chn].SetMaximum(
+			ctf_plot_param['mrec']['ymax'])
+		bkg_mrec_stack_rebin[fs_chn][sig_pd_chn].Draw(bkg_stack_options)
+		bkg_mrec_stack_rebin[fs_chn][sig_pd_chn].GetHistogram().SetXTitle(
+			ctf_plot_param['mrec']['xtitle'])
+		bkg_mrec_stack_rebin[fs_chn][sig_pd_chn].GetHistogram().SetYTitle(
+			'Events/bin')
+		bkg_mrec_stack_rebin[fs_chn][sig_pd_chn].GetHistogram().SetTitleSize(
+			axis_title_textsize, "xy")
+		ROOT.gPad.Update()
+		sig_mrec_hists_rebin[fs_chn][sig_pd_chn].SetMinimum(
+			ctf_plot_param['mrec']['ymin'])
+		sig_mrec_hists_rebin[fs_chn][sig_pd_chn].SetMaximum(
+			ctf_plot_param['mrec']['ymax'])
+		sig_mrec_hists_rebin[fs_chn][sig_pd_chn].Draw("hist, same")
+		ROOT.gPad.Update()
+		if sig_pd_chn == '0p5': scalar_mass = "0.5"
+		else: scalar_mass = sig_pd_chn
+		pad_titles[sig_pd_chn] = ROOT.TLatex(
+			pad_title_x, pad_title_y, "m_{s} = " + scalar_mass + " GeV"
+		)
+		pad_titles[sig_pd_chn].SetNDC()
+		pad_titles[sig_pd_chn].SetTextSize(pad_title_textsize)
+		pad_titles[sig_pd_chn].Draw()
+		if i_pad == 1:
+			canvas_mrec_title = ROOT.TLatex(0, 0.95, fs_chn) 
+			canvas_mrec_title.SetNDC()
+			canvas_mrec_title.SetTextSize(0.1)
+			canvas_mrec_title.Draw()
+		ROOT.gPad.Modified()
+		ROOT.gPad.Update()
+		i_pad += 1
+	canvas_mrec[fs_chn].Print(plot_path + fs_chn + '_mrec_' + output_suffix
+		                          + '_' + bin_option+ "_binning.png")
+
 ctf_hist_file.Close()
-
-
-
-
-
-
-
-
-
-
-
-

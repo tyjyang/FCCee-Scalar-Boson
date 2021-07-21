@@ -4,7 +4,7 @@ kmax    * number of nuisance parameters
 --------------------------------------------------------------------------------
 shapes  2f          signal_region   mu_2f_mrec.root         mu_2f_m_rec
 shapes  4f          signal_region   mu_4f_mrec.root         mu_4f_m_rec
-shapes  4fqq          signal_region   mu_4fqq_mrec.root         mu_4fqq_m_rec
+shapes  4fqq          signal_region  mu_4fqq_mrec.root         mu_4fqq_m_rec
 shapes  Sll         signal_region   mu_0p5_mrec.root        mu_0p5_m_rec
 shapes  data_obs    signal_region   mu_tot_0p5_mrec.root    tot_0p5
 --------------------------------------------------------------------------------
