@@ -21,8 +21,8 @@ combine_path = '../combine/'
 output_suffix = 'IDEA_500MeV'
 ctf_hist_file = ROOT.TFile(hist_path + "cutflow_hists_" + output_suffix + ".root",
                           "RECREATE") # root file to store all cutflow hists
-bin_option = "manual"
-#bin_option = "auto"
+#bin_option = "manual"
+bin_option = "auto"
 channels = ['electron', 'muon']
 lumi = 150 * 10 ** 6
 
@@ -168,6 +168,8 @@ ctf_plot_param['mrec'] = {
 'xtitle':'m_{rec}',
 'scale':'logy'
 }
+max_stat = 0.45 # max ratio between bin error and bin count
+max_sig_stat = 0.45 # for signal
 
 for cutname, params in ctf_plot_param.items():
 	params['binsize'] = (params['xmax'] - params['xmin']) / float(params['nbins'])
@@ -587,8 +589,8 @@ for fs_chn in channels:
 			b = atb.AutoRebin(
 				bkg_mrec_tot[fs_chn].Clone("b_bkg_copy"), 
 				hist.Clone("h_sig_copy"), 
-				0.2, 
-				0.2
+				max_stat, 
+				max_sig_stat
 			)
 			b.rebin() 
 			binning[fs_chn][pd_chn] = array('d',b.getBinArray()) #enforcing type 
