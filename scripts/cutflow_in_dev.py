@@ -21,8 +21,8 @@ combine_path = '../combine/'
 output_suffix = 'IDEA_500MeV'
 ctf_hist_file = ROOT.TFile(hist_path + "cutflow_hists_" + output_suffix + ".root",
                           "RECREATE") # root file to store all cutflow hists
-#bin_option = "manual"
-bin_option = "auto"
+bin_option = "manual"
+#bin_option = "auto"
 channels = ['electron', 'muon']
 lumi = 150 * 10 ** 6
 
@@ -47,7 +47,7 @@ bkg_ntuple_filenames = OrderedDict([
                 'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root')),
 ('4f-2mutau2l',('ee4lepton_mutau_photon500:electron-muon:pt-eta-phi-cos_theta-'
                 'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root')),
-('4f-2e2l',    ('ee4eequark_electron_photon500:electron-muon:pt-eta-phi-cos_theta-'
+('4f-2e2l',    ('ee4lepton_electron_photon500:electron-muon:pt-eta-phi-cos_theta-'
                 'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root')),
 ('4f-2mutau2q',('ee4lepquark_mutau_photon500:electron-muon:pt-eta-phi-cos_theta-'
                 'alpha-p_mag-m_inv-m_rec-p_mag_missing-cos_theta_p_missing.root')),
@@ -159,8 +159,8 @@ ctf_plot_param['m_inv'] = {
 }
 ctf_plot_param['mrec'] = {
 'xmin':-5, 
-'xmax':40,
-'nbins':45, 
+'xmax':30,
+'nbins':35, 
 'ymin':1000, 
 'ymax':100,
 'xvar':'m_rec',
@@ -168,9 +168,35 @@ ctf_plot_param['mrec'] = {
 'xtitle':'m_{rec}',
 'scale':'logy'
 }
-max_stat = 0.45 # max ratio between bin error and bin count
-max_sig_stat = 0.45 # for signal
-
+max_stat = OrderedDict()# max ratio between bin error and bin count
+max_sig_stat = OrderedDict() # for signal
+for fs_chn in channels:
+	max_stat[fs_chn] = OrderedDict()
+	max_sig_stat[fs_chn] = OrderedDict()
+max_stat['electron']['0p5'] = 0.2
+max_sig_stat['electron']['0p5'] = 0.02
+max_stat['electron']['2'] = 0.25
+max_sig_stat['electron']['2'] = 0.25
+max_stat['electron']['5'] = 0.25
+max_sig_stat['electron']['5'] = 0.25
+max_stat['electron']['10'] = 0.43
+max_sig_stat['electron']['10'] = 0.43
+max_stat['electron']['15'] = 0.5
+max_sig_stat['electron']['15'] = 0.5
+max_stat['electron']['25'] = 0.4
+max_sig_stat['electron']['25'] = 0.4
+max_stat['muon']['0p5'] = 0.25
+max_sig_stat['muon']['0p5'] = 0.05#0.06
+max_stat['muon']['2'] =  0.25
+max_sig_stat['muon']['2'] = 0.25
+max_stat['muon']['5'] = 0.23
+max_sig_stat['muon']['5'] = 0.23
+max_stat['muon']['10'] =  0.3
+max_sig_stat['muon']['10'] = 0.12
+max_stat['muon']['15'] =  0.15
+max_sig_stat['muon']['15'] = 0.05
+max_stat['muon']['25'] = 0.3
+max_sig_stat['muon']['25'] = 0.3
 for cutname, params in ctf_plot_param.items():
 	params['binsize'] = (params['xmax'] - params['xmin']) / float(params['nbins'])
 	decimal_place = str(params['binsize'])[::-1].find('.')
@@ -221,8 +247,8 @@ arrow_linewidth = 2
 ## canvas 
 hist_pixel_x = 600
 hist_pixel_y = 450
-num_hist_x = 3
-num_hist_y = 2
+num_hist_x = 2
+num_hist_y = 3
 ROOT.gStyle.SetHistTopMargin(0)
 #ROOT.gStyle.SetHistBottomMargin(0)
 #ROOT.gStyle.SetPadTopMargin(0)
@@ -589,19 +615,30 @@ for fs_chn in channels:
 			b = atb.AutoRebin(
 				bkg_mrec_tot[fs_chn].Clone("b_bkg_copy"), 
 				hist.Clone("h_sig_copy"), 
-				max_stat, 
-				max_sig_stat
+				max_stat[fs_chn][pd_chn], 
+				max_sig_stat[fs_chn][pd_chn]
 			)
 			b.rebin() 
 			binning[fs_chn][pd_chn] = array('d',b.getBinArray()) #enforcing type 
 		elif bin_option == "manual":
+			'''
 			x_cur = ctf_plot_param['mrec']['xmin']
 			binning[fs_chn][pd_chn] = array('d')
 			while x_cur <= ctf_plot_param['mrec']['xmax']:
 				binning[fs_chn][pd_chn].append(x_cur)
 				x_cur += ctf_plot_param['mrec']['binsize']
-			binning[fs_chn][pd_chn] = array('d',binning[fs_chn][pd_chn])
+			'''
+			binning[fs_chn]['0p5'] = array('d', [-5.0,-3.0,-2.0, -1.0, 1.0,2.0, 3.0,5.0, 7.0, 12.0, 30.0])
+			binning[fs_chn]['2'] = array('d', [-5.0, -3, -1,1,3, 6.0, 8.0, 11.0, 30.0])
+			binning[fs_chn]['5'] = array('d', [-5.0, -2.5, 0.0,2.0, 4.0, 6.0, 8.0, 12.0, 30.0])
+			binning[fs_chn]['10'] = array('d', [-5.0, 0.0, 4.0, 9, 15.0,  30.0])
+#			binning[fs_chn]['10'] = array('d', [-5.0, 0.0, 4.0, 8.0, 12.0, 16.0, 30.0])
 
+			binning[fs_chn]['15'] = array('d', [-5, 0, 5, 10, 20, 30.0])
+#			binning[fs_chn]['15'] = array('d', [-5,-2,1,4,7,10, 14,17, 20, 30.0])
+			binning[fs_chn]['25'] = array('d', [-5,-4.5,-4,-3.5,-3,-2.5,-2,-1.5,-1,-0.5,0,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,9, 10,12, 15, 20, 30.0])
+			#binning[fs_chn][pd_chn] = array('d',binning[fs_chn][pd_chn])
+print binning
 bkg_mrec_hists_rebin = OrderedDict()
 sig_mrec_hists_rebin = OrderedDict()
 bkg_mrec_stack_rebin = OrderedDict()
@@ -630,12 +667,12 @@ for fs_chn in channels:
 		tot_mrec_hists[fs_chn][sig_pd_chn] = ROOT.TH1D(
 			'tot_mrec_' + fs_chn + '_' + sig_pd_chn,
 			'tot_mrec_' + fs_chn + '_' + sig_pd_chn,
-			len(binning[fs_chn][sig_pd_chn]) - 1,
-			binning[fs_chn][sig_pd_chn]
+			len(binning['electron'][sig_pd_chn]) - 1,
+			binning['electron'][sig_pd_chn]
 		)
 		canvas_mrec[fs_chn].cd(i_pad)
 		sig_mrec_hists_rebin[fs_chn][sig_pd_chn] = atb.Rebin(
-			sig_hist, binning[fs_chn][sig_pd_chn]
+			sig_hist, binning['electron'][sig_pd_chn]
 		)
 		tot_mrec_hists[fs_chn][sig_pd_chn].Add(
 			sig_mrec_hists_rebin[fs_chn][sig_pd_chn]
@@ -655,7 +692,7 @@ for fs_chn in channels:
 		bkg_mrec_hists_rebin[fs_chn][sig_pd_chn] = OrderedDict()
 		for bkg_pd_chn, bkg_hist in bkg_mrec_hists[fs_chn].items():
 			bkg_mrec_hists_rebin[fs_chn][sig_pd_chn][bkg_pd_chn] = atb.Rebin(
-				bkg_hist, binning[fs_chn][sig_pd_chn]
+				bkg_hist, binning['electron'][sig_pd_chn]
 			)
 			tot_mrec_hists[fs_chn][sig_pd_chn].Add(
 				bkg_mrec_hists_rebin[fs_chn][sig_pd_chn][bkg_pd_chn]
@@ -677,7 +714,7 @@ for fs_chn in channels:
 		tot_mrec_hists[fs_chn][sig_pd_chn].Write()
 		# calculate the ymax of stacked bkgs
 		bkg_mrec_stack_rebin_ymax = 0
-		for i_bin in np.arange(1, len(binning[fs_chn][sig_pd_chn]) + 1):
+		for i_bin in np.arange(1, len(binning['electron'][sig_pd_chn]) + 1):
 			sum_bin_content = 0
 			for bkg_pd_chn, hist in bkg_mrec_hists_rebin[fs_chn][sig_pd_chn].items():
 				sum_bin_content += hist.GetBinContent(i_bin)
@@ -730,3 +767,7 @@ for fs_chn in channels:
 		                          + '_' + bin_option+ "_binning.png")
 
 ctf_hist_file.Close()
+#for key, f in sig_ntuple_filepaths.items():
+#	print key, hlp.get_num_evts(f, "Delphes")
+#for key, f in bkg_ntuple_filepaths.items():
+#	print key, hlp.get_num_evts(f, "Delphes")

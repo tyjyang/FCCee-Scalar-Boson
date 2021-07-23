@@ -1,3 +1,9 @@
+#######################################################
+# README
+# This is the verbose version of the cutflow script. 
+# For reference purposes only, 
+# avoid direct edits or production with this script.
+#######################################################
 import ROOT
 import numpy as np
 import time

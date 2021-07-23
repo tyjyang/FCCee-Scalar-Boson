@@ -188,7 +188,7 @@ def makePlotUpperLimit():
     latex.SetTextAlign(13)
     latex.SetTextFont(42)
     latex.SetTextSize(0.045)
-    latex.DrawLatex(0.15, 0.985, "#bf{FCC-ee} #scale[0.7]{#it{Performance}}")
+    latex.DrawLatex(0.15, 0.985, "#bf{FCC-ee} #scale[0.7]{#it{Simulation}}")
     
     
     ROOT.gPad.SetTicks()
@@ -217,8 +217,8 @@ if __name__ == "__main__":
     cfg_xtitle = "m_{S^{0}} (GeV)"
     cfg_ytitle = " limit on k for (#sigma_{S^{0}Z^{0}} = k * #sigma_{H^{0}Z^{0}} (m_{H^{0}_{SM}} = m_{S^{0}}))"
     
-    cfg_ymin, cfg_ymax = 0.01, 3 
+    cfg_ymin, cfg_ymax = 0.001,1 
     
-    fout = "limitPlot.png"
+    fout = "limitPlot_IDEA_500MeV_auto.png"
 
     makePlotUpperLimit()
