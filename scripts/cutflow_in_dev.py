@@ -161,7 +161,7 @@ ctf_plot_param['mrec'] = {
 'xmin':-5, 
 'xmax':30,
 'nbins':35, 
-'ymin':1000, 
+'ymin':50000, 
 'ymax':100,
 'xvar':'m_rec',
 'xunit':'GeV',
