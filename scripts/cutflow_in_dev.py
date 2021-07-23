@@ -642,7 +642,7 @@ for fs_chn in channels:
 
 			binning[fs_chn]['15'] = array('d', [-5, 10, 18, 30.0])
 #			binning[fs_chn]['15'] = array('d', [-5,-2,1,4,7,10, 14,17, 20, 30.0])
-			binning[fs_chn]['25'] = array('d', [-5, 0, 5, 10,15, 20,22, 30.0])
+			binning[fs_chn]['25'] = array('d', [-5,7.5,15, 20, 30.0])
 #			binning[fs_chn]['25'] = array('d', [-5,-4.5,-4,-3.5,-3,-2.5,-2,-1.5,-1,-0.5,0,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,9, 10,12, 15, 20, 30.0])
 			#binning[fs_chn][pd_chn] = array('d',binning[fs_chn][pd_chn])
 print binning
@@ -777,9 +777,9 @@ for fs_chn in channels:
 		                          + '_' + bin_option+ "_binning.png")
 
 ctf_hist_file.Close()
-for key, f in sig_ntuple_filepaths.items():
-	delphes_filepath = delphes_path + hlp.get_delphes_filename(f)
-	print key, hlp.get_num_evts(delphes_filepath, "Delphes")
-for key, f in bkg_ntuple_filepaths.items():
-	delphes_filepath = delphes_path + hlp.get_delphes_filename(f)
-	print key, hlp.get_num_evts(delphes_filepath, "Delphes")
+#for key, f in sig_ntuple_filepaths.items():
+#	delphes_filepath = delphes_path + hlp.get_delphes_filename(f)
+#	print key, hlp.get_num_evts(delphes_filepath, "Delphes")
+#for key, f in bkg_ntuple_filepaths.items():
+#	delphes_filepath = delphes_path + hlp.get_delphes_filename(f)
+#	print key, hlp.get_num_evts(delphes_filepath, "Delphes")
