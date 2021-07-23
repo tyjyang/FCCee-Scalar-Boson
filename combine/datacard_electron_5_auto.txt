@@ -1,0 +1,22 @@
+imax    * number of bins
+jmax    * number of processes minus 1
+kmax    * number of nuisance parameters
+--------------------------------------------------------------------------------
+shapes  2f        signal_region   mrec_electron_5_IDEA_500MeV_auto.root hist_electron_2f_mrec
+shapes  4f        signal_region   mrec_electron_5_IDEA_500MeV_auto.root hist_electron_4f-4l_mrec
+shapes  4fqq      signal_region   mrec_electron_5_IDEA_500MeV_auto.root hist_electron_4f-2l2q_mrec
+shapes  Sll       signal_region   mrec_electron_5_IDEA_500MeV_auto.root hist_electron_5_mrec
+shapes  data_obs  signal_region   mrec_electron_5_IDEA_500MeV_auto.root tot_mrec_electron_5
+--------------------------------------------------------------------------------
+bin          signal_region
+observation  -1
+--------------------------------------------------------------------------------
+bin                        signal_region   signal_region   signal_region   signal_region  
+process                    Sll             2f              4f              4fqq
+process                    0               1               2               3
+rate                       -1              -1              -1              -1
+--------------------------------------------------------------------------------
+lumi              lnN     1500000          1500000         1500000        1500000 
+#xsec_Sll          lnN     2.186           -               -             -
+#xsec_Zleplep      lnN     -               1.50            -             -
+signal_region autoMCStats 0

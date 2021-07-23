@@ -248,8 +248,8 @@ arrow_linewidth = 2
 ## canvas 
 hist_pixel_x = 600
 hist_pixel_y = 450
-num_hist_x = 2
-num_hist_y = 3
+num_hist_x = 3
+num_hist_y = 2
 ROOT.gStyle.SetHistTopMargin(0)
 ROOT.gStyle.SetLegendTextSize(0.05)
 #ROOT.gStyle.SetTitleFontSize(0.1)
@@ -640,8 +640,8 @@ for fs_chn in channels:
 			binning[fs_chn]['10'] = array('d', [-5.0, 0.0, 4.0, 9, 15.0,  30.0])
 #			binning[fs_chn]['10'] = array('d', [-5.0, 0.0, 4.0, 8.0, 12.0, 16.0, 30.0])
 
-			binning[fs_chn]['15'] = array('d', [-5, 10, 18, 30.0])
-#			binning[fs_chn]['15'] = array('d', [-5,-2,1,4,7,10, 14,17, 20, 30.0])
+#			binning[fs_chn]['15'] = array('d', [-5, 10, 18, 30.0])
+			binning[fs_chn]['15'] = array('d', [-5,0,5,10,14,16,18,30])
 			binning[fs_chn]['25'] = array('d', [-5,7.5,15, 20, 30.0])
 #			binning[fs_chn]['25'] = array('d', [-5,-4.5,-4,-3.5,-3,-2.5,-2,-1.5,-1,-0.5,0,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,9, 10,12, 15, 20, 30.0])
 			#binning[fs_chn][pd_chn] = array('d',binning[fs_chn][pd_chn])
