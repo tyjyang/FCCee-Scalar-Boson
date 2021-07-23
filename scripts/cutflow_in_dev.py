@@ -225,6 +225,7 @@ bkg_fillcolors = {
 bkg_linewidth = 1
 bkg_linestyle = 1
 
+hist_label_size = 0.04
 ## stacks and pads
 axis_title_textsize = 0.05
 sig_stack_options = "hist, same, nostack"
@@ -250,20 +251,22 @@ hist_pixel_y = 450
 num_hist_x = 2
 num_hist_y = 3
 ROOT.gStyle.SetHistTopMargin(0)
+ROOT.gStyle.SetLegendTextSize(0.05)
+#ROOT.gStyle.SetTitleFontSize(0.1)
 #ROOT.gStyle.SetHistBottomMargin(0)
 #ROOT.gStyle.SetPadTopMargin(0)
 #ROOT.gStyle.SetPadBottomMargin(0)
 canvas_titles = OrderedDict()
 canvas_title_x = 0.1
 canvas_title_y = 0.9
-canvas_titles['electron'] = "e^{+}e^{-} events @ #sqrt{s} = 91.2 GeV"
-canvas_titles['muon']     = "#mu^{+}#mu^{-} events @ #sqrt{s} = 91.2 GeV"
+canvas_titles['electron'] = "e^{+}e^{-} events"
+canvas_titles['muon']     = "#mu^{+}#mu^{-} events"
 canvas_title_x = 0.1
 canvas_title_y = 0.9
-canvas_title_textsize = 0.05
+canvas_title_textsize = 0.15
 pad_title_x = 0.4
 pad_title_y = 0.95
-pad_title_textsize = 0.05
+pad_title_textsize = 0.1
 ## legends
 legend_x_bl = 0.1 # x-coordinate of the bottom left point of the legend box
 legend_y_bl = 0.6
@@ -344,16 +347,16 @@ ctf_hist_file.cd()
 ########################
 # make cutflow tables #
 ########################
-'''
+#'''
 
 md_table_string = ctf.make_cutflow_table(sig_trees, sig_w, bkg_trees, bkg_w,
                                          delphes_path, sig_ntuple_filepaths, cuts,
-                                         sig_eff = True)
+                                         sig_eff = False)
 for chn, table in md_table_string.items():
 	mdfile = open(table_path + chn + "_cutflow_table_" + output_suffix + ".md", "w")
 	mdfile.write(table)
 	mdfile.close()
-'''
+#'''
 
 ######################################
 # merge trees from same bkg channel #
@@ -491,6 +494,9 @@ for fs_chn in channels:
 		ctf_plot_param[cutname]['ytitle'])
 		bkg_stacks[fs_chn][cutname].GetHistogram().SetTitleSize(
 		axis_title_textsize, "xy")
+		bkg_stacks[fs_chn][cutname].GetHistogram().SetLabelSize(
+			hist_label_size, "xy"
+		)
 		ROOT.gPad.Update()
 		sig_stacks[fs_chn][cutname].SetMinimum(ctf_plot_param[cutname]['ymin'])
 		sig_stacks[fs_chn][cutname].SetMaximum(ctf_plot_param[cutname]['ymax'])
@@ -634,9 +640,10 @@ for fs_chn in channels:
 			binning[fs_chn]['10'] = array('d', [-5.0, 0.0, 4.0, 9, 15.0,  30.0])
 #			binning[fs_chn]['10'] = array('d', [-5.0, 0.0, 4.0, 8.0, 12.0, 16.0, 30.0])
 
-			binning[fs_chn]['15'] = array('d', [-5, 0, 5, 10, 20, 30.0])
+			binning[fs_chn]['15'] = array('d', [-5, 10, 18, 30.0])
 #			binning[fs_chn]['15'] = array('d', [-5,-2,1,4,7,10, 14,17, 20, 30.0])
-			binning[fs_chn]['25'] = array('d', [-5,-4.5,-4,-3.5,-3,-2.5,-2,-1.5,-1,-0.5,0,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,9, 10,12, 15, 20, 30.0])
+			binning[fs_chn]['25'] = array('d', [-5, 0, 5, 10,15, 20,22, 30.0])
+#			binning[fs_chn]['25'] = array('d', [-5,-4.5,-4,-3.5,-3,-2.5,-2,-1.5,-1,-0.5,0,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,9, 10,12, 15, 20, 30.0])
 			#binning[fs_chn][pd_chn] = array('d',binning[fs_chn][pd_chn])
 print binning
 bkg_mrec_hists_rebin = OrderedDict()
@@ -740,6 +747,9 @@ for fs_chn in channels:
 			'Events/bin')
 		bkg_mrec_stack_rebin[fs_chn][sig_pd_chn].GetHistogram().SetTitleSize(
 			axis_title_textsize, "xy")
+		bkg_mrec_stack_rebin[fs_chn][sig_pd_chn].GetHistogram().SetLabelSize(
+			hist_label_size, "xy"
+		)
 		ROOT.gPad.Update()
 		sig_mrec_hists_rebin[fs_chn][sig_pd_chn].SetMinimum(
 			ctf_plot_param['mrec']['ymin'])
@@ -767,7 +777,9 @@ for fs_chn in channels:
 		                          + '_' + bin_option+ "_binning.png")
 
 ctf_hist_file.Close()
-#for key, f in sig_ntuple_filepaths.items():
-#	print key, hlp.get_num_evts(f, "Delphes")
-#for key, f in bkg_ntuple_filepaths.items():
-#	print key, hlp.get_num_evts(f, "Delphes")
+for key, f in sig_ntuple_filepaths.items():
+	delphes_filepath = delphes_path + hlp.get_delphes_filename(f)
+	print key, hlp.get_num_evts(delphes_filepath, "Delphes")
+for key, f in bkg_ntuple_filepaths.items():
+	delphes_filepath = delphes_path + hlp.get_delphes_filename(f)
+	print key, hlp.get_num_evts(delphes_filepath, "Delphes")
