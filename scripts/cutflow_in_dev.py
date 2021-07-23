@@ -248,8 +248,8 @@ arrow_linewidth = 2
 ## canvas 
 hist_pixel_x = 600
 hist_pixel_y = 450
-num_hist_x = 3
-num_hist_y = 2
+num_hist_x = 2
+num_hist_y = 3
 ROOT.gStyle.SetHistTopMargin(0)
 ROOT.gStyle.SetLegendTextSize(0.05)
 #ROOT.gStyle.SetTitleFontSize(0.1)
