@@ -182,9 +182,9 @@ max_sig_stat['electron']['5'] = 0.25
 max_stat['electron']['10'] = 0.43
 max_sig_stat['electron']['10'] = 0.43
 max_stat['electron']['15'] = 0.5
-max_sig_stat['electron']['15'] = 0.5
-max_stat['electron']['25'] = 0.4
-max_sig_stat['electron']['25'] = 0.4
+max_sig_stat['electron']['15'] = 1000
+max_stat['electron']['25'] = 0.25
+max_sig_stat['electron']['25'] = 0.25
 max_stat['muon']['0p5'] = 0.25
 max_sig_stat['muon']['0p5'] = 0.05#0.06
 max_stat['muon']['2'] =  0.25
@@ -193,8 +193,8 @@ max_stat['muon']['5'] = 0.23
 max_sig_stat['muon']['5'] = 0.23
 max_stat['muon']['10'] =  0.3
 max_sig_stat['muon']['10'] = 0.12
-max_stat['muon']['15'] =  0.15
-max_sig_stat['muon']['15'] = 0.05
+max_stat['muon']['15'] =  0.2
+max_sig_stat['muon']['15'] =1000 
 max_stat['muon']['25'] = 0.3
 max_sig_stat['muon']['25'] = 0.3
 for cutname, params in ctf_plot_param.items():
@@ -641,8 +641,10 @@ for fs_chn in channels:
 #			binning[fs_chn]['10'] = array('d', [-5.0, 0.0, 4.0, 8.0, 12.0, 16.0, 30.0])
 
 #			binning[fs_chn]['15'] = array('d', [-5, 10, 18, 30.0])
-			binning[fs_chn]['15'] = array('d', [-5,0,5,10,14,16,18,30])
-			binning[fs_chn]['25'] = array('d', [-5,7.5,15, 20, 30.0])
+#			binning[fs_chn]['15'] = array('d', [-5,-3,-2,0,2.5,5,7.5,10,14,16,18,22,30])
+#			binning[fs_chn]['15'] = array('d', [-5.0, 16.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 27.0, 30.0])
+			binning[fs_chn]['15'] = array('d', [-5.0, 16, 19,20, 21.0, 22.0, 23.0, 24.0, 27.0, 30.0])
+			binning[fs_chn]['25'] = array('d', [-5,25,26,27,28,30.0])
 #			binning[fs_chn]['25'] = array('d', [-5,-4.5,-4,-3.5,-3,-2.5,-2,-1.5,-1,-0.5,0,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,9, 10,12, 15, 20, 30.0])
 			#binning[fs_chn][pd_chn] = array('d',binning[fs_chn][pd_chn])
 print binning
