@@ -16,7 +16,7 @@ delphes_path = '/scratch5/arapyan/fcc_ee/scalar_delphes_idea/'
 plot_path = '../plots/'
 table_path = '../tables/'
 hist_path = '../hists/'
-combine_path = '../combine/unbinned/'
+combine_path = '../combine/unbinned'
 #output_suffix = 'IDEA_500MeV_no_photon_veto'
 output_suffix = 'IDEA_500MeV'
 ctf_hist_file = ROOT.TFile(hist_path + "cutflow_hists_" + output_suffix + ".root",
@@ -248,8 +248,8 @@ arrow_linewidth = 2
 ## canvas 
 hist_pixel_x = 600
 hist_pixel_y = 450
-num_hist_x = 2
-num_hist_y = 3
+num_hist_x = 3
+num_hist_y = 2
 #ROOT.gStyle.SetHistTopMargin(0)
 ROOT.gStyle.SetLegendTextSize(0.1)
 #ROOT.gStyle.SetTitleFontSize(0.1)
@@ -349,7 +349,7 @@ ctf_hist_file.cd()
 ########################
 # make cutflow tables #
 ########################
-#'''
+'''
 
 md_table_string = ctf.make_cutflow_table(sig_trees, sig_w, bkg_trees, bkg_w,
                                          delphes_path, sig_ntuple_filepaths, cuts,
@@ -358,7 +358,7 @@ for chn, table in md_table_string.items():
 	mdfile = open(table_path + chn + "_cutflow_table_" + output_suffix + ".md", "w")
 	mdfile.write(table)
 	mdfile.close()
-#'''
+'''
 
 ######################################
 # merge trees from same bkg channel #
@@ -386,7 +386,7 @@ for fs_chn in channels:
 #######################
 # make cutflow plots #
 #######################
-#'''
+'''
 sig_hists = OrderedDict()
 bkg_hists = OrderedDict()
 sig_mrec_hists = OrderedDict()  
@@ -561,7 +561,7 @@ for fs_chn in channels:
 	canvas_title.Draw()
 	canvases[fs_chn].Print(plot_path + fs_chn + '_cutflow_plot_' + output_suffix
 	                       + ".png")
-#'''
+'''
 ###############
 # mrec plots #
 ###############
@@ -666,8 +666,8 @@ for fs_chn in channels:
 			b.rebin() 
 			binning[fs_chn][pd_chn] = array('d',b.getBinArray()) #enforcing type 
 		elif bin_option == "manual":
-			binning['muon'] = OrderedDict()
-			'''
+			#binning['muon'] = OrderedDict()
+			#'''
 			x_cur = ctf_plot_param['mrec']['xmin']
 			binning[fs_chn][pd_chn] = array('d')
 			while x_cur <= ctf_plot_param['mrec']['xmax']:
@@ -680,7 +680,7 @@ for fs_chn in channels:
 			binning['electron']['2'] = array('d', [-5.0, -2.0, -1.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 12.0, 19.0, 30.0])
 			binning['muon']['2'] = array('d', [-5.0, -2.5, 0.0,2.0, 4.0, 6.0, 8.0, 12.0, 30.0])
 			binning['muon']['5'] = array('d', [-5.0, 2, 4.0, 6.0, 8, 12.0, 30.0]) 
-			binning['electron']['5'] = array('d', [-5.0, 4.0, 6.0, 9.0, 16.0, 30.0])
+			binning['electron']['5'] = array('d', [-5.0,2, 4.0, 6.0, 8.0, 12.0, 30.0])
 			binning[fs_chn]['10'] = array('d', [-5.0, 0.0, 4.0, 9, 15.0,  30.0])
 #			binning[fs_chn]['10'] = array('d', [-5.0, 0.0, 4.0, 8.0, 12.0, 16.0, 30.0])
 
@@ -693,6 +693,7 @@ for fs_chn in channels:
 			binning['muon']['25'] = array('d', [-5,25,26,27,28,30.0])
 #			binning[fs_chn]['25'] = array('d', [-5,-4.5,-4,-3.5,-3,-2.5,-2,-1.5,-1,-0.5,0,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,9, 10,12, 15, 20, 30.0])
 			#binning[fs_chn][pd_chn] = array('d',binning[fs_chn][pd_chn])
+			'''
 print binning
 
 bkg_mrec_hists_rebin = OrderedDict()
