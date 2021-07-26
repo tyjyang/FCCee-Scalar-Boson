@@ -16,7 +16,7 @@ delphes_path = '/scratch5/arapyan/fcc_ee/scalar_delphes_idea/'
 plot_path = '../plots/'
 table_path = '../tables/'
 hist_path = '../hists/'
-combine_path = '../combine/'
+combine_path = '../combine/unbinned/'
 #output_suffix = 'IDEA_500MeV_no_photon_veto'
 output_suffix = 'IDEA_500MeV'
 ctf_hist_file = ROOT.TFile(hist_path + "cutflow_hists_" + output_suffix + ".root",
@@ -177,8 +177,8 @@ max_stat['electron']['0p5'] = 0.2
 max_sig_stat['electron']['0p5'] = 0.02
 max_stat['electron']['2'] = 0.25
 max_sig_stat['electron']['2'] = 0.25
-max_stat['electron']['5'] = 0.25
-max_sig_stat['electron']['5'] = 0.25
+max_stat['electron']['5'] = 0.2
+max_sig_stat['electron']['5'] = 0.2
 max_stat['electron']['10'] = 0.43
 max_sig_stat['electron']['10'] = 0.43
 max_stat['electron']['15'] = 0.5
@@ -189,8 +189,8 @@ max_stat['muon']['0p5'] = 0.25
 max_sig_stat['muon']['0p5'] = 0.05#0.06
 max_stat['muon']['2'] =  0.25
 max_sig_stat['muon']['2'] = 0.25
-max_stat['muon']['5'] = 0.23
-max_sig_stat['muon']['5'] = 0.23
+max_stat['muon']['5'] = 0.2
+max_sig_stat['muon']['5'] = 0.2
 max_stat['muon']['10'] =  0.3
 max_sig_stat['muon']['10'] = 0.12
 max_stat['muon']['15'] =  0.2
@@ -384,6 +384,7 @@ for fs_chn in channels:
 #######################
 # make cutflow plots #
 #######################
+'''
 sig_hists = OrderedDict()
 bkg_hists = OrderedDict()
 sig_mrec_hists = OrderedDict()  
@@ -557,18 +558,26 @@ for fs_chn in channels:
 	canvas_title.Draw()
 	canvases[fs_chn].Print(plot_path + fs_chn + '_cutflow_plot_' + output_suffix
 	                       + ".png")
-
+'''
 ###############
 # mrec plots #
 ###############
+cumulative_cutstr = OrderedDict()
+for fs_chn in channels:
+	cumulative_cutstr[fs_chn] = ""
+	for cutname, cutstring in cuts[fs_chn].items():
+		if cumulative_cutstr[fs_chn] != '': cumulative_cutstr[fs_chn] += '&&'
+		cumulative_cutstr[fs_chn] += cutstring
 sig_mrec_hists = OrderedDict()
 bkg_mrec_hists = OrderedDict()
 bkg_mrec_tot = OrderedDict()
+bkg_nevts_tot = OrderedDict()
+sig_nevts = OrderedDict()
 canvas_mrec = OrderedDict()
 for fs_chn in channels:
 	sig_mrec_hists[fs_chn] = OrderedDict()
 	bkg_mrec_hists[fs_chn] = OrderedDict()
-	 
+	sig_nevts[fs_chn] = OrderedDict() 
 	for pd_chn, tree in sig_trees[fs_chn].items():
 		hist_title = 'hist_' + fs_chn + '_' + pd_chn + '_mrec'
 		hist_dscrp = hist_title
@@ -580,9 +589,10 @@ for fs_chn in channels:
 			ctf_plot_param['mrec']['xmax'])
 		# fill the cutted trees to the hists
 		tree.Draw(ctf_plot_param['mrec']['xvar'] + ">>" + hist_title, 
-		cumulative_cutstr, "goff")
+		cumulative_cutstr[fs_chn], "goff")
 		# store sum of squared weights to calculate stat uncertainty
 		sig_mrec_hists[fs_chn][pd_chn].Sumw2()
+		sig_nevts[fs_chn][pd_chn] = sig_mrec_hists[fs_chn][pd_chn].Integral()
 		#sig_mrec_hists[fs_chn][pd_chn].Write()
 
 	bkg_mrec_tot[fs_chn] = ROOT.TH1D(
@@ -604,11 +614,37 @@ for fs_chn in channels:
 			ctf_plot_param['mrec']['xmax'])
 		# fill the cutted trees to the hists
 		tree.Draw(ctf_plot_param['mrec']['xvar'] + ">>" + hist_title, 
-		cumulative_cutstr, "goff")
+		cumulative_cutstr[fs_chn], "goff")
 		# store sum of squared weights to calculate stat uncertainty
 		bkg_mrec_hists[fs_chn][pd_chn].Sumw2()
 		#bkg_mrec_hists[fs_chn][pd_chn].Write()
 		bkg_mrec_tot[fs_chn].Add(bkg_mrec_hists[fs_chn][pd_chn])
+	bkg_nevts_tot[fs_chn] = bkg_mrec_tot[fs_chn].Integral()
+snr_vs_mass = OrderedDict()
+canvas_snr = ROOT.TCanvas("snr vs mass","snr vs mass", hist_pixel_x * 2, hist_pixel_y * 1)
+canvas_snr.Divide(2,1)
+mass = array('d', [0.5, 2, 5, 10, 15, 25])
+snr = OrderedDict()
+snr_vs_mass = OrderedDict()
+title = OrderedDict()
+ipad = 1
+for fs_chn in channels:
+	canvas_snr.cd(ipad)
+	snr[fs_chn] = []
+	for i,pd_chn in enumerate(sig_trees[fs_chn].keys()):
+		snr[fs_chn].append(sig_nevts[fs_chn][pd_chn] / np.sqrt(
+		sig_nevts[fs_chn][pd_chn] + bkg_nevts_tot[fs_chn]))
+	snr[fs_chn] = array('d', snr[fs_chn])
+	snr_vs_mass[fs_chn] = ROOT.TGraph(6, mass, snr[fs_chn])
+	snr_vs_mass[fs_chn].SetTitle(fs_chn)
+	snr_vs_mass[fs_chn].GetXaxis().SetTitle("Scalar Boson Mass [GeV]")
+	snr_vs_mass[fs_chn].GetYaxis().SetTitle("#frac{S}{#sqrt{S+B}}")
+	snr_vs_mass[fs_chn].Draw()
+	title[fs_chn] = ROOT.TLatex(0.45, 0.9, fs_chn)
+	title[fs_chn].SetNDC()
+	title[fs_chn].Draw()
+	ipad += 1
+canvas_snr.Print("snr_over_mass.png")
 
 
 # rebin the sig + total bkg histograms
@@ -627,16 +663,20 @@ for fs_chn in channels:
 			b.rebin() 
 			binning[fs_chn][pd_chn] = array('d',b.getBinArray()) #enforcing type 
 		elif bin_option == "manual":
-			'''
+			#binning['muon'] = OrderedDict()
+			
 			x_cur = ctf_plot_param['mrec']['xmin']
 			binning[fs_chn][pd_chn] = array('d')
 			while x_cur <= ctf_plot_param['mrec']['xmax']:
 				binning[fs_chn][pd_chn].append(x_cur)
 				x_cur += ctf_plot_param['mrec']['binsize']
+			
 			'''
 			binning[fs_chn]['0p5'] = array('d', [-5.0,-3.0,-2.0, -1.0, 1.0,2.0, 3.0,5.0, 7.0, 12.0, 30.0])
 			binning[fs_chn]['2'] = array('d', [-5.0, -3, -1,1,3, 6.0, 8.0, 11.0, 30.0])
-			binning[fs_chn]['5'] = array('d', [-5.0, -2.5, 0.0,2.0, 4.0, 6.0, 8.0, 12.0, 30.0])
+			# before binning[fs_chn]['5'] = array('d', [-5.0, -2.5, 0.0,2.0, 4.0, 6.0, 8.0, 12.0, 30.0])
+			binning['muon']['5'] = array('d', [-5.0, 4.0, 6.0, 9.0, 16.0, 30.0]) 
+			binning['electron']['5'] = array('d', [-5.0, 4.0, 5.0, 6.0, 9.0, 10.0, 17.0, 30.0])
 			binning[fs_chn]['10'] = array('d', [-5.0, 0.0, 4.0, 9, 15.0,  30.0])
 #			binning[fs_chn]['10'] = array('d', [-5.0, 0.0, 4.0, 8.0, 12.0, 16.0, 30.0])
 
@@ -647,7 +687,9 @@ for fs_chn in channels:
 			binning[fs_chn]['25'] = array('d', [-5,25,26,27,28,30.0])
 #			binning[fs_chn]['25'] = array('d', [-5,-4.5,-4,-3.5,-3,-2.5,-2,-1.5,-1,-0.5,0,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,9, 10,12, 15, 20, 30.0])
 			#binning[fs_chn][pd_chn] = array('d',binning[fs_chn][pd_chn])
+			'''
 print binning
+
 bkg_mrec_hists_rebin = OrderedDict()
 sig_mrec_hists_rebin = OrderedDict()
 bkg_mrec_stack_rebin = OrderedDict()
@@ -676,12 +718,12 @@ for fs_chn in channels:
 		tot_mrec_hists[fs_chn][sig_pd_chn] = ROOT.TH1D(
 			'tot_mrec_' + fs_chn + '_' + sig_pd_chn,
 			'tot_mrec_' + fs_chn + '_' + sig_pd_chn,
-			len(binning['electron'][sig_pd_chn]) - 1,
-			binning['electron'][sig_pd_chn]
+			len(binning[fs_chn][sig_pd_chn]) - 1,
+			binning[fs_chn][sig_pd_chn]
 		)
 		canvas_mrec[fs_chn].cd(i_pad)
 		sig_mrec_hists_rebin[fs_chn][sig_pd_chn] = atb.Rebin(
-			sig_hist, binning['electron'][sig_pd_chn]
+			sig_hist, binning[fs_chn][sig_pd_chn]
 		)
 		tot_mrec_hists[fs_chn][sig_pd_chn].Add(
 			sig_mrec_hists_rebin[fs_chn][sig_pd_chn]
@@ -701,7 +743,7 @@ for fs_chn in channels:
 		bkg_mrec_hists_rebin[fs_chn][sig_pd_chn] = OrderedDict()
 		for bkg_pd_chn, bkg_hist in bkg_mrec_hists[fs_chn].items():
 			bkg_mrec_hists_rebin[fs_chn][sig_pd_chn][bkg_pd_chn] = atb.Rebin(
-				bkg_hist, binning['electron'][sig_pd_chn]
+				bkg_hist, binning[fs_chn][sig_pd_chn]
 			)
 			tot_mrec_hists[fs_chn][sig_pd_chn].Add(
 				bkg_mrec_hists_rebin[fs_chn][sig_pd_chn][bkg_pd_chn]
@@ -729,7 +771,7 @@ for fs_chn in channels:
 				sum_bin_content += hist.GetBinContent(i_bin)
 			if sum_bin_content > bkg_mrec_stack_rebin_ymax:
 				bkg_mrec_stack_rebin_ymax = sum_bin_content
-		graph_max = max(sig_rebin_ymax,bkg_mrec_stack_rebin_ymax)
+		graph_ymax = max(sig_rebin_ymax,bkg_mrec_stack_rebin_ymax)
 		# automatic adjustment of ymax for the pad
 		if (ctf_plot_param['mrec']['ymax'] *
 		    pad_ymax_ub[ctf_plot_param['mrec']['scale']] < graph_ymax or

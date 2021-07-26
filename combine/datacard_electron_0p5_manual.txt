@@ -16,7 +16,7 @@ process                    Sll             2f              4f              4fqq
 process                    0               1               2               3
 rate                       -1              -1              -1              -1
 --------------------------------------------------------------------------------
-lumi              lnN     1500000          1500000         1500000        1500000 
+lumi              lnN      1.025           1.025           1.025         1.025
 #xsec_Sll          lnN     2.186           -               -             -
 #xsec_Zleplep      lnN     -               1.50            -             -
 signal_region autoMCStats 0
