@@ -160,7 +160,7 @@ ctf_plot_param['m_inv'] = {
 ctf_plot_param['mrec'] = {
 'xmin':-5, 
 'xmax':30,
-'nbins':1, 
+'nbins':35, 
 'ymin':50000, 
 'ymax':100,
 'xvar':'m_rec',
@@ -666,8 +666,8 @@ for fs_chn in channels:
 			b.rebin() 
 			binning[fs_chn][pd_chn] = array('d',b.getBinArray()) #enforcing type 
 		elif bin_option == "manual":
-			#binning['muon'] = OrderedDict()
-			#'''
+			binning['muon'] = OrderedDict()
+			'''
 			x_cur = ctf_plot_param['mrec']['xmin']
 			binning[fs_chn][pd_chn] = array('d')
 			while x_cur <= ctf_plot_param['mrec']['xmax']:
@@ -698,7 +698,7 @@ for fs_chn in channels:
 #			binning['muon']['25'] = array('d', [-5,25,26,27,28,30.0])
 #			binning[fs_chn]['25'] = array('d', [-5,-4.5,-4,-3.5,-3,-2.5,-2,-1.5,-1,-0.5,0,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,9, 10,12, 15, 20, 30.0])
 			#binning[fs_chn][pd_chn] = array('d',binning[fs_chn][pd_chn])
-			'''
+			#'''
 print binning
 
 bkg_mrec_hists_rebin = OrderedDict()
