@@ -16,7 +16,7 @@ delphes_path = '/scratch5/arapyan/fcc_ee/scalar_delphes_idea/'
 plot_path = '../plots/'
 table_path = '../tables/'
 hist_path = '../hists/'
-combine_path = '../combine/unbinned'
+combine_path = '../combine/'
 #output_suffix = 'IDEA_500MeV_no_photon_veto'
 output_suffix = 'IDEA_500MeV'
 ctf_hist_file = ROOT.TFile(hist_path + "cutflow_hists_" + output_suffix + ".root",
@@ -160,7 +160,7 @@ ctf_plot_param['m_inv'] = {
 ctf_plot_param['mrec'] = {
 'xmin':-5, 
 'xmax':30,
-'nbins':35, 
+'nbins':1, 
 'ymin':50000, 
 'ymax':100,
 'xvar':'m_rec',
@@ -173,28 +173,28 @@ max_sig_stat = OrderedDict() # for signal
 for fs_chn in channels:
 	max_stat[fs_chn] = OrderedDict()
 	max_sig_stat[fs_chn] = OrderedDict()
-max_stat['electron']['0p5'] = 0.4
-max_sig_stat['electron']['0p5'] = 0.2
-max_stat['electron']['2'] = 0.25
-max_sig_stat['electron']['2'] = 0.25
-max_stat['electron']['5'] = 0.3
-max_sig_stat['electron']['5'] = 0.3
-max_stat['electron']['10'] = 0.43
-max_sig_stat['electron']['10'] = 0.43
+max_stat['electron']['0p5'] = 0.2
+max_sig_stat['electron']['0p5'] = 0.15
+max_stat['electron']['2'] = 0.2
+max_sig_stat['electron']['2'] = 0.2
+max_stat['electron']['5'] = 0.25
+max_sig_stat['electron']['5'] = 0.25
+max_stat['electron']['10'] = 0.35
+max_sig_stat['electron']['10'] = 0.35
 max_stat['electron']['15'] = 0.5
 max_sig_stat['electron']['15'] = 1000
 max_stat['electron']['25'] = 0.25
 max_sig_stat['electron']['25'] = 0.25
-max_stat['muon']['0p5'] = 0.25
-max_sig_stat['muon']['0p5'] = 0.05#0.06
-max_stat['muon']['2'] =  0.25
-max_sig_stat['muon']['2'] = 0.25
-max_stat['muon']['5'] = 0.2
-max_sig_stat['muon']['5'] = 0.2
+max_stat['muon']['0p5'] = 0.2
+max_sig_stat['muon']['0p5'] = 0.15#0.06
+max_stat['muon']['2'] =  0.2
+max_sig_stat['muon']['2'] = 0.2
+max_stat['muon']['5'] = 0.25
+max_sig_stat['muon']['5'] = 0.25
 max_stat['muon']['10'] =  0.3
-max_sig_stat['muon']['10'] = 0.12
+max_sig_stat['muon']['10'] = 0.3
 max_stat['muon']['15'] =  0.2
-max_sig_stat['muon']['15'] =1000 
+max_sig_stat['muon']['15'] =0.3
 max_stat['muon']['25'] = 0.3
 max_sig_stat['muon']['25'] = 0.3
 for cutname, params in ctf_plot_param.items():
@@ -678,10 +678,14 @@ for fs_chn in channels:
 			binning[fs_chn]['0p5'] = array('d', [-5.0,-3.0,-2.0, -1.0, 1.0,2.0, 3.0,5.0, 7.0, 12.0, 30.0])
 #			binning[fs_chn]['2'] = array('d', [-5.0, -3, -1,1,3, 6.0, 8.0, 11.0, 30.0])
 			binning['electron']['2'] = array('d', [-5.0, -2.0, -1.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 12.0, 19.0, 30.0])
-			binning['muon']['2'] = array('d', [-5.0, -2.5, 0.0,2.0, 4.0, 6.0, 8.0, 12.0, 30.0])
-			binning['muon']['5'] = array('d', [-5.0, 2, 4.0, 6.0, 8, 12.0, 30.0]) 
-			binning['electron']['5'] = array('d', [-5.0,2, 4.0, 6.0, 8.0, 12.0, 30.0])
-			binning[fs_chn]['10'] = array('d', [-5.0, 0.0, 4.0, 9, 15.0,  30.0])
+#			binning['muon']['2'] = array('d', [-5.0, -2.5, 0.0,2.0, 4.0, 6.0, 8.0, 12.0, 30.0])
+			binning['muon']['2'] = array('d', [-5.0, -3.0, -2.0, -1.0, 1.0, 2.0, 3.0, 4.0, 5.0, 7.0, 9.0, 13.0, 14.0, 16.0, 17.0, 20.0, 24.0, 30.0])
+			binning['muon']['5'] = array('d', [-5.0, -2,0,2, 4.0, 6.0, 8, 12, 30.0]) 
+			binning['electron']['5'] = array('d', [-5.0,-2,0, 2, 4.0, 6.0, 8.0, 12.0, 30.0])
+			#binning['muon']['10'] = array('d', [-5.0, 0.0, 4.0, 9, 15.0,  30.0])
+			binning['electron']['10'] = array('d', [-5.0, 10.0, 12.0, 13.0, 16.0, 17.0, 18.0, 19.0, 20.0, 21.0, 23.0, 30.0])
+			#binning['muon']['10'] = array('d', [-5.0, 10.0, 12.0, 13.0, 16.0, 17.0, 18.0, 19.0, 20.0, 21.0, 23.0, 30.0])
+			binning['muon']['10'] = array('d', [-5.0, 10.0, 13.0, 14.0, 15.0, 16.0, 17.0, 19.0, 21.0, 25.0, 30.0])
 #			binning[fs_chn]['10'] = array('d', [-5.0, 0.0, 4.0, 8.0, 12.0, 16.0, 30.0])
 
 #			binning[fs_chn]['15'] = array('d', [-5, 10, 18, 30.0])
@@ -690,7 +694,8 @@ for fs_chn in channels:
 			binning['muon']['15'] = array('d', [-5.0, 16, 19,20, 21.0, 22.0, 23.0, 24.0, 27.0, 30.0])
 			binning['electron']['15'] = array('d', [-5.0, 16.0, 17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 28.0, 30.0])
 			binning['electron']['25'] = array('d', [-5.0, 25.0, 26.0, 27.0, 28.0, 30.0])
-			binning['muon']['25'] = array('d', [-5,25,26,27,28,30.0])
+			binning['muon']['25'] = array('d', [-5.0, 25.0, 26.0, 27.0, 28.0, 30.0])
+#			binning['muon']['25'] = array('d', [-5,25,26,27,28,30.0])
 #			binning[fs_chn]['25'] = array('d', [-5,-4.5,-4,-3.5,-3,-2.5,-2,-1.5,-1,-0.5,0,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,9, 10,12, 15, 20, 30.0])
 			#binning[fs_chn][pd_chn] = array('d',binning[fs_chn][pd_chn])
 			'''

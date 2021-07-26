@@ -182,7 +182,7 @@ def makePlotUpperLimit():
     latex.SetTextColor(1)
     latex.SetTextFont(42)
     latex.SetTextAlign(33)
-    latex.DrawLatex(0.95, 0.995, "\mathrm{L}_{int} = 150 ab^{-1} \sqrt{s} = 91GeV ")
+    latex.DrawLatex(0.95, 0.995, "\mathrm{L}_{int} = 150 ab^{-1} (91 GeV) ")
 
     # draw CMS preliminary
     latex.SetTextAlign(13)
@@ -217,7 +217,7 @@ if __name__ == "__main__":
     cfg_xtitle = "m_{S^{0}} (GeV)"
     cfg_ytitle = " limit on k for (#sigma_{S^{0}Z^{0}} = k * #sigma_{H^{0}Z^{0}} (m_{H^{0}_{SM}} = m_{S^{0}}))"
     
-    cfg_ymin, cfg_ymax = 0.002, 0.6
+    cfg_ymin, cfg_ymax = 0.01,10 
     
     fout = "limitPlot_IDEA_500MeV_auto.png"
 

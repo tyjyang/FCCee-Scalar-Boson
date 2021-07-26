@@ -1,7 +1,7 @@
 Combination of datacard_electron_5_manual.txt  datacard_muon_5_manual.txt
-imax * number of bins
+imax 2 number of bins
 jmax 3 number of processes minus 1
-kmax 1 number of nuisance parameters
+kmax * number of nuisance parameters
 ----------------------------------------------------------------------------------------------------------------------------------
 shapes 2f        ch1       mrec_electron_5_IDEA_500MeV_manual.root hist_electron_2f_mrec
 shapes 4f        ch1       mrec_electron_5_IDEA_500MeV_manual.root hist_electron_4f-4l_mrec
@@ -22,6 +22,6 @@ process                         Sll        4f         2f         4fqq       Sll 
 process                         0          1          2          3          0          1          2          3        
 rate                            -1         -1         -1         -1         -1         -1         -1         -1       
 ----------------------------------------------------------------------------------------------------------------------------------
-lumi                    lnN    1.025      1.025      1.025       1.025      1.025      1.025      1.025      1.025 
+#lumi                    lnN    1.025      1.025      1.025       1.025      1.025      1.025      1.025      1.025 
 ch1 autoMCStats 0 0 1
 ch2 autoMCStats 0 0 1
