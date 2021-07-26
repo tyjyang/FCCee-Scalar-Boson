@@ -173,12 +173,12 @@ max_sig_stat = OrderedDict() # for signal
 for fs_chn in channels:
 	max_stat[fs_chn] = OrderedDict()
 	max_sig_stat[fs_chn] = OrderedDict()
-max_stat['electron']['0p5'] = 0.2
-max_sig_stat['electron']['0p5'] = 0.02
+max_stat['electron']['0p5'] = 0.4
+max_sig_stat['electron']['0p5'] = 0.2
 max_stat['electron']['2'] = 0.25
 max_sig_stat['electron']['2'] = 0.25
-max_stat['electron']['5'] = 0.2
-max_sig_stat['electron']['5'] = 0.2
+max_stat['electron']['5'] = 0.3
+max_sig_stat['electron']['5'] = 0.3
 max_stat['electron']['10'] = 0.43
 max_sig_stat['electron']['10'] = 0.43
 max_stat['electron']['15'] = 0.5
@@ -225,9 +225,9 @@ bkg_fillcolors = {
 bkg_linewidth = 1
 bkg_linestyle = 1
 
-hist_label_size = 0.04
+axis_title_size = 0.08
+ROOT.gStyle.SetLabelSize(.05, "XY")
 ## stacks and pads
-axis_title_textsize = 0.05
 sig_stack_options = "hist, same, nostack"
 bkg_stack_options = "hist"
 pad_ymax_ratio = {'linear': 1.2, 'logy': 5} # the ratio between the y upper bound
@@ -248,14 +248,15 @@ arrow_linewidth = 2
 ## canvas 
 hist_pixel_x = 600
 hist_pixel_y = 450
-num_hist_x = 3
-num_hist_y = 2
-ROOT.gStyle.SetHistTopMargin(0)
-ROOT.gStyle.SetLegendTextSize(0.05)
+num_hist_x = 2
+num_hist_y = 3
+#ROOT.gStyle.SetHistTopMargin(0)
+ROOT.gStyle.SetLegendTextSize(0.1)
 #ROOT.gStyle.SetTitleFontSize(0.1)
 #ROOT.gStyle.SetHistBottomMargin(0)
 #ROOT.gStyle.SetPadTopMargin(0)
-#ROOT.gStyle.SetPadBottomMargin(0)
+ROOT.gStyle.SetPadBottomMargin(.15)
+ROOT.gStyle.SetPadLeftMargin(.15)
 canvas_titles = OrderedDict()
 canvas_title_x = 0.1
 canvas_title_y = 0.9
@@ -264,13 +265,14 @@ canvas_titles['muon']     = "#mu^{+}#mu^{-} events"
 canvas_title_x = 0.1
 canvas_title_y = 0.9
 canvas_title_textsize = 0.15
+canvas_left_margin = 0.2
 pad_title_x = 0.4
-pad_title_y = 0.95
+pad_title_y = 0.92
 pad_title_textsize = 0.1
 ## legends
 legend_x_bl = 0.1 # x-coordinate of the bottom left point of the legend box
-legend_y_bl = 0.6
-legend_x_tr = 0.6
+legend_y_bl = 0.2
+legend_x_tr = 0.85
 legend_y_tr = 0.85
 sig_legend_entry = OrderedDict()
 bkg_legend_entry = OrderedDict()
@@ -384,7 +386,7 @@ for fs_chn in channels:
 #######################
 # make cutflow plots #
 #######################
-'''
+#'''
 sig_hists = OrderedDict()
 bkg_hists = OrderedDict()
 sig_mrec_hists = OrderedDict()  
@@ -493,10 +495,11 @@ for fs_chn in channels:
 		ctf_plot_param[cutname]['xtitle'])
 		bkg_stacks[fs_chn][cutname].GetHistogram().SetYTitle(
 		ctf_plot_param[cutname]['ytitle'])
-		bkg_stacks[fs_chn][cutname].GetHistogram().SetTitleSize(
-		axis_title_textsize, "xy")
-		bkg_stacks[fs_chn][cutname].GetHistogram().SetLabelSize(
-			hist_label_size, "xy"
+		bkg_stacks[fs_chn][cutname].GetHistogram().GetXaxis().SetTitleSize(
+			axis_title_size
+		)
+		bkg_stacks[fs_chn][cutname].GetHistogram().GetYaxis().SetTitleSize(
+			axis_title_size
 		)
 		ROOT.gPad.Update()
 		sig_stacks[fs_chn][cutname].SetMinimum(ctf_plot_param[cutname]['ymin'])
@@ -558,7 +561,7 @@ for fs_chn in channels:
 	canvas_title.Draw()
 	canvases[fs_chn].Print(plot_path + fs_chn + '_cutflow_plot_' + output_suffix
 	                       + ".png")
-'''
+#'''
 ###############
 # mrec plots #
 ###############
@@ -663,8 +666,8 @@ for fs_chn in channels:
 			b.rebin() 
 			binning[fs_chn][pd_chn] = array('d',b.getBinArray()) #enforcing type 
 		elif bin_option == "manual":
-			#binning['muon'] = OrderedDict()
-			
+			binning['muon'] = OrderedDict()
+			'''
 			x_cur = ctf_plot_param['mrec']['xmin']
 			binning[fs_chn][pd_chn] = array('d')
 			while x_cur <= ctf_plot_param['mrec']['xmax']:
@@ -673,21 +676,23 @@ for fs_chn in channels:
 			
 			'''
 			binning[fs_chn]['0p5'] = array('d', [-5.0,-3.0,-2.0, -1.0, 1.0,2.0, 3.0,5.0, 7.0, 12.0, 30.0])
-			binning[fs_chn]['2'] = array('d', [-5.0, -3, -1,1,3, 6.0, 8.0, 11.0, 30.0])
-			# before binning[fs_chn]['5'] = array('d', [-5.0, -2.5, 0.0,2.0, 4.0, 6.0, 8.0, 12.0, 30.0])
-			binning['muon']['5'] = array('d', [-5.0, 4.0, 6.0, 9.0, 16.0, 30.0]) 
-			binning['electron']['5'] = array('d', [-5.0, 4.0, 5.0, 6.0, 9.0, 10.0, 17.0, 30.0])
+#			binning[fs_chn]['2'] = array('d', [-5.0, -3, -1,1,3, 6.0, 8.0, 11.0, 30.0])
+			binning['electron']['2'] = array('d', [-5.0, -2.0, -1.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 12.0, 19.0, 30.0])
+			binning['muon']['2'] = array('d', [-5.0, -2.5, 0.0,2.0, 4.0, 6.0, 8.0, 12.0, 30.0])
+			binning['muon']['5'] = array('d', [-5.0, 2, 4.0, 6.0, 8, 12.0, 30.0]) 
+			binning['electron']['5'] = array('d', [-5.0, 4.0, 6.0, 9.0, 16.0, 30.0])
 			binning[fs_chn]['10'] = array('d', [-5.0, 0.0, 4.0, 9, 15.0,  30.0])
 #			binning[fs_chn]['10'] = array('d', [-5.0, 0.0, 4.0, 8.0, 12.0, 16.0, 30.0])
 
 #			binning[fs_chn]['15'] = array('d', [-5, 10, 18, 30.0])
 #			binning[fs_chn]['15'] = array('d', [-5,-3,-2,0,2.5,5,7.5,10,14,16,18,22,30])
 #			binning[fs_chn]['15'] = array('d', [-5.0, 16.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 27.0, 30.0])
-			binning[fs_chn]['15'] = array('d', [-5.0, 16, 19,20, 21.0, 22.0, 23.0, 24.0, 27.0, 30.0])
-			binning[fs_chn]['25'] = array('d', [-5,25,26,27,28,30.0])
+			binning['muon']['15'] = array('d', [-5.0, 16, 19,20, 21.0, 22.0, 23.0, 24.0, 27.0, 30.0])
+			binning['electron']['15'] = array('d', [-5.0, 16.0, 17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 28.0, 30.0])
+			binning['electron']['25'] = array('d', [-5.0, 25.0, 26.0, 27.0, 28.0, 30.0])
+			binning['muon']['25'] = array('d', [-5,25,26,27,28,30.0])
 #			binning[fs_chn]['25'] = array('d', [-5,-4.5,-4,-3.5,-3,-2.5,-2,-1.5,-1,-0.5,0,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,9, 10,12, 15, 20, 30.0])
 			#binning[fs_chn][pd_chn] = array('d',binning[fs_chn][pd_chn])
-			'''
 print binning
 
 bkg_mrec_hists_rebin = OrderedDict()
@@ -758,7 +763,8 @@ for fs_chn in channels:
 				bkg_linestyle)
 			bkg_mrec_stack_rebin[fs_chn][sig_pd_chn].Add(
 				bkg_mrec_hists_rebin[fs_chn][sig_pd_chn][bkg_pd_chn]
-			) 
+			)
+			ROOT.gPad.Modified() 
 			bkg_mrec_hists_rebin[fs_chn][sig_pd_chn][bkg_pd_chn].Sumw2()
 			bkg_mrec_hists_rebin[fs_chn][sig_pd_chn][bkg_pd_chn].Write()
 
@@ -789,11 +795,15 @@ for fs_chn in channels:
 			ctf_plot_param['mrec']['xtitle'])
 		bkg_mrec_stack_rebin[fs_chn][sig_pd_chn].GetHistogram().SetYTitle(
 			'Events/bin')
-		bkg_mrec_stack_rebin[fs_chn][sig_pd_chn].GetHistogram().SetTitleSize(
-			axis_title_textsize, "xy")
-		bkg_mrec_stack_rebin[fs_chn][sig_pd_chn].GetHistogram().SetLabelSize(
-			hist_label_size, "xy"
+#		bkg_mrec_stack_rebin[fs_chn][sig_pd_chn].GetHistogram().SetTitleSize(
+#			axis_label_textsize, "xy")
+		bkg_mrec_stack_rebin[fs_chn][sig_pd_chn].GetHistogram().GetXaxis().SetTitleSize(
+			axis_title_size
 		)
+		bkg_mrec_stack_rebin[fs_chn][sig_pd_chn].GetHistogram().GetYaxis().SetTitleSize(
+			axis_title_size
+		)
+		ROOT.gPad.Modified()
 		ROOT.gPad.Update()
 		sig_mrec_hists_rebin[fs_chn][sig_pd_chn].SetMinimum(
 			ctf_plot_param['mrec']['ymin'])
