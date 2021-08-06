@@ -11,7 +11,7 @@ oldargv = sys.argv[:]
 import ROOT
 import numpy as np
 from helper import *
-
+from array import array
 '''
 INPUT -------------------------------------------------------------------------
 |* NONE
@@ -219,7 +219,7 @@ OUTPUT ------------------------------------------------------------------------
 +------------------------------------------------------------------------------ 
 ''' 
 def select_ptcl_var_highest(delphes_file, event, particles, var, var_in_delphes,
-                                candidates="all"):
+                                candidates="all", cand_subset_size = 1):
 	particles = string_to_list(particles)
 	# overwrite particles passed in with particles contained in the pre-selected
 	# candidate set
@@ -230,7 +230,7 @@ def select_ptcl_var_highest(delphes_file, event, particles, var, var_in_delphes,
 	var_max = 0
 	for i_ptcl, ptcl in enumerate(particles):
 		if candidates == "all":
-			ptcl_cands = get_idx_candidate_sets(event, ptcl, subset_size = 2)
+			ptcl_cands = get_idx_candidate_sets(event, ptcl, cand_subset_size)
 		elif candidates == 0:
 			return 0
 		else:
@@ -342,7 +342,7 @@ ROUTINE -----------------------------------------------------------------------
 |* sort each list passed in
 | 
 OUTPUT ------------------------------------------------------------------------
-|* list(str) the sorted variables 
+|* list(list(str)) the sorted variables 
 +------------------------------------------------------------------------------ 
 ''' 
 def sort_separated_vars(*var_lists):
@@ -356,6 +356,7 @@ INPUT -------------------------------------------------------------------------
 |* (dict) particle_variable: the dictionary specifying which 
 |         variables are to be extracted from each particle.
 |         e.g. particle_variable = {"electron":["pt", "eta", "phi"]}
+|* list(str) photon_vars: the list of photon vars to be appended to each ptcl tree
 |* (bool) flatten_vars: option to create col names to put all vars into one row
 |* (bool) sort_each_var: option to sort the multi-valued vars when flattening
 |                       If TRUE, write the col names as leading_var, trailing_var
@@ -380,7 +381,7 @@ OUTPUT ------------------------------------------------------------------------
 |* {(str) "particle":(TNtuple) ntuple_tree} the dict containing all trees
 +------------------------------------------------------------------------------ 
 ''' 
-def create_ntuple_trees(particle_variable, flatten_vars = False,
+def create_ntuple_trees(particle_variable, photon_vars, flatten_vars = False,
                         sort_each_var = False, num_ptcl_per_evt = 2):
 	ntuple_tree = {}
 	particles = particle_variable.keys()
@@ -390,6 +391,10 @@ def create_ntuple_trees(particle_variable, flatten_vars = False,
 		variables = particle_variable[particle]
 		a,b,c,d = sep_vars_into_delph_calc_ptcl_evt(variables)
 		sorted_var_lists = sort_separated_vars(a,b,c,d)
+		photon_colnames = []
+		for i, photon_var in enumerate(photon_vars):
+			photon_colnames.append('photon_' + photon_var)
+		sorted_var_lists.append(photon_colnames)
 		sorted_vars = []
 		for var_list in sorted_var_lists:
 			for var in var_list:
@@ -401,10 +406,10 @@ def create_ntuple_trees(particle_variable, flatten_vars = False,
 					num_ptcl_for_var = 1
 				elif var in b or var in d:
 					num_ptcl_for_var = num_ptcl_per_evt
-				else:
+				elif var in c:
 					num_ptcl_for_var = get_num_ptcl_to_calc_var(var)
 				num_val = num_ptcl_per_evt / num_ptcl_for_var
-				if num_val == 2:
+				if num_val == 2 and (var in a or var in b or var in c or var in d):
 					if sort_each_var:
 						sorted_vars[i_var] = ['leading_'+var, 'trailing_'+var]
 					else:
@@ -414,6 +419,7 @@ def create_ntuple_trees(particle_variable, flatten_vars = False,
 			sorted_vars = flatten_var_val_arrays(False, sorted_vars)
 		column_separator = ":"
 		variables_combined = column_separator.join(sorted_vars)
+		print variables_combined
 		ntuple_tree[particle] = ROOT.TNtuple(particle, "Flat ntuple tree for " 
 		                                     + particle, variables_combined)
 	return ntuple_tree
@@ -427,8 +433,10 @@ INPUT -------------------------------------------------------------------------
 |                     keys are ptcl name in str, values are TTree for the ptcl
 |* (TObject) event: the delphes event to look at
 |* (dict) ptcl_cand: keys are ptcl name in str, values are list(int) cand idx
+|* (dict) photon_cand: key is 'photon', value is cand int idx
 |* list(str) variables: the vars to be written to the ntuple tree. 
 |                       must be same for all ptcl
+|* list(str) photon_vars: the list of photon vars to be appended to each ptcl tree
 |* (bool) flatten_vars: option to write all variables from one evt in one row
 |* (bool) sort_each_var: option to sort multi-value variables in descending order
 |
@@ -451,8 +459,10 @@ OUTPUT ------------------------------------------------------------------------
 |* NONE
 +------------------------------------------------------------------------------
 '''
-def write_to_ntuple_tree(delphes_file, tree_chain, event, ptcl_cand, variables,
-                         flatten_vars = False, sort_each_var = False):
+def write_to_ntuple_tree(
+	delphes_file, tree_chain, event, ptcl_cand, photon_cand, variables, photon_vars,
+	flatten_vars = False, sort_each_var = False
+):
 	particles = ptcl_cand.keys()
 	if len(particles) > 1: sys.exit("only one ptcl species can be wrtn per evt")
 	else: ptcl = list_to_string(particles)
@@ -467,11 +477,17 @@ def write_to_ntuple_tree(delphes_file, tree_chain, event, ptcl_cand, variables,
 	arr_calc_ptcl = calc_ptcl_var_by_idx(delphes_file, event, ptcl_cand,
 	                                     ptcl_var_calc)
 	arr_calc_evt = calc_evt_var(delphes_file, event, evt_var_calc)
+	if not (photon_cand):
+		arr_photon = np.zeros([len(photon_vars), 1])
+	else:
+		arr_photon = get_ptcl_var_by_idx(
+			event, 'photon', photon_cand['photon'], photon_vars
+		)
 	arr_all_var = concatenate_var_val_arrays(arr_delphes_ptcl, arr_delphes_evt,
-	                                         arr_calc_ptcl, arr_calc_evt)
+	                                         arr_calc_ptcl, arr_calc_evt, arr_photon)
 	if flatten_vars:
-		var_data = flatten_var_val_arrays(sort_each_var, arr_all_var)
-		tree_chain[ptcl].Fill(*var_data)
+		var_data = array('f', flatten_var_val_arrays(sort_each_var, arr_all_var))
+		tree_chain[ptcl].Fill(var_data)
 	else:
 		var_data = rectangularize_jagged_array_T(arr_all_var)
 		for i in range(len(var_data)):

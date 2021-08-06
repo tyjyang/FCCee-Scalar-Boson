@@ -11,7 +11,7 @@ from array import array
 # I/O variables #
 ##################
 #ntuple_path = '../ntuples-no-photon-veto/'
-ntuple_path = '../ntuples_IDEA_500MeV/'
+ntuple_path = '../ntuples_IDEA_500MeV_w_RECO_photons/'
 delphes_path = '/scratch5/arapyan/fcc_ee/scalar_delphes_idea/'
 plot_path = '../plots/'
 table_path = '../tables/'
@@ -77,6 +77,9 @@ cut_bounds['muon']    ['momentum']      = [30      , 'infty']
 cut_bounds['muon']    ['missing_angle'] = ['-infty', 0.98   ]
 cut_bounds['muon']    ['m_inv']         = [20      , 100    ]
 
+cuts['electron']['photon_veto'] = "photon_pt < 1.0"
+cuts['muon']['photon_veto'] = cuts['electron']['photon_veto']
+photon_suffix = "photon_pt<1GeV"
 cuts['electron']['alpha']  = "alpha > 0.11 && alpha < 2.0"
 cuts['muon']['alpha']      = cuts['electron']['alpha']
 
@@ -346,19 +349,6 @@ ctf_hist_file.cd()
 ''' preamble ends here '''
 ''' script procedures below '''
 
-########################
-# make cutflow tables #
-########################
-'''
-
-md_table_string = ctf.make_cutflow_table(sig_trees, sig_w, bkg_trees, bkg_w,
-                                         delphes_path, sig_ntuple_filepaths, cuts,
-                                         sig_eff = False)
-for chn, table in md_table_string.items():
-	mdfile = open(table_path + chn + "_cutflow_table_" + output_suffix + ".md", "w")
-	mdfile.write(table)
-	mdfile.close()
-'''
 
 ######################################
 # merge trees from same bkg channel #
@@ -382,6 +372,20 @@ for fs_chn in channels:
 		if fs_chn == channels[-1]: # change the weight dict for only once
 			bkg_w[merged_treename] = bkg_trees[fs_chn][merged_treename].GetWeight()
 			for t in treenames_to_merge: del bkg_w[t]
+
+########################
+# make cutflow tables #
+########################
+
+md_table_string = ctf.make_cutflow_table(sig_trees, sig_w, bkg_trees, bkg_w,
+                                         delphes_path, sig_ntuple_filepaths, cuts,
+                                         sig_eff = True)
+for chn, table in md_table_string.items():
+	mdfile = open(
+		table_path + chn + "-cutflow_table-" + output_suffix + 
+		"-" + photon_suffix + ".md", "w")
+	mdfile.write(table)
+	mdfile.close()
 
 #######################
 # make cutflow plots #
@@ -562,6 +566,7 @@ for fs_chn in channels:
 	canvases[fs_chn].Print(plot_path + fs_chn + '_cutflow_plot_' + output_suffix
 	                       + ".png")
 '''
+'''
 ###############
 # mrec plots #
 ###############
@@ -667,14 +672,14 @@ for fs_chn in channels:
 			binning[fs_chn][pd_chn] = array('d',b.getBinArray()) #enforcing type 
 		elif bin_option == "manual":
 			binning['muon'] = OrderedDict()
-			'''
+			
 			x_cur = ctf_plot_param['mrec']['xmin']
 			binning[fs_chn][pd_chn] = array('d')
 			while x_cur <= ctf_plot_param['mrec']['xmax']:
 				binning[fs_chn][pd_chn].append(x_cur)
 				x_cur += ctf_plot_param['mrec']['binsize']
 			
-			'''
+			
 			binning[fs_chn]['0p5'] = array('d', [-5.0,-3.0,-2.0, -1.0, 1.0,2.0, 3.0,5.0, 7.0, 12.0, 30.0])
 #			binning[fs_chn]['2'] = array('d', [-5.0, -3, -1,1,3, 6.0, 8.0, 11.0, 30.0])
 			binning['electron']['2'] = array('d', [-5.0, -2.0, -1.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 12.0, 19.0, 30.0])
@@ -698,7 +703,6 @@ for fs_chn in channels:
 #			binning['muon']['25'] = array('d', [-5,25,26,27,28,30.0])
 #			binning[fs_chn]['25'] = array('d', [-5,-4.5,-4,-3.5,-3,-2.5,-2,-1.5,-1,-0.5,0,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,9, 10,12, 15, 20, 30.0])
 			#binning[fs_chn][pd_chn] = array('d',binning[fs_chn][pd_chn])
-			#'''
 print binning
 
 bkg_mrec_hists_rebin = OrderedDict()
@@ -843,3 +847,4 @@ ctf_hist_file.Close()
 #for key, f in bkg_ntuple_filepaths.items():
 #	delphes_filepath = delphes_path + hlp.get_delphes_filename(f)
 #	print key, hlp.get_num_evts(delphes_filepath, "Delphes")
+'''
