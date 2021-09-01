@@ -77,9 +77,70 @@ cut_bounds['muon']    ['momentum']      = [30      , 'infty']
 cut_bounds['muon']    ['missing_angle'] = ['-infty', 0.98   ]
 cut_bounds['muon']    ['m_inv']         = [20      , 100    ]
 
-cuts['electron']['photon_veto'] = "photon_pt < 1.0"
-cuts['muon']['photon_veto'] = cuts['electron']['photon_veto']
-photon_suffix = "photon_pt<1GeV"
+photon_dielectron_mrec = (
+"("
+	"(91 - TMath::Sqrt(pow(pt_1      * cosh(eta_1     ), 2.0) + pow(0.000511,2.0))"
+	    "- TMath::Sqrt(pow(pt_2      * cosh(eta_2     ), 2.0) + pow(0.000511,2.0))"
+	    "- photon_energy"   
+	") -"
+	"(pow(pt_1      * TMath::Cos(phi_1     ) +" 
+         "pt_2      * TMath::Cos(phi_2     ) +" 
+	     "photon_pt * TMath::Cos(photon_phi) , 2.0) +"
+	 "pow(pt_1      * TMath::Sin(phi_1     ) +" 
+         "pt_2      * TMath::Sin(phi_2     ) +" 
+	     "photon_pt * TMath::Sin(photon_phi) , 2.0) +"
+	 "pow(pt_1      * sinh      (eta_1     ) +" 
+         "pt_2      * sinh      (eta_2     ) +" 
+	     "photon_pt * sinh      (photon_eta) , 2.0) )"
+")" 
+)
+photon_dimuon_mrec = (
+"("
+	"(91 - TMath::Sqrt(pow(pt_1      * cosh(eta_1     ), 2.0) + pow(0.1057,2.0))"
+	    "- TMath::Sqrt(pow(pt_2      * cosh(eta_2     ), 2.0) + pow(0.1057,2.0))"
+	    "- photon_energy"   
+	") -"
+	"(pow(pt_1      * TMath::Cos(phi_1     ) +" 
+         "pt_2      * TMath::Cos(phi_2     ) +" 
+	     "photon_pt * TMath::Cos(photon_phi) , 2.0) +"
+	 "pow(pt_1      * TMath::Sin(phi_1     ) +" 
+         "pt_2      * TMath::Sin(phi_2     ) +" 
+	     "photon_pt * TMath::Sin(photon_phi) , 2.0) +"
+	 "pow(pt_1      * sinh      (eta_1     ) +" 
+         "pt_2      * sinh      (eta_2     ) +" 
+	     "photon_pt * sinh      (photon_eta) , 2.0) )"
+")" 
+)
+photon_dilepton_angle = (
+"TMath::ACos("
+	"("
+		"(pt_1 * TMath::Cos(phi_1) + pt_2 * TMath::Cos(phi_2)) *"
+		"(photon_pt * TMath::Cos(photon_phi)) +"
+		"(pt_1 * TMath::Sin(phi_1) + pt_2 * TMath::Sin(phi_2)) *" 
+		"(photon_pt * TMath::Sin(photon_phi)) +"
+		"(pt_1 * sinh(eta_1)       + pt_2 * sinh(eta_2)      ) *" 
+		"(photon_pt * sinh(photon_eta)      )" 
+	") / "
+	"("
+		"TMath::Sqrt("
+			"pow(pt_1 * TMath::Cos(phi_1) + pt_2 * TMath::Cos(phi_2) , 2.0) +"
+			"pow(pt_1 * TMath::Sin(phi_1) + pt_2 * TMath::Sin(phi_2) , 2.0) +"
+			"pow(pt_1 * sinh(eta_1)       + pt_2 * sinh(eta_2)       , 2.0)" 
+		") * photon_energy"
+	")"
+")"
+)
+cuts['electron']['photon_veto'] = ("(photon_pt < 1.0 && " +
+photon_dilepton_angle +
+" < 0.98 * TMath::Pi()"
+")"
+)
+cuts['muon'    ]['photon_veto'] = ("(photon_pt < 1.0 && " +
+photon_dilepton_angle +
+" < 0.98 * TMath::Pi()"
+")"
+)
+photon_suffix = "photon_pt<1GeV-angle<0.98Pi"
 cuts['electron']['alpha']  = "alpha > 0.11 && alpha < 2.0"
 cuts['muon']['alpha']      = cuts['electron']['alpha']
 

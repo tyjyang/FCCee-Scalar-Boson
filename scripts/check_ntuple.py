@@ -1,4 +1,4 @@
-#######################################################
+r######################################################
 # README
 # This is the verbose version of the cutflow script. 
 # For reference purposes only, 
@@ -76,6 +76,12 @@ ntuple_files = {}
 electrons = OrderedDict()
 muons = OrderedDict()
 w = {}
+for key, f in sig_ntuple_filepaths.items():
+	ntuple_files[key] = ROOT.TFile.Open(f)
+	electrons[key] = ntuple_files[key].Get('electron')
+	muons[key] = ntuple_files[key].Get('muon')
+	delphes_file = hlp.get_delphes_filename(f)
+	delphes_filepath = delphes_path + delphes_file
 for key, f in sig_ntuple_filepaths.items():
 	ntuple_files[key] = ROOT.TFile.Open(f)
 	electrons[key] = ntuple_files[key].Get('electron')
@@ -1677,12 +1683,6 @@ hist_mu_tot_5_rec.Write()
 hist_mu_tot_10_rec = ROOT.TH1F('tot_10',
                       mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
 hist_mu_tot_10_rec.Add(hist_mu_10_rec)
-hist_mu_tot_10_rec.Add(hist_mu_2f_rec)
-hist_mu_tot_10_rec.Add(hist_mu_4f_rec)
-hist_mu_tot_10_rec.Add(hist_mu_4fqq_rec)
-file_mu_tot_10_rec.cd()
-hist_mu_tot_10_rec.Write()
-hist_mu_tot_15_rec = ROOT.TH1F('tot_15',
                       mu_rec_descrp, mu_rec_nbins, mu_rec_xlow, mu_rec_xhigh)
 hist_mu_tot_15_rec.Add(hist_mu_15_rec)
 hist_mu_tot_15_rec.Add(hist_mu_2f_rec)
