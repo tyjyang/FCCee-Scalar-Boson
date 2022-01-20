@@ -5,10 +5,11 @@ git clone https://github.com/tyjyang/FCCee-Scalar-Boson
 cd FCCee-Scalar-Boson
 source setup.sh
 ```
-Note that you'd have to run `source setup.sh` everytime you log in to a new shell.
-
-It should be noted here that you'd have to **remove any CMSSW setup** and start 
-from a clean shell before `setup.sh` can properly install delphes.
+Things to check for setup errors:
+-   remember to run `source setup.sh` everytime you log in to a new shell.
+-   unset any CMSSW environmental variable and start from a clean shell
+    before `setup.sh` can properly install delphes.
+-   This repo only runs on CentOS7 due to gcc compatibility for delphes.
 
 # Modules
 This repository provides pre-written functions that aims to modularize the 
