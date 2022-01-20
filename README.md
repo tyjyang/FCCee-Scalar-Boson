@@ -42,6 +42,18 @@ Other optional components include:
 the selection functions under `lib/ntuplizer.py` with customary parameters.
 - Efficiency counters for those selection functions.
 
+# Combine
+`scripts/cutflow_in_dev.py` performs event cuts and produces the recoil mass root files under
+`combine/`. It also sets the binning for combine fits. The binning can either be set manually
+or automatically by pre-set statistical constraint.
+
+To use combine, first `source combine/combine-setup.sh` to install combine. Then,
+-   `source combine/run_combined_manual.sh` or `source combine/run_combined_auto.sh`
+    to run the datacards for all recoil mass rootfiles generated with manual/auto binning
+    to get the fit results for signal sensitivity.
+-   `python combine/make_limit_plot.py` to plot the sensitivity vs. recoil mass.
+
+---
 Below are more detailed documentation. Read until this point to learn the basic
 use of the code.
 ---

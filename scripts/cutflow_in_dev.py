@@ -627,7 +627,6 @@ for fs_chn in channels:
 	canvases[fs_chn].Print(plot_path + fs_chn + '_cutflow_plot_' + output_suffix
 	                       + ".png")
 '''
-'''
 ###############
 # mrec plots #
 ###############
@@ -902,10 +901,3 @@ for fs_chn in channels:
 		                          + '_' + bin_option+ "_binning.png")
 
 ctf_hist_file.Close()
-#for key, f in sig_ntuple_filepaths.items():
-#	delphes_filepath = delphes_path + hlp.get_delphes_filename(f)
-#	print key, hlp.get_num_evts(delphes_filepath, "Delphes")
-#for key, f in bkg_ntuple_filepaths.items():
-#	delphes_filepath = delphes_path + hlp.get_delphes_filename(f)
-#	print key, hlp.get_num_evts(delphes_filepath, "Delphes")
-'''
